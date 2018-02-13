@@ -1,4 +1,3 @@
-/.bundle/
 /.yardoc
 /_yardoc/
 /coverage/
@@ -9,3 +8,20 @@
 
 # rspec failure tracking
 .rspec_status
+
+## Environment normalization:
+/.bundle/
+/vendor/bundle
+/lib/bundler/man/
+
+# for a library or gem, you might want to ignore these files since the code is
+# intended to run in multiple environments; otherwise, check them in:
+Gemfile.lock
+.ruby-version
+.ruby-gemset
+
+# additional
+.DS_Store
+*~
+*.swp
+/yang/
