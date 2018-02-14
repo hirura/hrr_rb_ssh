@@ -7,6 +7,10 @@ module HrrRbSsh
       @@logger = logger
     end
 
+    def self.uninitialize
+      @@logger = nil
+    end
+
     def self.initialized?
       @@logger != nil
     end
