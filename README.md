@@ -1,6 +1,8 @@
 # HrrRbSsh
 
 [![Build Status](https://travis-ci.org/hirura/hrr_rb_ssh.svg?branch=master)](https://travis-ci.org/hirura/hrr_rb_ssh)
+[![Maintainability](https://api.codeclimate.com/v1/badges/f5dfdb97d72f24ca5939/maintainability)](https://codeclimate.com/github/hirura/hrr_rb_ssh/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/f5dfdb97d72f24ca5939/test_coverage)](https://codeclimate.com/github/hirura/hrr_rb_ssh/test_coverage)
 
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/hrr_rb_ssh`. To experiment with that code, run `bin/console` for an interactive prompt.
 
