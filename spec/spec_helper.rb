@@ -1,13 +1,13 @@
 require "bundler/setup"
-require "hrr_rb_ssh"
 
 if ENV['CI']
   require 'codeclimate-test-reporter'
   SimpleCov.start do
-    add_filter '/spec/'
-    add_filter '/vendor/'
+    #add_filter '/spec/'
   end
 end
+
+require "hrr_rb_ssh"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
