@@ -37,3 +37,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## Code of Conduct
 
 Everyone interacting in the HrrRbSsh project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/hrr_rb_ssh/blob/master/CODE_OF_CONDUCT.md).
+
+## License
+
+The gem is available as open source under the terms of the [Apache License 2.0](https://opensource.org/licenses/Apache-2.0).
