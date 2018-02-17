@@ -3,6 +3,7 @@
 
 require "hrr_rb_ssh/version"
 require "hrr_rb_ssh/logger"
+require "hrr_rb_ssh/transport"
 
 module HrrRbSsh
   # Your code goes here...
