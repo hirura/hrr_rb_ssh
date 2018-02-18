@@ -234,7 +234,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           [
             "",
             "testing",
-            'abcd' * (0x3fff_ffff) + 'xyz',
+            #'abcd' * (0x3fff_ffff) + 'xyz',
           ].each do |str|
             str_length                = str.length
             str_length_hex_str        = "%08x" % str_length
@@ -282,7 +282,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
       [
         "",
         "testing",
-        'abcd' * (0x3fff_ffff) + 'xyz',
+        #'abcd' * (0x3fff_ffff) + 'xyz',
       ].each do |str|
         str_length                = str.length
         str_length_hex_str        = "%08x" % str_length
@@ -351,7 +351,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
             [],
             ["zlib"],
             ["zlib", "none"],
-            ['ab', 'wxyz' * 0x3fff_ffff],
+            #['ab', 'wxyz' * 0x3fff_ffff],
           ].each do |array|
             str                       = array.join(',')
             str_length                = str.length
@@ -439,7 +439,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
         [],
         ["zlib"],
         ["zlib", "none"],
-        ['ab', 'wxyz' * 0x3fff_ffff],
+        #['ab', 'wxyz' * 0x3fff_ffff],
       ].each do |array|
         str                       = array.join(',')
         str_length                = str.length
