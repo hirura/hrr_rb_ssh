@@ -3,6 +3,7 @@
 
 require 'hrr_rb_ssh/version'
 require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/message'
 require 'hrr_rb_ssh/transport/data_type'
 require 'hrr_rb_ssh/transport/sequence_number'
 require 'hrr_rb_ssh/transport/encryption_algorithm'
