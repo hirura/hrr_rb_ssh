@@ -1,12 +1,9 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/message/020_ssh_msg_kexinit'
+
 module HrrRbSsh
   module Message
-    @@ssh_msg_list ||= Hash.new
-
-    def self.[] key
-      @@ssh_msg_list[key]
-    end
   end
 end
