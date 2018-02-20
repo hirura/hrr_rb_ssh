@@ -1,6 +1,8 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'openssl'
+
 require 'hrr_rb_ssh/logger'
 
 module HrrRbSsh
@@ -106,9 +108,9 @@ module HrrRbSsh
 
       class Mpint
         def self.encode arg
-          raise unless arg.kind_of? Integer
+          raise unless arg.kind_of? ::Integer
           raise if     arg.size > 0xffff_ffff
-          bn = OpenSSL::BN.new(arg)
+          bn = ::OpenSSL::BN.new(arg)
 
           if bn < 0
             # get 2's complement
