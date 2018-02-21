@@ -2,6 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_rsa'
 
 module HrrRbSsh
   class Transport
