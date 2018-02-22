@@ -15,6 +15,10 @@ module HrrRbSsh
           @logger = HrrRbSsh::Logger.new self.class.name
         end
 
+        def block_size
+          0
+        end
+
         def encrypt data
           data
         end

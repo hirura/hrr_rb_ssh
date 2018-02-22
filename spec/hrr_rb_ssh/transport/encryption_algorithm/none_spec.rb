@@ -13,6 +13,12 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::None do
     expect( HrrRbSsh::Transport::EncryptionAlgorithm.name_list ).to include 'none'
   end
 
+  describe '#block_size' do
+    it "returns 0" do
+      expect( encryption_algorithm.block_size ).to eq 0
+    end
+  end
+
   describe '#encrypt' do
     it "returns data without encryption" do
       expect( encryption_algorithm.encrypt test_data ).to eq test_data
