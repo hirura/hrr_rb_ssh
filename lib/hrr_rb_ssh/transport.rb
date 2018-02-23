@@ -8,6 +8,7 @@ require 'hrr_rb_ssh/transport/mode'
 require 'hrr_rb_ssh/transport/data_type'
 require 'hrr_rb_ssh/transport/sequence_number'
 require 'hrr_rb_ssh/transport/sender'
+require 'hrr_rb_ssh/transport/receiver'
 require 'hrr_rb_ssh/transport/kex_algorithm'
 require 'hrr_rb_ssh/transport/server_host_key_algorithm'
 require 'hrr_rb_ssh/transport/encryption_algorithm'
@@ -33,7 +34,8 @@ module HrrRbSsh
 
       @logger = HrrRbSsh::Logger.new self.class.name
 
-      @sender = HrrRbSsh::Transport::Sender.new self
+      @sender   = HrrRbSsh::Transport::Sender.new self
+      @receiver = HrrRbSsh::Transport::Receiver.new self
 
       @incoming_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
       @outgoing_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
