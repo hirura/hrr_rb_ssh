@@ -40,6 +40,10 @@ module HrrRbSsh
       @incoming_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
       @outgoing_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
 
+      initialize_algorithms
+    end
+
+    def initialize_algorithms
       @incoming_encryption_algorithm  = HrrRbSsh::Transport::EncryptionAlgorithm['none'].new
       @incoming_mac_algorithm         = HrrRbSsh::Transport::MacAlgorithm['none'].new
       @incoming_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm['none'].new
