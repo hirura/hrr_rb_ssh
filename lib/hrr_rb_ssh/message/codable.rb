@@ -9,7 +9,8 @@ module HrrRbSsh
     module Codable
       def encode payload
         definition.map{ |data_type, field_name|
-          HrrRbSsh::Transport::DataType[data_type].encode( payload[field_name] )
+          field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
+          HrrRbSsh::Transport::DataType[data_type].encode( field_value )
         }.join
       end
 
