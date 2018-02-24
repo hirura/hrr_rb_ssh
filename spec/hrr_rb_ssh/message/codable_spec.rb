@@ -18,8 +18,16 @@ RSpec.describe HrrRbSsh::Message::Codable do
   }
 
   describe ".encode" do
-    it "encodes #{{'SSH_MSG_MOCK' => 168, 'data' => 'testing'}.inspect} to \"A8 00 00 00 07 t e s t i n g\"" do
-      expect( mixed_in.encode( {'SSH_MSG_MOCK' => 168, 'data' => 'testing'} ) ).to eq( ["A8", "00000007", "testing"].pack("H*H*a*") )
+    context "when arg does not contain an instance of Proc" do
+      it "encodes #{{'SSH_MSG_MOCK' => 168, 'data' => 'testing'}.inspect} to \"A8 00 00 00 07 t e s t i n g\"" do
+        expect( mixed_in.encode( {'SSH_MSG_MOCK' => 168, 'data' => 'testing'} ) ).to eq( ["A8", "00000007", "testing"].pack("H*H*a*") )
+      end
+    end
+
+    context "when arg contains an instance of Proc" do
+      it "encodes #{{'SSH_MSG_MOCK' => 168, 'data' => lambda { 'testing' }}.inspect} to \"A8 00 00 00 07 t e s t i n g\"" do
+        expect( mixed_in.encode( {'SSH_MSG_MOCK' => 168, 'data' => 'testing'} ) ).to eq( ["A8", "00000007", "testing"].pack("H*H*a*") )
+      end
     end
   end
 
