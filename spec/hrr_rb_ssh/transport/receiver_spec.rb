@@ -12,8 +12,8 @@ RSpec.describe HrrRbSsh::Transport::Receiver do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
 
     describe "#receive" do
-      context "with encrypted_packet with payload \"testing\"" do
-        let(:encrypted_packet){
+      context "with packet of payload \"testing\"" do
+        let(:packet){
           [
             "00000014",
             "0c",
@@ -23,20 +23,19 @@ RSpec.describe HrrRbSsh::Transport::Receiver do
         }
 
         it "increments incoming sequence number" do
-          io.write encrypted_packet
+          io.write packet
           io.rewind
           expect { receiver.receive transport }.to change { transport.incoming_sequence_number.sequence_number }.from(0).to(1)
         end
 
-        it "returns packet with the same encrypted payload" do
-          io.write encrypted_packet
+        it "returns payload \"testing\"" do
+          io.write packet
           io.rewind
-          packet = receiver.receive transport
-          expect(packet.encrypted).to eq encrypted_packet
+          expect(receiver.receive transport).to eq "testing"
         end
 
         it "reads all" do
-          io.write encrypted_packet
+          io.write packet
           io.rewind
           receiver.receive transport
           expect(io.read).to eq ""
