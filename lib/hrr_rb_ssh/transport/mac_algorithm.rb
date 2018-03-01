@@ -3,6 +3,7 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/transport/mac_algorithm/none'
+require 'hrr_rb_ssh/transport/mac_algorithm/hmac_sha1'
 
 module HrrRbSsh
   class Transport
