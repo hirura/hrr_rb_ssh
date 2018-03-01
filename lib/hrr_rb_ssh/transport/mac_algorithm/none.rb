@@ -11,20 +11,27 @@ module HrrRbSsh
       ]
 
       class None
-        def initialize
+        DIGEST_LENGTH = 0
+        KEY_LENGTH    = 0
+
+        def initialize incoming_key=nil, outgoing_key=nil
           @logger = HrrRbSsh::Logger.new self.class.name
         end
 
-        def compute transport, packet
+        def compute sequence_number, unencrypted_packet, key=nil
           String.new
         end
 
-        def valid? transport, packet, mac
-          mac == compute( transport, packet )
+        def valid? sequence_number, unencrypted_packet, mac
+          mac == compute( sequence_number, unencrypted_packet )
         end
 
-        def length
-          0
+        def digest_length
+          DIGEST_LENGTH
+        end
+
+        def key_length
+          KEY_LENGTH
         end
       end
 
