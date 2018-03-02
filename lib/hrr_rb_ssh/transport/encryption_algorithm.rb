@@ -3,6 +3,7 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/transport/encryption_algorithm/none'
+require 'hrr_rb_ssh/transport/encryption_algorithm/aes_128_cbc'
 
 module HrrRbSsh
   class Transport
