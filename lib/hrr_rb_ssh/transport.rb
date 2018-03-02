@@ -29,7 +29,10 @@ module HrrRbSsh
       :incoming_compression_algorithm,
       :outgoing_encryption_algorithm,
       :outgoing_mac_algorithm,
-      :outgoing_compression_algorithm
+      :outgoing_compression_algorithm,
+      :v_c,
+      :v_s
+
 
     def initialize io, mode
       @io = io
@@ -40,10 +43,20 @@ module HrrRbSsh
       @sender   = HrrRbSsh::Transport::Sender.new
       @receiver = HrrRbSsh::Transport::Receiver.new
 
+      @local_version  = "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}".force_encoding(Encoding::ASCII_8BIT)
+      @remote_version = "".force_encoding(Encoding::ASCII_8BIT)
+
       @incoming_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
       @outgoing_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
 
       initialize_algorithms
+    end
+
+    def exchange_version
+      send_version
+      receive_version
+
+      update_version_strings
     end
 
     def initialize_algorithms
@@ -54,6 +67,36 @@ module HrrRbSsh
       @outgoing_encryption_algorithm  = HrrRbSsh::Transport::EncryptionAlgorithm['none'].new
       @outgoing_mac_algorithm         = HrrRbSsh::Transport::MacAlgorithm['none'].new
       @outgoing_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm['none'].new
+    end
+
+    def send_version
+      @io.write (@local_version + CR + LF)
+    end
+
+    def receive_version
+      tmp_str = String.new
+      loop do
+        tmp_str << @io.read(1)
+        if tmp_str =~ /#{CR}#{LF}/
+          if tmp_str =~ /^SSH-/
+            @remote_version = tmp_str.match( /(:?SSH-.+)#{CR}#{LF}/ )[1]
+            break
+          else
+            tmp_str.clear
+          end
+        end
+      end
+    end
+
+    def update_version_strings
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        @v_c = @remote_version
+        @v_s = @local_version
+      when HrrRbSsh::Transport::Mode::CLIENT
+        @v_c = @local_version
+        @v_s = @remote_version
+      end
     end
   end
 end
