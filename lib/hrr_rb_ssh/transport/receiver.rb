@@ -41,7 +41,7 @@ module HrrRbSsh
       end
 
       def receive_mac transport
-        transport.io.read transport.incoming_mac_algorithm.length
+        transport.io.read transport.incoming_mac_algorithm.digest_length
       end
 
       def receive transport
