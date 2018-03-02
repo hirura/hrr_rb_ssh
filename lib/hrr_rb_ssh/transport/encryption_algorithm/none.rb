@@ -11,12 +11,24 @@ module HrrRbSsh
       ]
 
       class None
-        def initialize
+        BLOCK_SIZE  = 0
+        IV_LENGTH   = 0
+        KEY_LENGTH  = 0
+
+        def initialize iv=nil, key=nil
           @logger = HrrRbSsh::Logger.new self.class.name
         end
 
         def block_size
-          0
+          BLOCK_SIZE
+        end
+
+        def iv_length
+          IV_LENGTH
+        end
+
+        def key_length
+          KEY_LENGTH
         end
 
         def encrypt data
