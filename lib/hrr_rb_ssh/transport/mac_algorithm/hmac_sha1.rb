@@ -16,20 +16,15 @@ module HrrRbSsh
         DIGEST_LENGTH = 20
         KEY_LENGTH    = 20
 
-        def initialize incoming_key, outgoing_key
+        def initialize key
           @logger = HrrRbSsh::Logger.new self.class.name
 
-          @incoming_key = incoming_key
-          @outgoing_key = outgoing_key
+          @key = key
         end
 
-        def compute sequence_number, unencrypted_packet, key=@outgoing_key
+        def compute sequence_number, unencrypted_packet
           data = HrrRbSsh::Transport::DataType::Uint32.encode(sequence_number) + unencrypted_packet
-          OpenSSL::HMAC.digest DIGEST, key, data
-        end
-
-        def valid? sequence_number, unencrypted_packet, mac
-          mac == compute( sequence_number, unencrypted_packet, @incoming_key )
+          OpenSSL::HMAC.digest DIGEST, @key, data
         end
 
         def digest_length

@@ -45,11 +45,11 @@ module HrrRbSsh
       end
 
       def receive transport
-        packet  = receive_packet transport
-        payload = depacketize transport, packet
-        mac     = receive_mac transport
+        unencrypted_packet = receive_packet transport
+        payload            = depacketize transport, unencrypted_packet
+        mac                = receive_mac transport
 
-        raise unless transport.incoming_mac_algorithm.valid? transport.incoming_sequence_number.sequence_number, packet, mac
+        raise if mac != transport.incoming_mac_algorithm.compute( transport.incoming_sequence_number.sequence_number, unencrypted_packet )
 
         transport.incoming_sequence_number.increment
 

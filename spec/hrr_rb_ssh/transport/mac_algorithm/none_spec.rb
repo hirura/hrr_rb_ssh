@@ -20,24 +20,6 @@ RSpec.describe HrrRbSsh::Transport::MacAlgorithm::None do
     end
   end
 
-  describe '#valid?' do
-    context "when mac is #{String.new.inspect}" do
-      let(:mac){ String.new }
-
-      it "returns true" do
-        expect( mac_algorithm.valid? sequence_number, unencrypted_packet, mac ).to be true
-      end
-    end
-
-    context "when mac is not #{String.new.inspect}" do
-      let(:mac){ "dummy mac" }
-
-      it "returns false" do
-        expect( mac_algorithm.valid? sequence_number, unencrypted_packet, mac ).to be false
-      end
-    end
-  end
-
   describe '#digest_length' do
     it "returns 0" do
       expect( mac_algorithm.digest_length ).to eq 0

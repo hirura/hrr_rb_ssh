@@ -14,16 +14,12 @@ module HrrRbSsh
         DIGEST_LENGTH = 0
         KEY_LENGTH    = 0
 
-        def initialize incoming_key=nil, outgoing_key=nil
+        def initialize key=nil
           @logger = HrrRbSsh::Logger.new self.class.name
         end
 
-        def compute sequence_number, unencrypted_packet, key=nil
+        def compute sequence_number, unencrypted_packet
           String.new
-        end
-
-        def valid? sequence_number, unencrypted_packet, mac
-          mac == compute( sequence_number, unencrypted_packet )
         end
 
         def digest_length
