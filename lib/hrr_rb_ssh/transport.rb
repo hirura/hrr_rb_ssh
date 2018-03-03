@@ -49,6 +49,7 @@ module HrrRbSsh
       @incoming_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
       @outgoing_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
 
+      initialize_local_algorithms
       initialize_algorithms
     end
 
@@ -57,6 +58,17 @@ module HrrRbSsh
       receive_version
 
       update_version_strings
+    end
+
+    def initialize_local_algorithms
+      @local_kex_algorithms                          = HrrRbSsh::Transport::KexAlgorithm.name_list
+      @local_server_host_key_algorithms              = HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
+      @local_encryption_algorithms_client_to_server  = HrrRbSsh::Transport::EncryptionAlgorithm.name_list
+      @local_encryption_algorithms_server_to_client  = HrrRbSsh::Transport::EncryptionAlgorithm.name_list
+      @local_mac_algorithms_client_to_server         = HrrRbSsh::Transport::MacAlgorithm.name_list
+      @local_mac_algorithms_server_to_client         = HrrRbSsh::Transport::MacAlgorithm.name_list
+      @local_compression_algorithms_client_to_server = HrrRbSsh::Transport::CompressionAlgorithm.name_list
+      @local_compression_algorithms_server_to_client = HrrRbSsh::Transport::CompressionAlgorithm.name_list
     end
 
     def initialize_algorithms
