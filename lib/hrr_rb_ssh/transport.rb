@@ -31,7 +31,9 @@ module HrrRbSsh
       :outgoing_mac_algorithm,
       :outgoing_compression_algorithm,
       :v_c,
-      :v_s
+      :v_s,
+      :i_c,
+      :i_s
 
 
     def initialize io, mode
@@ -58,6 +60,11 @@ module HrrRbSsh
       receive_version
 
       update_version_strings
+    end
+
+    def exchange_key
+      send_kexinit
+      receive_kexinit
     end
 
     def initialize_local_algorithms
@@ -109,6 +116,60 @@ module HrrRbSsh
         @v_c = @local_version
         @v_s = @remote_version
       end
+    end
+
+    def send_kexinit
+      message = {
+        'SSH_MSG_KEXINIT'                         => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+        'cookie (random byte)'                    => lambda { rand(0x01_00) },
+        'kex_algorithms'                          => @local_kex_algorithms,
+        'server_host_key_algorithms'              => @local_server_host_key_algorithms,
+        'encryption_algorithms_client_to_server'  => @local_encryption_algorithms_client_to_server,
+        'encryption_algorithms_server_to_client'  => @local_encryption_algorithms_server_to_client,
+        'mac_algorithms_client_to_server'         => @local_mac_algorithms_client_to_server,
+        'mac_algorithms_server_to_client'         => @local_mac_algorithms_server_to_client,
+        'compression_algorithms_client_to_server' => @local_compression_algorithms_client_to_server,
+        'compression_algorithms_server_to_client' => @local_compression_algorithms_server_to_client,
+        'languages_client_to_server'              => [],
+        'languages_server_to_client'              => [],
+        'first_kex_packet_follows'                => false,
+        '0 (reserved for future extension)'       => 0,
+      }
+      payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode message
+      @sender.send self, payload
+
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        @i_s = payload
+      when HrrRbSsh::Transport::Mode::CLIENT
+        @i_c = payload
+      end
+    end
+
+    def receive_kexinit
+      payload = @receiver.receive self
+
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        @i_c = payload
+      when HrrRbSsh::Transport::Mode::CLIENT
+        @i_s = payload
+      end
+
+      message = HrrRbSsh::Message::SSH_MSG_KEXINIT.decode payload
+
+      update_remote_algorithms message
+    end
+
+    def update_remote_algorithms message
+      @remote_kex_algorithms                          = message['kex_algorithms']
+      @remote_server_host_key_algorithms              = message['server_host_key_algorithms']
+      @remote_encryption_algorithms_client_to_server  = message['encryption_algorithms_client_to_server']
+      @remote_encryption_algorithms_server_to_client  = message['encryption_algorithms_server_to_client']
+      @remote_mac_algorithms_client_to_server         = message['mac_algorithms_client_to_server']
+      @remote_mac_algorithms_server_to_client         = message['mac_algorithms_server_to_client']
+      @remote_compression_algorithms_client_to_server = message['compression_algorithms_client_to_server']
+      @remote_compression_algorithms_server_to_client = message['compression_algorithms_server_to_client']
     end
   end
 end
