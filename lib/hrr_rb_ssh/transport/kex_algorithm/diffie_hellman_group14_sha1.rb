@@ -74,16 +74,6 @@ module HrrRbSsh
           }.join
         end
 
-        def decode definition, payload
-          payload_io = StringIO.new payload, 'r'
-          definition.map{ |data_type, field_name|
-            [
-              field_name,
-              HrrRbSsh::Transport::DataType[data_type].decode( payload_io )
-            ]
-          }.to_h
-        end
-
         def set_e e
           @e = e
         end
