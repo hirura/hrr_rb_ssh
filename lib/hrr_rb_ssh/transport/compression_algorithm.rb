@@ -3,6 +3,7 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/transport/compression_algorithm/none'
+require 'hrr_rb_ssh/transport/compression_algorithm/zlib'
 
 module HrrRbSsh
   class Transport
