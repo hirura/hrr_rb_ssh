@@ -2,7 +2,6 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/logger'
-require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman_group1_sha1'
 require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman_group14_sha1'
 
 module HrrRbSsh
