@@ -118,4 +118,113 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup1Sha1 do
       end
     end
   end
+
+  describe '#build_key' do
+    let(:_k){ 1 }
+    let(:h){ OpenSSL::Digest.digest('sha1', '2') }
+    let(:_x){ 'C'.ord }
+    let(:session_id){ OpenSSL::Digest.digest('sha1', '4') }
+
+    context "with key_length equal to digest length" do
+      let(:key_length){ 16 }
+
+      it "generates key with no digesting loop" do
+        expect( kex_algorithm.build_key(_k, h, _x, session_id, 16) ).to eq ["1b0be755e0369b5d024852a072d6b89f"].pack("H*")
+      end
+    end
+
+    context "with key_length shorter than digest length" do
+      let(:key_length){ 8 }
+
+      it "generates key using first key_length charactors with no digesting loop" do
+        expect( kex_algorithm.build_key(_k, h, _x, session_id, 8) ).to eq ["1b0be755e0369b5d"].pack("H*")
+      end
+    end
+
+    context "with key_length longer than digest length" do
+      let(:key_length){ 32 }
+
+      it "generates key with digesting loop" do
+        expect( kex_algorithm.build_key(_k, h, _x, session_id, 32) ).to eq ["1b0be755e0369b5d024852a072d6b89fed995d28846f36f0830d0d4dd9e61c48"].pack("H*")
+      end
+    end
+  end
+
+  describe '#iv_c_to_s' do
+    let(:mock_t){ double('mock transport') }
+    let(:encryption_algorithm_name){ 'aes128-cbc' }
+
+    it "generates iv_c_to_s" do
+      expect(kex_algorithm).to receive(:shared_secret).with(no_args).and_return( 1 ).once
+      expect(kex_algorithm).to receive(:hash).with(mock_t).and_return( OpenSSL::Digest.digest('sha1', '2') ).once
+      expect(mock_t).to receive(:session_id).with(no_args).and_return( OpenSSL::Digest.digest('sha1', '4') ).once
+
+      expect( kex_algorithm.iv_c_to_s(mock_t, encryption_algorithm_name) ).to eq ["f85c1a10175286d348ff80a673b91c13"].pack("H*")
+    end
+  end
+
+  describe '#iv_s_to_c' do
+    let(:mock_t){ double('mock transport') }
+    let(:encryption_algorithm_name){ 'aes128-cbc' }
+
+    it "generates iv_s_to_c" do
+      expect(kex_algorithm).to receive(:shared_secret).with(no_args).and_return( 1 ).once
+      expect(kex_algorithm).to receive(:hash).with(mock_t).and_return( OpenSSL::Digest.digest('sha1', '2') ).once
+      expect(mock_t).to receive(:session_id).with(no_args).and_return( OpenSSL::Digest.digest('sha1', '4') ).once
+
+      expect( kex_algorithm.iv_s_to_c(mock_t, encryption_algorithm_name) ).to eq ["23257a8d5bad4babe68a021496b19938"].pack("H*")
+    end
+  end
+
+  describe '#key_c_to_s' do
+    let(:mock_t){ double('mock transport') }
+    let(:encryption_algorithm_name){ 'aes128-cbc' }
+
+    it "generates key_c_to_s" do
+      expect(kex_algorithm).to receive(:shared_secret).with(no_args).and_return( 1 ).once
+      expect(kex_algorithm).to receive(:hash).with(mock_t).and_return( OpenSSL::Digest.digest('sha1', '2') ).once
+      expect(mock_t).to receive(:session_id).with(no_args).and_return( OpenSSL::Digest.digest('sha1', '4') ).once
+
+      expect( kex_algorithm.key_c_to_s(mock_t, encryption_algorithm_name) ).to eq ["1b0be755e0369b5d024852a072d6b89f"].pack("H*")
+    end
+  end
+
+  describe '#key_s_to_c' do
+    let(:mock_t){ double('mock transport') }
+    let(:encryption_algorithm_name){ 'aes128-cbc' }
+
+    it "generates key_s_to_c" do
+      expect(kex_algorithm).to receive(:shared_secret).with(no_args).and_return( 1 ).once
+      expect(kex_algorithm).to receive(:hash).with(mock_t).and_return( OpenSSL::Digest.digest('sha1', '2') ).once
+      expect(mock_t).to receive(:session_id).with(no_args).and_return( OpenSSL::Digest.digest('sha1', '4') ).once
+
+      expect( kex_algorithm.key_s_to_c(mock_t, encryption_algorithm_name) ).to eq ["c158ef6e070f03b584fe0dad12297481"].pack("H*")
+    end
+  end
+
+  describe '#mac_c_to_s' do
+    let(:mock_t){ double('mock transport') }
+    let(:mac_algorithm_name){ 'hmac-sha1' }
+
+    it "generates mac_c_to_s" do
+      expect(kex_algorithm).to receive(:shared_secret).with(no_args).and_return( 1 ).once
+      expect(kex_algorithm).to receive(:hash).with(mock_t).and_return( OpenSSL::Digest.digest('sha1', '2') ).once
+      expect(mock_t).to receive(:session_id).with(no_args).and_return( OpenSSL::Digest.digest('sha1', '4') ).once
+
+      expect( kex_algorithm.mac_c_to_s(mock_t, mac_algorithm_name) ).to eq ["7116b4b3e1b545f200fa0b0eeb784cf74be3f887"].pack("H*")
+    end
+  end
+
+  describe '#mac_s_to_c' do
+    let(:mock_t){ double('mock transport') }
+    let(:mac_algorithm_name){ 'hmac-sha1' }
+
+    it "generates mac_s_to_c" do
+      expect(kex_algorithm).to receive(:shared_secret).with(no_args).and_return( 1 ).once
+      expect(kex_algorithm).to receive(:hash).with(mock_t).and_return( OpenSSL::Digest.digest('sha1', '2') ).once
+      expect(mock_t).to receive(:session_id).with(no_args).and_return( OpenSSL::Digest.digest('sha1', '4') ).once
+
+      expect( kex_algorithm.mac_s_to_c(mock_t, mac_algorithm_name) ).to eq ["7244373045b45947ff3c29c09dcb8a755e6e7d2c"].pack("H*")
+    end
+  end
 end
