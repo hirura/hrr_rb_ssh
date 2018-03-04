@@ -34,8 +34,8 @@ module HrrRbSsh
       :v_c,
       :v_s,
       :i_c,
-      :i_s
-
+      :i_s,
+      :session_id
 
     def initialize io, mode
       @io = io
@@ -73,6 +73,9 @@ module HrrRbSsh
       when HrrRbSsh::Transport::Mode::SERVER
         receive_kexdh_init
         send_kexdh_reply
+
+        send_newkeys
+        receive_newkeys
       end
     end
 
@@ -190,6 +193,21 @@ module HrrRbSsh
         @sender.send self, payload
     end
 
+    def send_newkeys
+        message = {
+          'SSH_MSG_NEWKEYS' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
+        }
+        payload = HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode message
+        @sender.send self, payload
+    end
+
+    def receive_newkeys
+      payload = @receiver.receive self
+      message = HrrRbSsh::Message::SSH_MSG_NEWKEYS.decode payload
+
+      update_encryption_mac_compression_algorithms
+    end
+
     def update_remote_algorithms message
       @remote_kex_algorithms                          = message['kex_algorithms']
       @remote_server_host_key_algorithms              = message['server_host_key_algorithms']
@@ -213,6 +231,54 @@ module HrrRbSsh
 
       @kex_algorithm             = HrrRbSsh::Transport::KexAlgorithm[kex_algorithm_name].new
       @server_host_key_algorithm = HrrRbSsh::Transport::ServerHostKeyAlgorithm[server_host_key_algorithm_name].new
+    end
+
+    def update_encryption_mac_compression_algorithms
+      update_encryption_algorithm
+      update_mac_algorithm
+      update_compression_algorithm
+    end
+
+    def update_encryption_algorithm
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        encryption_algorithm_c_to_s_name = @remote_encryption_algorithms_client_to_server.find{ |a| @local_encryption_algorithms_client_to_server.include? a } or raise
+        encryption_algorithm_s_to_c_name = @remote_encryption_algorithms_server_to_client.find{ |a| @local_encryption_algorithms_server_to_client.include? a } or raise
+        incoming_encryption_algorithm_name = encryption_algorithm_c_to_s_name
+        outgoing_encryption_algorithm_name = encryption_algorithm_s_to_c_name
+        incoming_crpt_iv = @kex_algorithm.iv_c_to_s self, incoming_encryption_algorithm_name
+        outgoing_crpt_iv = @kex_algorithm.iv_s_to_c self, outgoing_encryption_algorithm_name
+        incoming_crpt_key = @kex_algorithm.key_c_to_s self, incoming_encryption_algorithm_name
+        outgoing_crpt_key = @kex_algorithm.key_s_to_c self, outgoing_encryption_algorithm_name
+      end
+      @incoming_encryption_algorithm = HrrRbSsh::Transport::EncryptionAlgorithm[incoming_encryption_algorithm_name].new incoming_crpt_iv, incoming_crpt_key
+      @outgoing_encryption_algorithm = HrrRbSsh::Transport::EncryptionAlgorithm[outgoing_encryption_algorithm_name].new outgoing_crpt_iv, outgoing_crpt_key
+    end
+
+    def update_mac_algorithm
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        mac_algorithm_c_to_s_name = @remote_mac_algorithms_client_to_server.find{ |a| @local_mac_algorithms_client_to_server.include? a } or raise
+        mac_algorithm_s_to_c_name = @remote_mac_algorithms_server_to_client.find{ |a| @local_mac_algorithms_server_to_client.include? a } or raise
+        incoming_mac_algorithm_name = mac_algorithm_c_to_s_name
+        outgoing_mac_algorithm_name = mac_algorithm_s_to_c_name
+        incoming_mac_key = @kex_algorithm.mac_c_to_s self, incoming_mac_algorithm_name
+        outgoing_mac_key = @kex_algorithm.mac_s_to_c self, outgoing_mac_algorithm_name
+      end
+      @incoming_mac_algorithm = HrrRbSsh::Transport::MacAlgorithm[incoming_mac_algorithm_name].new incoming_mac_key
+      @outgoing_mac_algorithm = HrrRbSsh::Transport::MacAlgorithm[outgoing_mac_algorithm_name].new outgoing_mac_key
+    end
+
+    def update_compression_algorithm
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        compression_algorithm_c_to_s_name = @remote_compression_algorithms_client_to_server.find{ |a| @local_compression_algorithms_client_to_server.include? a } or raise
+        compression_algorithm_s_to_c_name = @remote_compression_algorithms_server_to_client.find{ |a| @local_compression_algorithms_server_to_client.include? a } or raise
+        incoming_compression_algorithm_name = compression_algorithm_c_to_s_name
+        outgoing_compression_algorithm_name = compression_algorithm_s_to_c_name
+      end
+      @incoming_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[incoming_compression_algorithm_name].new
+      @outgoing_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[outgoing_compression_algorithm_name].new
     end
   end
 end

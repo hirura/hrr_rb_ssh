@@ -184,6 +184,12 @@ RSpec.describe HrrRbSsh::Transport do
       let(:remote_dh_pub_key){ 
         OpenSSL::BN.new(remote_dh.pub_key, 2).to_i
       }
+      let(:remote_newkeys_message){
+        {
+          "SSH_MSG_NEWKEYS" => 21,
+        }
+      }
+      let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode remote_newkeys_message }
 
       before :example do
         transport.instance_variable_set('@sender',   mock_sender  )
@@ -216,8 +222,8 @@ RSpec.describe HrrRbSsh::Transport do
         expect(transport.i_s).to be nil
 
         expect(mock_sender).to   receive(:send).with(transport, match(local_kexinit_payload[17..(local_kexinit_payload.length-1)])).once
-        expect(mock_sender).to   receive(:send).with(transport, anything).once
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload).twice
+        expect(mock_sender).to   receive(:send).with(transport, anything).twice
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
 
         transport.exchange_key
 
@@ -244,8 +250,8 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       it "updates kex_algorithm" do
-        expect(mock_sender).to   receive(:send).with(transport, anything).twice
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload).twice
+        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(3).times
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
 
         transport.exchange_key
 
@@ -254,8 +260,8 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       it "gets shared secret" do
-        expect(mock_sender).to   receive(:send).with(transport, anything).twice
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload).twice
+        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(3).times
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
 
         transport.exchange_key
 
@@ -264,6 +270,20 @@ RSpec.describe HrrRbSsh::Transport do
         local_shared_secret  = local_kex_algorithm.shared_secret
         remote_shared_secret = OpenSSL::BN.new(remote_dh.compute_key(local_e), 2).to_i
         expect(local_shared_secret).to eq remote_shared_secret
+      end
+
+      it "updates encryption, mac, and compression algorithms" do
+        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(3).times
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
+
+        transport.exchange_key
+
+        expect(transport.incoming_encryption_algorithm).to  be_an_instance_of HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc
+        expect(transport.outgoing_encryption_algorithm).to  be_an_instance_of HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc
+        expect(transport.incoming_mac_algorithm).to         be_an_instance_of HrrRbSsh::Transport::MacAlgorithm::HmacSha1
+        expect(transport.outgoing_mac_algorithm).to         be_an_instance_of HrrRbSsh::Transport::MacAlgorithm::HmacSha1
+        expect(transport.incoming_compression_algorithm).to be_an_instance_of HrrRbSsh::Transport::CompressionAlgorithm::None
+        expect(transport.outgoing_compression_algorithm).to be_an_instance_of HrrRbSsh::Transport::CompressionAlgorithm::None
       end
     end
   end
