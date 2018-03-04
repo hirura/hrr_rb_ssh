@@ -36,6 +36,10 @@ RSpec.describe HrrRbSsh::Transport do
       expect(transport.outgoing_sequence_number.sequence_number).to eq 0
     end
 
+    it "initializes server_host_key_algorithm readable" do
+      expect(transport.server_host_key_algorithm).to be nil
+    end
+
     it "initializes incoming_encryption_algorithm readable" do
       expect(transport.incoming_encryption_algorithm).to be_an_instance_of HrrRbSsh::Transport::EncryptionAlgorithm::None
     end
@@ -67,6 +71,14 @@ RSpec.describe HrrRbSsh::Transport do
     it "initializes v_s readable" do
       expect(transport.v_s).to be nil
     end
+
+    it "initializes i_c readable" do
+      expect(transport.i_c).to be nil
+    end
+
+    it "initializes i_s readable" do
+      expect(transport.i_s).to be nil
+    end
   end
 
   context "when mode is server" do
@@ -85,18 +97,21 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       it "receives remote version string and updates v_c" do
+        expect(transport.v_c).to be nil
         io.remote_write ("SSH-2.0-dummy_ssh_1.2.3" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         transport.exchange_version
         expect(transport.v_c).to eq remote_version_string
       end
 
       it "updates v_s" do
+        expect(transport.v_s).to be nil
         io.remote_write ("SSH-2.0-dummy_ssh_1.2.3" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         transport.exchange_version
         expect(transport.v_s).to eq local_version_string
       end
 
       it "skips data before remote version string" do
+        expect(transport.v_c).to be nil
         io.remote_write ("initial data" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         io.remote_write ("SSH-2.0-dummy_ssh_1.2.3" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         transport.exchange_version
@@ -106,66 +121,108 @@ RSpec.describe HrrRbSsh::Transport do
 
     describe "#exchange_key" do
       let(:transport){ described_class.new io, mode }
-      let(:remote_kexinit_packet){
-        [
-          "0000010c" "06145855" "3f58552c" "8ed18b59" \
-          "ad2d7ea1" "0d250000" "00366469" "66666965" \
-          "2d68656c" "6c6d616e" "2d67726f" "75703134" \
-          "2d736861" "312c6469" "66666965" "2d68656c" \
-          "6c6d616e" "2d67726f" "7570312d" "73686131" \
-          "0000000f" "7373682d" "7273612c" "7373682d" \
-          "64737300" "00001561" "65733132" "382d6362" \
-          "632c6165" "73323536" "2d636263" "00000015" \
-          "61657331" "32382d63" "62632c61" "65733235" \
-          "362d6362" "63000000" "12686d61" "632d7368" \
-          "61312c68" "6d61632d" "6d643500" "00001268" \
-          "6d61632d" "73686131" "2c686d61" "632d6d64" \
-          "35000000" "1a6e6f6e" "652c7a6c" "6962406f" \
-          "70656e73" "73682e63" "6f6d2c7a" "6c696200" \
-          "00001a6e" "6f6e652c" "7a6c6962" "406f7065" \
-          "6e737368" "2e636f6d" "2c7a6c69" "62000000" \
-          "00000000" "00000000" "00000000" "00000000"
-        ].pack("H*")
+
+      let(:mock_sender  ){ double("mock sender") }
+      let(:mock_receiver){ double("mock receiver") }
+
+      let(:local_version_string){ "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}" }
+      let(:remote_version_string){ "SSH-2.0-dummy_ssh_1.2.3" }
+
+      let(:remote_kexinit_message){
+        {
+          "SSH_MSG_KEXINIT"                         => 20,
+          "cookie (random byte)"                    => 37,
+          "kex_algorithms"                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
+          "server_host_key_algorithms"              => ["ssh-rsa", "ssh-dss"],
+          "encryption_algorithms_client_to_server"  => ["aes128-cbc", "aes256-cbc"],
+          "encryption_algorithms_server_to_client"  => ["aes128-cbc", "aes256-cbc"],
+          "mac_algorithms_client_to_server"         => ["hmac-sha1", "hmac-md5"],
+          "mac_algorithms_server_to_client"         => ["hmac-sha1", "hmac-md5"],
+          "compression_algorithms_client_to_server" => ["none", "zlib@openssh.com", "zlib"],
+          "compression_algorithms_server_to_client" => ["none", "zlib@openssh.com", "zlib"],
+          "languages_client_to_server"              => [],
+          "languages_server_to_client"              => [],
+          "first_kex_packet_follows"                => false,
+          "0 (reserved for future extension)"       => 0
+        }
       }
-      let(:remote_kexinit_payload){
-        [
-          "1458553f" "58552c8e" "d18b59ad" "2d7ea10d" \
-          "25000000" "36646966" "6669652d" "68656c6c" \
-          "6d616e2d" "67726f75" "7031342d" "73686131" \
-          "2c646966" "6669652d" "68656c6c" "6d616e2d" \
-          "67726f75" "70312d73" "68613100" "00000f73" \
-          "73682d72" "73612c73" "73682d64" "73730000" \
-          "00156165" "73313238" "2d636263" "2c616573" \
-          "3235362d" "63626300" "00001561" "65733132" \
-          "382d6362" "632c6165" "73323536" "2d636263" \
-          "00000012" "686d6163" "2d736861" "312c686d" \
-          "61632d6d" "64350000" "0012686d" "61632d73" \
-          "6861312c" "686d6163" "2d6d6435" "0000001a" \
-          "6e6f6e65" "2c7a6c69" "62406f70" "656e7373" \
-          "682e636f" "6d2c7a6c" "69620000" "001a6e6f" \
-          "6e652c7a" "6c696240" "6f70656e" "7373682e" \
-          "636f6d2c" "7a6c6962" "00000000" "00000000" \
-          "00000000" "00"
-        ].pack("H*")
+      let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
+      let(:remote_kexdh_init_message){
+        {
+          "SSH_MSG_KEXDH_INIT" => 30,
+          "e"                  => remote_dh_pub_key,
+        }
+      }
+      let(:remote_kexdh_init_payload){ HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.encode remote_kexdh_init_message }
+      let(:dh_group14_p){
+        "FFFFFFFF" "FFFFFFFF" "C90FDAA2" "2168C234" \
+        "C4C6628B" "80DC1CD1" "29024E08" "8A67CC74" \
+        "020BBEA6" "3B139B22" "514A0879" "8E3404DD" \
+        "EF9519B3" "CD3A431B" "302B0A6D" "F25F1437" \
+        "4FE1356D" "6D51C245" "E485B576" "625E7EC6" \
+        "F44C42E9" "A637ED6B" "0BFF5CB6" "F406B7ED" \
+        "EE386BFB" "5A899FA5" "AE9F2411" "7C4B1FE6" \
+        "49286651" "ECE45B3D" "C2007CB8" "A163BF05" \
+        "98DA4836" "1C55D39A" "69163FA8" "FD24CF5F" \
+        "83655D23" "DCA3AD96" "1C62F356" "208552BB" \
+        "9ED52907" "7096966D" "670C354E" "4ABC9804" \
+        "F1746C08" "CA18217C" "32905E46" "2E36CE3B" \
+        "E39E772C" "180E8603" "9B2783A2" "EC07A28F" \
+        "B5C55DF0" "6F4C52C9" "DE2BCBF6" "95581718" \
+        "3995497C" "EA956AE5" "15D22618" "98FA0510" \
+        "15728E5A" "8AACAA68" "FFFFFFFF" "FFFFFFFF"
+      }
+      let(:dh_group14_g){
+        2
+      }
+      let(:remote_dh){
+        dh = OpenSSL::PKey::DH.new
+        dh.set_pqg OpenSSL::BN.new(dh_group14_p, 16), nil, OpenSSL::BN.new(dh_group14_g)
+        dh.generate_key!
+        dh
+      }
+      let(:remote_dh_pub_key){ 
+        OpenSSL::BN.new(remote_dh.pub_key, 2).to_i
       }
 
-      it "sends kexinit" do
-        io.remote_write remote_kexinit_packet
-        transport.exchange_key
-        io.remote_read 4  # skip packet length field
-        io.remote_read 1  # skip padding length field
-        expect(io.remote_read 1).to eq [20].pack("C")
+      before :example do
+        transport.instance_variable_set('@sender',   mock_sender  )
+        transport.instance_variable_set('@receiver', mock_receiver)
+
+        transport.instance_variable_set('@v_c', remote_version_string)
+        transport.instance_variable_set('@v_s', local_version_string )
       end
 
-      it "updates i_c" do
-        io.remote_write remote_kexinit_packet
+      it "updates i_c and i_s" do
+        local_kexinit_message = {
+          "SSH_MSG_KEXINIT"                         => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+          'cookie (random byte)'                    => lambda { rand(0x01_00) },
+          "kex_algorithms"                          => HrrRbSsh::Transport::KexAlgorithm.name_list,
+          "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list,
+          "encryption_algorithms_client_to_server"  => HrrRbSsh::Transport::EncryptionAlgorithm.name_list,
+          "encryption_algorithms_server_to_client"  => HrrRbSsh::Transport::EncryptionAlgorithm.name_list,
+          "mac_algorithms_client_to_server"         => HrrRbSsh::Transport::MacAlgorithm.name_list,
+          "mac_algorithms_server_to_client"         => HrrRbSsh::Transport::MacAlgorithm.name_list,
+          "compression_algorithms_client_to_server" => HrrRbSsh::Transport::CompressionAlgorithm.name_list,
+          "compression_algorithms_server_to_client" => HrrRbSsh::Transport::CompressionAlgorithm.name_list,
+          "languages_client_to_server"              => [],
+          "languages_server_to_client"              => [],
+          "first_kex_packet_follows"                => false,
+          "0 (reserved for future extension)"       => 0
+        }
+        local_kexinit_payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode(local_kexinit_message)
+
+        expect(transport.i_c).to be nil
+        expect(transport.i_s).to be nil
+
+        expect(mock_sender).to   receive(:send).with(transport, match(local_kexinit_payload[17..(local_kexinit_payload.length-1)])).once
+        expect(mock_sender).to   receive(:send).with(transport, anything).once
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload).twice
+
         transport.exchange_key
+
         expect(transport.i_c).to eq remote_kexinit_payload
-      end
 
-      it "updates i_s" do
-        io.remote_write remote_kexinit_packet
-        transport.exchange_key
         i_s = StringIO.new transport.i_s, 'r'
         expect(i_s.read(1).unpack("C")[0]).to eq 20
         16.times do
@@ -185,6 +242,29 @@ RSpec.describe HrrRbSsh::Transport do
         expect(HrrRbSsh::Transport::DataType::Uint32.decode i_s).to eq 0
         expect(i_s.read).to eq ""
       end
+
+      it "updates kex_algorithm" do
+        expect(mock_sender).to   receive(:send).with(transport, anything).twice
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload).twice
+
+        transport.exchange_key
+
+        expect(transport.server_host_key_algorithm).to be_an_instance_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa
+        expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1
+      end
+
+      it "gets shared secret" do
+        expect(mock_sender).to   receive(:send).with(transport, anything).twice
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload).twice
+
+        transport.exchange_key
+
+        local_kex_algorithm  = transport.instance_variable_get('@kex_algorithm')
+        local_e              = local_kex_algorithm.pub_key
+        local_shared_secret  = local_kex_algorithm.shared_secret
+        remote_shared_secret = OpenSSL::BN.new(remote_dh.compute_key(local_e), 2).to_i
+        expect(local_shared_secret).to eq remote_shared_secret
+      end
     end
   end
 
@@ -203,19 +283,22 @@ RSpec.describe HrrRbSsh::Transport do
         expect(io.remote_read 24).to eq (local_version_string + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
       end
 
-      it "receives remote version string and updates v_c" do
+      it "receives remote version string and updates v_s" do
+        expect(transport.v_s).to be nil
         io.remote_write ("SSH-2.0-dummy_ssh_1.2.3" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         transport.exchange_version
         expect(transport.v_s).to eq remote_version_string
       end
 
-      it "updates v_s" do
+      it "updates v_c" do
+        expect(transport.v_c).to be nil
         io.remote_write ("SSH-2.0-dummy_ssh_1.2.3" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         transport.exchange_version
         expect(transport.v_c).to eq local_version_string
       end
 
       it "skips data before remote version string" do
+        expect(transport.v_s).to be nil
         io.remote_write ("initial data" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         io.remote_write ("SSH-2.0-dummy_ssh_1.2.3" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         transport.exchange_version
@@ -225,66 +308,70 @@ RSpec.describe HrrRbSsh::Transport do
 
     describe "#exchange_key" do
       let(:transport){ described_class.new io, mode }
-      let(:remote_kexinit_packet){
-        [
-          "0000010c" "06145855" "3f58552c" "8ed18b59" \
-          "ad2d7ea1" "0d250000" "00366469" "66666965" \
-          "2d68656c" "6c6d616e" "2d67726f" "75703134" \
-          "2d736861" "312c6469" "66666965" "2d68656c" \
-          "6c6d616e" "2d67726f" "7570312d" "73686131" \
-          "0000000f" "7373682d" "7273612c" "7373682d" \
-          "64737300" "00001561" "65733132" "382d6362" \
-          "632c6165" "73323536" "2d636263" "00000015" \
-          "61657331" "32382d63" "62632c61" "65733235" \
-          "362d6362" "63000000" "12686d61" "632d7368" \
-          "61312c68" "6d61632d" "6d643500" "00001268" \
-          "6d61632d" "73686131" "2c686d61" "632d6d64" \
-          "35000000" "1a6e6f6e" "652c7a6c" "6962406f" \
-          "70656e73" "73682e63" "6f6d2c7a" "6c696200" \
-          "00001a6e" "6f6e652c" "7a6c6962" "406f7065" \
-          "6e737368" "2e636f6d" "2c7a6c69" "62000000" \
-          "00000000" "00000000" "00000000" "00000000"
-        ].pack("H*")
-      }
-      let(:remote_kexinit_payload){
-        [
-          "1458553f" "58552c8e" "d18b59ad" "2d7ea10d" \
-          "25000000" "36646966" "6669652d" "68656c6c" \
-          "6d616e2d" "67726f75" "7031342d" "73686131" \
-          "2c646966" "6669652d" "68656c6c" "6d616e2d" \
-          "67726f75" "70312d73" "68613100" "00000f73" \
-          "73682d72" "73612c73" "73682d64" "73730000" \
-          "00156165" "73313238" "2d636263" "2c616573" \
-          "3235362d" "63626300" "00001561" "65733132" \
-          "382d6362" "632c6165" "73323536" "2d636263" \
-          "00000012" "686d6163" "2d736861" "312c686d" \
-          "61632d6d" "64350000" "0012686d" "61632d73" \
-          "6861312c" "686d6163" "2d6d6435" "0000001a" \
-          "6e6f6e65" "2c7a6c69" "62406f70" "656e7373" \
-          "682e636f" "6d2c7a6c" "69620000" "001a6e6f" \
-          "6e652c7a" "6c696240" "6f70656e" "7373682e" \
-          "636f6d2c" "7a6c6962" "00000000" "00000000" \
-          "00000000" "00"
-        ].pack("H*")
-      }
 
-      it "sends kexinit" do
-        io.remote_write remote_kexinit_packet
-        transport.exchange_key
-        io.remote_read 4  # skip packet length field
-        io.remote_read 1  # skip padding length field
-        expect(io.remote_read 1).to eq [20].pack("C")
+      let(:mock_sender  ){ double("mock sender") }
+      let(:mock_receiver){ double("mock receiver") }
+
+      let(:local_version_string){ "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}" }
+      let(:remote_version_string){ "SSH-2.0-dummy_ssh_1.2.3" }
+
+      let(:remote_kexinit_message){
+        {
+          "SSH_MSG_KEXINIT"                         => 20,
+          "cookie (random byte)"                    => 37,
+          "kex_algorithms"                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
+          "server_host_key_algorithms"              => ["ssh-rsa", "ssh-dss"],
+          "encryption_algorithms_client_to_server"  => ["aes128-cbc", "aes256-cbc"],
+          "encryption_algorithms_server_to_client"  => ["aes128-cbc", "aes256-cbc"],
+          "mac_algorithms_client_to_server"         => ["hmac-sha1", "hmac-md5"],
+          "mac_algorithms_server_to_client"         => ["hmac-sha1", "hmac-md5"],
+          "compression_algorithms_client_to_server" => ["none", "zlib@openssh.com", "zlib"],
+          "compression_algorithms_server_to_client" => ["none", "zlib@openssh.com", "zlib"],
+          "languages_client_to_server"              => [],
+          "languages_server_to_client"              => [],
+          "first_kex_packet_follows"                => false,
+          "0 (reserved for future extension)"       => 0
+        }
+      }
+      let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
+
+      before :example do
+        transport.instance_variable_set('@sender',   mock_sender  )
+        transport.instance_variable_set('@receiver', mock_receiver)
+
+        transport.instance_variable_set('@v_s', remote_version_string)
+        transport.instance_variable_set('@v_c', local_version_string )
       end
 
-      it "updates i_s" do
-        io.remote_write remote_kexinit_packet
+      it "updates i_c and i_s" do
+        local_kexinit_message = {
+          "SSH_MSG_KEXINIT"                         => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+          'cookie (random byte)'                    => lambda { rand(0x01_00) },
+          "kex_algorithms"                          => HrrRbSsh::Transport::KexAlgorithm.name_list,
+          "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list,
+          "encryption_algorithms_client_to_server"  => HrrRbSsh::Transport::EncryptionAlgorithm.name_list,
+          "encryption_algorithms_server_to_client"  => HrrRbSsh::Transport::EncryptionAlgorithm.name_list,
+          "mac_algorithms_client_to_server"         => HrrRbSsh::Transport::MacAlgorithm.name_list,
+          "mac_algorithms_server_to_client"         => HrrRbSsh::Transport::MacAlgorithm.name_list,
+          "compression_algorithms_client_to_server" => HrrRbSsh::Transport::CompressionAlgorithm.name_list,
+          "compression_algorithms_server_to_client" => HrrRbSsh::Transport::CompressionAlgorithm.name_list,
+          "languages_client_to_server"              => [],
+          "languages_server_to_client"              => [],
+          "first_kex_packet_follows"                => false,
+          "0 (reserved for future extension)"       => 0
+        }
+        local_kexinit_payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode(local_kexinit_message)
+
+        expect(transport.i_c).to be nil
+        expect(transport.i_s).to be nil
+
+        expect(mock_sender).to   receive(:send).with(transport, match(local_kexinit_payload[17..(local_kexinit_payload.length-1)])).once
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload).once
+
         transport.exchange_key
+
         expect(transport.i_s).to eq remote_kexinit_payload
-      end
 
-      it "updates i_c" do
-        io.remote_write remote_kexinit_packet
-        transport.exchange_key
         i_c = StringIO.new transport.i_c, 'r'
         expect(i_c.read(1).unpack("C")[0]).to eq 20
         16.times do
@@ -303,6 +390,16 @@ RSpec.describe HrrRbSsh::Transport do
         expect(HrrRbSsh::Transport::DataType::Boolean.decode i_c).to eq false
         expect(HrrRbSsh::Transport::DataType::Uint32.decode i_c).to eq 0
         expect(i_c.read).to eq ""
+      end
+
+      it "updates kex_algorithm" do
+        expect(mock_sender).to   receive(:send).with(transport, anything).once
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload).once
+
+        transport.exchange_key
+
+        expect(transport.server_host_key_algorithm).to be_an_instance_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa
+        expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup1Sha1
       end
     end
   end

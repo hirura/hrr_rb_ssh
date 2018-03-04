@@ -24,6 +24,7 @@ module HrrRbSsh
       :io,
       :incoming_sequence_number,
       :outgoing_sequence_number,
+      :server_host_key_algorithm,
       :incoming_encryption_algorithm,
       :incoming_mac_algorithm,
       :incoming_compression_algorithm,
@@ -65,6 +66,14 @@ module HrrRbSsh
     def exchange_key
       send_kexinit
       receive_kexinit
+
+      update_kex_and_server_host_key_algorithms
+
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        receive_kexdh_init
+        send_kexdh_reply
+      end
     end
 
     def initialize_local_algorithms
@@ -161,6 +170,26 @@ module HrrRbSsh
       update_remote_algorithms message
     end
 
+    def receive_kexdh_init
+      payload = @receiver.receive self
+      message = HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.decode payload
+
+      @kex_algorithm.set_e message['e']
+
+      @session_id ||= @kex_algorithm.hash self
+    end
+
+    def send_kexdh_reply
+        message = {
+          'SSH_MSG_KEXDH_REPLY'                           => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
+          'server public host key and certificates (K_S)' => @server_host_key_algorithm.server_public_host_key,
+          'f'                                             => @kex_algorithm.pub_key,
+          'signature of H'                                => @kex_algorithm.sign(self),
+        }
+        payload = HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.encode message
+        @sender.send self, payload
+    end
+
     def update_remote_algorithms message
       @remote_kex_algorithms                          = message['kex_algorithms']
       @remote_server_host_key_algorithms              = message['server_host_key_algorithms']
@@ -170,6 +199,20 @@ module HrrRbSsh
       @remote_mac_algorithms_server_to_client         = message['mac_algorithms_server_to_client']
       @remote_compression_algorithms_client_to_server = message['compression_algorithms_client_to_server']
       @remote_compression_algorithms_server_to_client = message['compression_algorithms_server_to_client']
+    end
+
+    def update_kex_and_server_host_key_algorithms
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        kex_algorithm_name             = @remote_kex_algorithms.find{ |a| @local_kex_algorithms.include? a } or raise
+        server_host_key_algorithm_name = @remote_server_host_key_algorithms.find{ |a| @local_server_host_key_algorithms.include? a } or raise
+      when HrrRbSsh::Transport::Mode::CLIENT
+        kex_algorithm_name             = @local_kex_algorithms.find{ |a| @remote_kex_algorithms.include? a } or raise
+        server_host_key_algorithm_name = @local_server_host_key_algorithms.find{ |a| @remote_server_host_key_algorithms.include? a } or raise
+      end
+
+      @kex_algorithm             = HrrRbSsh::Transport::KexAlgorithm[kex_algorithm_name].new
+      @server_host_key_algorithm = HrrRbSsh::Transport::ServerHostKeyAlgorithm[server_host_key_algorithm_name].new
     end
   end
 end
