@@ -4,7 +4,6 @@
 RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY do
   let(:id){ 'SSH_MSG_KEXDH_REPLY' }
   let(:value){ 31 }
-  let(:num_fields){ 4 }
 
   describe "::ID" do
     it "is defined" do
@@ -18,9 +17,32 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY do
     end
   end
 
-  describe ".definition" do
-    it "is defined" do
-      expect(described_class.definition.size).to eq num_fields
+  let(:message){
+    {
+      id                                              => value,
+      'server public host key and certificates (K_S)' => 'dummy',
+      'f'                                             => 1234567890,
+      'signature of H'                                => 'dummy',
+    }
+  }
+  let(:payload){
+    [
+      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::String.encode(message['server public host key and certificates (K_S)']),
+      HrrRbSsh::Transport::DataType::Mpint.encode(message['f']),
+      HrrRbSsh::Transport::DataType::String.encode(message['signature of H']),
+    ].join
+  }
+
+  describe ".encode" do
+    it "returns payload encoded" do
+      expect(described_class.encode(message)).to eq payload
+    end
+  end
+
+  describe ".decode" do
+    it "returns message decoded" do
+      expect(described_class.decode(payload)).to eq message
     end
   end
 end
