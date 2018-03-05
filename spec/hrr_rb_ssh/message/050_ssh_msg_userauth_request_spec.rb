@@ -84,13 +84,52 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
   end
 
   context "when 'method name' is \"publickey\"" do
+    context "without signature" do
+      let(:message){
+        {
+          id                           => value,
+          'user name'                  => 'rspec',
+          'service name'               => 'ssh-connection',
+          'method name'                => 'publickey',
+          'with signature'             => false,
+          'public key algorithm name'  => 'ssh-rsa',
+          'public key blob'            => 'dummy',
+        }
+      }
+      let(:payload){
+        [
+          HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+          HrrRbSsh::Transport::DataType::String.encode(message['user name']),
+          HrrRbSsh::Transport::DataType::String.encode(message['service name']),
+          HrrRbSsh::Transport::DataType::String.encode(message['method name']),
+          HrrRbSsh::Transport::DataType::Boolean.encode(message['with signature']),
+          HrrRbSsh::Transport::DataType::String.encode(message['public key algorithm name']),
+          HrrRbSsh::Transport::DataType::String.encode(message['public key blob']),
+        ].join
+      }
+
+      describe ".encode" do
+        it "returns payload encoded" do
+          expect(described_class.encode(message)).to eq payload
+        end
+      end
+
+      describe ".decode" do
+        it "returns message decoded" do
+          expect(described_class.decode(payload)).to eq message
+        end
+      end
+    end
+  end
+
+  context "with signature" do
     let(:message){
       {
         id                           => value,
         'user name'                  => 'rspec',
         'service name'               => 'ssh-connection',
         'method name'                => 'publickey',
-        'TRUE'                       => true,
+        'with signature'             => true,
         'public key algorithm name'  => 'ssh-rsa',
         'public key blob'            => 'dummy',
         'signature'                  => 'dummy',
@@ -102,7 +141,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
         HrrRbSsh::Transport::DataType::String.encode(message['user name']),
         HrrRbSsh::Transport::DataType::String.encode(message['service name']),
         HrrRbSsh::Transport::DataType::String.encode(message['method name']),
-        HrrRbSsh::Transport::DataType::Boolean.encode(message['TRUE']),
+        HrrRbSsh::Transport::DataType::Boolean.encode(message['with signature']),
         HrrRbSsh::Transport::DataType::String.encode(message['public key algorithm name']),
         HrrRbSsh::Transport::DataType::String.encode(message['public key blob']),
         HrrRbSsh::Transport::DataType::String.encode(message['signature']),

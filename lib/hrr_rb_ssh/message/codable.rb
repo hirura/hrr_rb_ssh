@@ -28,20 +28,28 @@ module HrrRbSsh
       end
 
       def decode payload
-        payload_io = StringIO.new payload, 'r'
-        common_message = common_definition.map{ |data_type, field_name|
-          [
-            field_name,
-            HrrRbSsh::Transport::DataType[data_type].decode( payload_io )
-          ]
-        }
-        conditional_message = conditional_definition(common_message).map{ |data_type, field_name|
-          [
-            field_name,
-            HrrRbSsh::Transport::DataType[data_type].decode( payload_io )
-          ]
-        }
-        (common_message + conditional_message).to_h
+        def decode_recursively payload_io, message=nil
+          if message.class == Array and message.size == 0
+            []
+          else
+            definition = case message
+                         when nil
+                           common_definition
+                         when Array
+                           conditional_definition(message)
+                         end
+            additional_message = definition.map{ |data_type, field_name|
+              [
+                field_name,
+                HrrRbSsh::Transport::DataType[data_type].decode( payload_io )
+              ]
+            }
+
+            additional_message + decode_recursively(payload_io, additional_message)
+          end
+        end
+
+        decode_recursively(StringIO.new payload).to_h
       end
     end
   end

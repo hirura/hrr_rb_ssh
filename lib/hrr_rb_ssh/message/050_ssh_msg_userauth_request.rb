@@ -25,9 +25,14 @@ module HrrRbSsh
       PUBLICKEY_DEFINITION = [
         # [Data Type, Field Name]
         # ['string',  'method name' : "publickey"],
-        ['boolean',   'TRUE'],
+        ['boolean',   'with signature'],
         ['string',    'public key algorithm name'],
         ['string',    'public key blob'],
+      ]
+
+      PUBLICKEY_SIGNATURE_DEFINITION = [
+        # [Data Type, Field Name]
+        # ['string',  'with signature' : "TRUE"],
         ['string',    'signature'],
       ]
 
@@ -43,6 +48,9 @@ module HrrRbSsh
         'method name' => {
           'publickey' => PUBLICKEY_DEFINITION,
           'password'  => PASSWORD_DEFINITION,
+        },
+        'with signature' => {
+          true => PUBLICKEY_SIGNATURE_DEFINITION,
         },
       }
     end

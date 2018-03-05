@@ -89,4 +89,60 @@ RSpec.describe HrrRbSsh::Message::Codable do
       end
     end
   end
+
+  context "when module has chained CONDITIONAL_DEFINITION" do
+    before :context do
+      module SSH_MSG_MOCK_WITH_CHAINED_CONDITIONAL_DEFINITION
+        class << self
+          include HrrRbSsh::Message::Codable
+        end
+
+        DEFINITION = [
+          ['byte',   'SSH_MSG_MOCK'],
+          ['string', 'data'        ],
+        ]
+
+        TESTING_DEFINITION = [
+          ['string', 'testing data'],
+        ]
+
+        CHAINED_DEFINITION = [
+          ['string', 'chained data'],
+        ]
+
+        CONDITIONAL_DEFINITION = {
+          'data' => {
+            'testing' => TESTING_DEFINITION,
+          },
+          'testing data' => {
+            'conditional' => CHAINED_DEFINITION,
+          },
+        }
+      end
+    end
+
+    let(:mixed_in){
+      SSH_MSG_MOCK_WITH_CHAINED_CONDITIONAL_DEFINITION
+    }
+
+    describe ".encode" do
+      context "when arg does not contain an instance of Proc" do
+        it "encodes #{{'SSH_MSG_MOCK' => 168, 'data' => 'testing', 'testing data' => 'conditional', 'chained data' => 'chained'}.inspect} to \"A8 00 00 00 07 t e s t i n g 00 00 00 0B c o n d i t i o n a l 00 00 00 07 c h a i n e d\"" do
+          expect( mixed_in.encode( {'SSH_MSG_MOCK' => 168, 'data' => 'testing', 'testing data' => 'conditional', 'chained data' => 'chained'} ) ).to eq( ["A8", "00000007", "testing", "0000000B", "conditional", "00000007", "chained"].pack("H*H*a*H*a*H*a*") )
+        end
+      end
+
+      context "when arg contains an instance of Proc" do
+        it "encodes #{{'SSH_MSG_MOCK' => 168, 'data' => lambda { 'testing' }, 'testing data' => lambda { 'conditional' }, 'chained data' => lambda { 'chained' }}.inspect} to \"A8 00 00 00 07 t e s t i n g 00 00 00 0B c o n d i t i o n a l 00 00 00 07 c h a i n e d\"" do
+          expect( mixed_in.encode( {'SSH_MSG_MOCK' => 168, 'data' => lambda { 'testing' }, 'testing data' => lambda { 'conditional' }, 'chained data' => lambda { 'chained' }} ) ).to eq( ["A8", "00000007", "testing", "0000000B", "conditional", "00000007", "chained"].pack("H*H*a*H*a*H*a*") )
+        end
+      end
+    end
+
+    describe ".decode" do
+      it "decodes \"A8 00 00 00 07 t e s t i n g 00 00 00 0B c o n d i t i o n a l 00 00 00 07 c h a i n e d\" to #{{'SSH_MSG_MOCK' => 168, 'data' => 'testing', 'testing data' => 'conditional', 'chained data' => 'chained'}.inspect}" do
+        expect( mixed_in.decode( ["A8", "00000007", "testing", "0000000B", "conditional", "00000007", "chained"].pack("H*H*a*H*a*H*a*") ) ).to eq( {'SSH_MSG_MOCK' => 168, 'data' => 'testing', 'testing data' => 'conditional', 'chained data' => 'chained'} )
+      end
+    end
+  end
 end
