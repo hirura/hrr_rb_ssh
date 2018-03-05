@@ -9,10 +9,6 @@ module HrrRbSsh
     module SSH_MSG_KEXINIT
       class << self
         include Codable
-
-        def definition
-          DEFINITION
-        end
       end
 
       ID    = self.name.split('::').last
