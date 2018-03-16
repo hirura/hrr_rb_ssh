@@ -6,39 +6,43 @@ RSpec.describe HrrRbSsh::Logger do
   let(:l_mock){ double('logger') }
   let(:logger){ HrrRbSsh::Logger.new name }
 
-  describe 'self#initialize' do
+  describe '.initialize' do
     it "takes one argument" do
       expect { HrrRbSsh::Logger.initialize l_mock }.not_to raise_error
     end
 
     it "initialize HrrRbSsh::Logger" do
-      expect(HrrRbSsh::Logger.initialized?).to be_truthy
+      HrrRbSsh::Logger.initialize l_mock
+      expect(HrrRbSsh::Logger.initialized?).to be true
     end
   end
 
-  describe 'self#uninitialize' do
+  describe '.uninitialize' do
     it "takes no arguments" do
       expect { HrrRbSsh::Logger.uninitialize }.not_to raise_error
     end
 
     it "uninitialize HrrRbSsh::Logger" do
-      expect(HrrRbSsh::Logger.initialized?).to be_falsey
+      HrrRbSsh::Logger.initialize l_mock
+      HrrRbSsh::Logger.uninitialize
+      expect(HrrRbSsh::Logger.initialized?).to be false
     end
   end
 
-  describe 'self#initialized?' do
+  describe '.initialized?' do
     it "is false when uninitialized" do
+      HrrRbSsh::Logger.initialize l_mock
       HrrRbSsh::Logger.uninitialize
-      expect(HrrRbSsh::Logger.initialized?).to be_falsey
+      expect(HrrRbSsh::Logger.initialized?).to be false
     end
 
     it "is true when initialized" do
       HrrRbSsh::Logger.initialize l_mock
-      expect(HrrRbSsh::Logger.initialized?).to be_truthy
+      expect(HrrRbSsh::Logger.initialized?).to be true
     end
   end
 
-  describe '#initialize' do
+  describe '#new' do
     it "takes one argument" do
       expect { HrrRbSsh::Logger.new name }.not_to raise_error
     end
