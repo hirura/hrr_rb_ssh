@@ -4,6 +4,7 @@
 require "hrr_rb_ssh/version"
 require "hrr_rb_ssh/logger"
 require "hrr_rb_ssh/transport"
+require "hrr_rb_ssh/authentication"
 
 module HrrRbSsh
   # Your code goes here...
