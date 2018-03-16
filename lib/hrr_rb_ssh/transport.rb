@@ -56,6 +56,14 @@ module HrrRbSsh
       initialize_algorithms
     end
 
+    def send payload
+      @sender.send self, payload
+    end
+
+    def receive
+      @receiver.receive self
+    end
+
     def exchange_version
       send_version
       receive_version

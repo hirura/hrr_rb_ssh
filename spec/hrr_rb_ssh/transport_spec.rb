@@ -81,6 +81,40 @@ RSpec.describe HrrRbSsh::Transport do
     end
   end
 
+  describe "#send" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+    let(:mock_sender){ double("mock sender") }
+    let(:payload){ "testing" }
+
+    before :example do
+      transport.instance_variable_set('@sender', mock_sender)
+    end
+
+    it "sends payload" do
+      expect(mock_sender).to   receive(:send).with(transport, payload).once
+      transport.send payload
+    end
+  end
+
+  describe "#receive" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+    let(:mock_receiver){ double("mock receiver") }
+    let(:payload){ "testing" }
+
+    before :example do
+      transport.instance_variable_set('@receiver', mock_receiver)
+    end
+
+    it "receives payload" do
+      expect(mock_receiver).to receive(:receive).with(transport).and_return(payload).once
+      transport.receive
+    end
+  end
+
   context "when mode is server" do
     let(:io){ MockSocket.new }
     let(:mode){ HrrRbSsh::Transport::Mode::SERVER }
