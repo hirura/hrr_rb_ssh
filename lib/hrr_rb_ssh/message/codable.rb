@@ -7,6 +7,10 @@ require 'hrr_rb_ssh/transport/data_type'
 module HrrRbSsh
   module Message
     module Codable
+      def logger
+        @logger ||= HrrRbSsh::Logger.new self.name
+      end
+
       def common_definition
         self::DEFINITION
       end
@@ -20,6 +24,7 @@ module HrrRbSsh
       end
 
       def encode message
+        logger.debug('encoding message: ' + message.inspect)
         definition = common_definition + conditional_definition(message)
         definition.map{ |data_type, field_name|
           field_value = if message[field_name].instance_of? ::Proc then message[field_name].call else message[field_name] end
@@ -49,7 +54,9 @@ module HrrRbSsh
           end
         end
 
-        decode_recursively(StringIO.new payload).to_h
+        message = decode_recursively(StringIO.new payload).to_h
+        logger.debug('decoded message: ' + message.inspect)
+        message
       end
     end
   end
