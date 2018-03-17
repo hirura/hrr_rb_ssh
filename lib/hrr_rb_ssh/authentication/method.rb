@@ -2,6 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/authentication/method/none'
+require 'hrr_rb_ssh/authentication/method/password'
 
 module HrrRbSsh
   class Authentication
