@@ -7,10 +7,18 @@ require 'hrr_rb_ssh/authentication/authenticator'
 
 module HrrRbSsh
   class Authentication
+    SERVICE_NAME = 'ssh-userauth'
+
     def initialize transport
       @transport = transport
 
       @logger = HrrRbSsh::Logger.new self.class.name
+
+      @transport.register_acceptable_service SERVICE_NAME
+    end
+
+    def start
+      @transport.start
     end
   end
 end
