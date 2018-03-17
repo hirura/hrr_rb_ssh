@@ -52,8 +52,14 @@ module HrrRbSsh
       @incoming_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
       @outgoing_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
 
+      @acceptable_services = Array.new
+
       initialize_local_algorithms
       initialize_algorithms
+    end
+
+    def register_acceptable_service service_name
+      @acceptable_services.push service_name
     end
 
     def send payload
@@ -62,6 +68,16 @@ module HrrRbSsh
 
     def receive
       @receiver.receive self
+    end
+
+    def start
+      exchange_version
+      exchange_key
+
+      case @mode
+      when HrrRbSsh::Transport::Mode::SERVER
+        verify_service_request
+      end
     end
 
     def exchange_version
@@ -84,6 +100,18 @@ module HrrRbSsh
 
         send_newkeys
         receive_newkeys
+      end
+    end
+
+    def verify_service_request
+      service_request_message = receive_service_request
+      service_name = service_request_message['service name']
+      if @acceptable_services.include? service_name
+        send_service_accept service_name
+      else
+        # TODO
+        # send disconnect
+        # and raise error
       end
     end
 
@@ -214,6 +242,22 @@ module HrrRbSsh
       message = HrrRbSsh::Message::SSH_MSG_NEWKEYS.decode payload
 
       update_encryption_mac_compression_algorithms
+    end
+
+    def receive_service_request
+      payload = @receiver.receive self
+      message = HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.decode payload
+
+      message
+    end
+
+    def send_service_accept service_name
+        message = {
+          'SSH_MSG_SERVICE_ACCEPT' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
+          'service name'           => service_name,
+        }
+        payload = HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode message
+        @sender.send self, payload
     end
 
     def update_remote_algorithms message

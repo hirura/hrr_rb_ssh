@@ -119,6 +119,18 @@ RSpec.describe HrrRbSsh::Transport do
     let(:io){ MockSocket.new }
     let(:mode){ HrrRbSsh::Transport::Mode::SERVER }
 
+    describe "#start" do
+      let(:transport){ described_class.new io, mode }
+
+      it "calls #exchange_version, #exchange_key, and #verify_service_request" do
+        expect(transport).to receive(:exchange_version).with(no_args).once
+        expect(transport).to receive(:exchange_key).with(no_args).once
+        expect(transport).to receive(:verify_service_request).with(no_args).once
+
+        transport.start
+      end
+    end
+
     describe "#exchange_version" do
       let(:transport){ described_class.new io, mode }
       let(:local_version_string){ "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}" }
@@ -318,6 +330,50 @@ RSpec.describe HrrRbSsh::Transport do
         expect(transport.outgoing_mac_algorithm).to         be_an_instance_of HrrRbSsh::Transport::MacAlgorithm::HmacSha1
         expect(transport.incoming_compression_algorithm).to be_an_instance_of HrrRbSsh::Transport::CompressionAlgorithm::None
         expect(transport.outgoing_compression_algorithm).to be_an_instance_of HrrRbSsh::Transport::CompressionAlgorithm::None
+      end
+    end
+
+    describe "#verify_service_request" do
+      let(:transport){ described_class.new io, mode }
+
+      let(:mock_sender  ){ double("mock sender") }
+      let(:mock_receiver){ double("mock receiver") }
+
+      let(:service_request_message){
+        {
+          "SSH_MSG_SERVICE_REQUEST" => 5,
+          "service name"            => 'ssh-userauth',
+        }
+      }
+      let(:service_request_payload){
+        HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.encode service_request_message
+      }
+
+      let(:service_accept_message){
+        {
+          "SSH_MSG_SERVICE_ACCEPT" => 6,
+          "service name"           => 'ssh-userauth',
+        }
+      }
+      let(:service_accept_payload){
+        HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode service_accept_message
+      }
+
+      before :example do
+        transport.instance_variable_set('@sender',   mock_sender  )
+        transport.instance_variable_set('@receiver', mock_receiver)
+      end
+
+      context "when 'ssh-userauth' is registered as acceptable service" do
+        let(:acceptable_service){ 'ssh-userauth' }
+
+        it "receives service request and service accept" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(service_request_payload).once
+          expect(mock_sender).to   receive(:send).with(transport, service_accept_payload).once
+
+          transport.register_acceptable_service acceptable_service
+          transport.verify_service_request
+        end
       end
     end
   end
