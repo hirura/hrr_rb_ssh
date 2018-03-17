@@ -4,6 +4,7 @@
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/message'
 require 'hrr_rb_ssh/authentication/authenticator'
+require 'hrr_rb_ssh/authentication/method'
 
 module HrrRbSsh
   class Authentication
