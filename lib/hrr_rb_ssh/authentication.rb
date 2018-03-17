@@ -9,8 +9,9 @@ module HrrRbSsh
   class Authentication
     SERVICE_NAME = 'ssh-userauth'
 
-    def initialize transport
+    def initialize transport, options={}
       @transport = transport
+      @options = options
 
       @logger = HrrRbSsh::Logger.new self.class.name
 

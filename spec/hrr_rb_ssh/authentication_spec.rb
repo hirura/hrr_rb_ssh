@@ -14,9 +14,14 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:options){ Hash.new }
 
-    it "takes one argument: transport" do
+    it "can take one argument: transport" do
       expect { described_class.new(transport) }.not_to raise_error
+    end
+
+    it "can take two arguments: transport and options" do
+      expect { described_class.new(transport, options) }.not_to raise_error
     end
 
     it "registeres ::SERVICE_NAME in transport" do
