@@ -1,6 +1,10 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/message/001_ssh_msg_disconnect'
+require 'hrr_rb_ssh/message/002_ssh_msg_ignore'
+require 'hrr_rb_ssh/message/003_ssh_msg_unimplemented'
+require 'hrr_rb_ssh/message/004_ssh_msg_debug'
 require 'hrr_rb_ssh/message/005_ssh_msg_service_request'
 require 'hrr_rb_ssh/message/006_ssh_msg_service_accept'
 require 'hrr_rb_ssh/message/020_ssh_msg_kexinit'
