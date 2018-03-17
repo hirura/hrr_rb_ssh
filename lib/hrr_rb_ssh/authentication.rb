@@ -19,6 +19,14 @@ module HrrRbSsh
       @transport.register_acceptable_service SERVICE_NAME
     end
 
+    def send payload
+      @transport.send payload
+    end
+
+    def receive
+      @transport.receive
+    end
+
     def start
       @transport.start
 

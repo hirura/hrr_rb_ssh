@@ -33,6 +33,32 @@ RSpec.describe HrrRbSsh::Authentication do
     end
   end
 
+  describe '#send' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ described_class.new(transport) }
+    let(:payload){ "testing" }
+
+    it "sends payload" do
+      expect(transport).to receive(:send).with(payload).once
+      authentication.send payload
+    end
+  end
+
+  describe '#receive' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ described_class.new(transport) }
+    let(:payload){ "testing" }
+
+    it "receives payload" do
+      expect(transport).to receive(:receive).with(no_args).and_return(payload).once
+      expect(authentication.receive).to eq payload
+    end
+  end
+
   describe '#start' do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
