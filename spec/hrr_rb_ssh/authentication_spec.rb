@@ -115,7 +115,7 @@ RSpec.describe HrrRbSsh::Authentication do
         HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_none_method_message
       }
 
-      it "receives" do
+      it "sends userauth success message for none method" do
         expect( transport ).to receive(:receive).with(no_args).and_return(userauth_request_with_none_method_payload).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
@@ -161,7 +161,7 @@ RSpec.describe HrrRbSsh::Authentication do
         ]
       }
 
-      it "receives" do
+      it "sends userauth success message for password method after userauth failure message for none method" do
         expect( transport ).to receive(:receive).with(no_args).and_return(*userauth_requests).twice
         expect( transport ).to receive(:send).with(userauth_failure_payload).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
@@ -183,7 +183,7 @@ RSpec.describe HrrRbSsh::Authentication do
         ].join
       }
 
-      it "receives" do
+      it "sends userauth failure message and raise error" do
         expect( transport ).to receive(:receive).with(no_args).and_return(not_userauth_request_payload).once
 
         expect { authentication.authenticate }.to raise_error RuntimeError
