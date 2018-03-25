@@ -34,19 +34,53 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc do
   end
 
   describe '#encrypt' do
-    it "returns not original data" do
-      expect( encryption_algorithm.encrypt data ).to_not eq data
+    context "when data length is 0" do
+      let(:empty_string){ String.new }
+
+      it "returns original data (empty string)" do
+        expect( encryption_algorithm.encrypt empty_string ).to eq empty_string
+      end
+    end
+
+    context "when data length is a multiple of block length" do
+      it "returns not original data" do
+        expect( encryption_algorithm.encrypt data ).to_not eq data
+      end
+    end
+
+    context "when data length is not a multiple of block length" do
+      let(:invalid_length_data){ data + 'z' }
+
+      it "raises error" do
+        expect { encryption_algorithm.encrypt invalid_length_data }.to raise_error OpenSSL::Cipher::CipherError
+      end
     end
   end
 
   describe '#decrypt' do
-    it "returns not original data" do
-      expect( encryption_algorithm.decrypt data ).to_not eq data
+    context "when data length is 0" do
+      let(:empty_string){ String.new }
+
+      it "returns original data (empty string)" do
+        expect( encryption_algorithm.decrypt empty_string ).to eq empty_string
+      end
     end
 
-    it "returns original data for encrypted data" do
-      encrypted_data = encryption_algorithm.encrypt(data)
-      expect( encryption_algorithm.decrypt encrypted_data ).to eq data
+    context "when data length is a multiple of block length" do
+      let(:encrypted_data){ encryption_algorithm.encrypt data }
+
+      it "returns original data for encrypted data" do
+        expect( encryption_algorithm.decrypt encrypted_data ).to eq data
+      end
+    end
+
+    context "when data length is not a multiple of block length" do
+      let(:encrypted_data){ encryption_algorithm.encrypt data }
+      let(:invalid_length_encrypted_data){ encrypted_data + 'z' }
+
+      it "raises error" do
+        expect { encryption_algorithm.decrypt invalid_length_encrypted_data }.to raise_error OpenSSL::Cipher::CipherError
+      end
     end
   end
 end

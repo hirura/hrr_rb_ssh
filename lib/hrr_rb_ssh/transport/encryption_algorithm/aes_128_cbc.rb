@@ -48,11 +48,19 @@ module HrrRbSsh
         end
 
         def encrypt data
-          @encryptor.update(data) + @encryptor.final
+          if data.empty?
+            data
+          else
+            @encryptor.update(data) + @encryptor.final
+          end
         end
 
         def decrypt data
-          @decryptor.update(data) + @decryptor.final
+          if data.empty?
+            data
+          else
+            @decryptor.update(data) + @decryptor.final
+          end
         end
       end
 
