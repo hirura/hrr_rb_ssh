@@ -46,6 +46,9 @@ module HrrRbSsh
       @sender   = HrrRbSsh::Transport::Sender.new
       @receiver = HrrRbSsh::Transport::Receiver.new
 
+      @send_queue    = Queue.new
+      @receive_queue = Queue.new
+
       @local_version  = "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}".force_encoding(Encoding::ASCII_8BIT)
       @remote_version = "".force_encoding(Encoding::ASCII_8BIT)
 
@@ -63,11 +66,11 @@ module HrrRbSsh
     end
 
     def send payload
-      @sender.send self, payload
+      @send_queue.enq payload
     end
 
     def receive
-      @receiver.receive self
+      @receive_queue.deq
     end
 
     def start
@@ -78,6 +81,9 @@ module HrrRbSsh
       when HrrRbSsh::Transport::Mode::SERVER
         verify_service_request
       end
+
+      start_sender_thread
+      start_receiver_thread
     end
 
     def exchange_version
@@ -113,6 +119,41 @@ module HrrRbSsh
         # send disconnect
         # and raise error
       end
+    end
+
+    def start_sender_thread
+      Thread.start {
+        loop do
+          payload = @send_queue.deq
+          break if nil == payload && @send_queue.closed?
+          @sender.send self, payload
+        end
+      }
+    end
+
+    def start_receiver_thread
+      Thread.start {
+        loop do
+          payload = @receiver.receive self
+          case payload[0,1].unpack("C")[0]
+          when HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE
+            message = HrrRbSsh::Message::SSH_MSG_DISCONNECT.decode payload
+            @logger.debug("received disconnect message: #{message.inspect}")
+            break
+          when HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE
+            message = HrrRbSsh::Message::SSH_MSG_IGNORE.decode payload
+            @logger.debug("received ignore message: #{message.inspect}")
+          when HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE
+            message = HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.decode payload
+            @logger.debug("received unimplemented message: #{message.inspect}")
+          when HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE
+            message = HrrRbSsh::Message::SSH_MSG_DEBUG.decode payload
+            @logger.debug("received debug message: #{message.inspect}")
+          else
+            @receive_queue.enq payload
+          end
+        end
+      }
     end
 
     def initialize_local_algorithms
