@@ -2,6 +2,10 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/connection/channel/session/pty_req'
+require 'hrr_rb_ssh/connection/channel/session/env'
+require 'hrr_rb_ssh/connection/channel/session/shell'
+require 'hrr_rb_ssh/connection/channel/session/exec'
+require 'hrr_rb_ssh/connection/channel/session/subsystem'
 
 module HrrRbSsh
   class Connection
