@@ -13,7 +13,7 @@ module HrrRbSsh
           @q = Queue.new
         end
         def connect next_proc
-          @q.enq next_proc
+          @q.enq next_proc if next_proc
         end
         def call_next *args
           next_proc = @q.deq
