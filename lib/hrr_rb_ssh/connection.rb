@@ -18,6 +18,10 @@ module HrrRbSsh
       @channels = Hash.new
     end
 
+    def send payload
+      @authentication.send payload
+    end
+
     def start
       @authentication.start
       connection_loop

@@ -18,6 +18,21 @@ RSpec.describe HrrRbSsh::Connection do
     end
   end
 
+  describe '#send' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:options){ Hash.new }
+    let(:connection){ described_class.new authentication, options }
+    let(:payload){ "testing" }
+
+    it "calls authentication.send" do
+      expect(authentication).to receive(:send).with(payload).once
+      connection.send payload
+    end
+  end
+
   describe '#start' do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
