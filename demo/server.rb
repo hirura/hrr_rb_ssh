@@ -65,7 +65,7 @@ conn_shell = HrrRbSsh::Connection::RequestHandler.new { |context|
       STDERR.reopen pts, 'w'
       pts.close
       context.vars[:env] ||= Hash.new
-      exec context.vars[:env], ['/bin/bash', '-tcsh']
+      exec context.vars[:env], ['/bin/bash', '-bash']
     end
 
     pts.close
