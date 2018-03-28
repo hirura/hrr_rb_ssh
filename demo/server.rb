@@ -4,7 +4,13 @@
 require 'logger'
 require 'pty'
 require 'socket'
-require 'hrr_rb_ssh'
+
+begin
+  require 'hrr_rb_ssh'
+rescue LoadError
+  $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+  require 'hrr_rb_ssh'
+end
 
 
 logger = Logger.new STDOUT
