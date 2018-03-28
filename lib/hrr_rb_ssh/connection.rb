@@ -20,14 +20,18 @@ module HrrRbSsh
 
     def start
       @authentication.start
-      start_connection_loop
+      connection_loop
     end
 
-    def start_connection_loop
+    def connection_loop
       while payload = @authentication.receive
         case payload[0,1].unpack("C")[0]
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE
           channel_open payload
+        when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
+          channel_request payload
+        when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
+          channel_data payload
         end
       end
     end
@@ -43,6 +47,20 @@ module HrrRbSsh
       channel = Channel.new self, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
       @channels[local_channel] = channel
       send_channel_open_confirmation channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
+    end
+
+    def channel_request payload
+      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID)
+      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.decode payload
+      local_channel = message['recipient channel']
+      @channels[local_channel].receive_queue.enq message
+    end
+
+    def channel_data payload
+      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::ID)
+      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.decode payload
+      local_channel = message['recipient channel']
+      @channels[local_channel].receive_queue.enq message
     end
 
     def send_channel_open_confirmation channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size

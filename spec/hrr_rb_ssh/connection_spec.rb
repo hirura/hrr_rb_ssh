@@ -26,14 +26,14 @@ RSpec.describe HrrRbSsh::Connection do
     let(:options){ Hash.new }
     let(:connection){ described_class.new authentication, options }
 
-    it "calls authentication.start and start_connection_loop" do
+    it "calls authentication.start and connection_loop" do
       expect(authentication).to receive(:start).with(no_args).once
-      expect(connection).to receive(:start_connection_loop).with(no_args).once
+      expect(connection).to receive(:connection_loop).with(no_args).once
       connection.start
     end
   end
 
-  describe '#start_connection_loop' do
+  describe '#connection_loop' do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
@@ -59,7 +59,49 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_open_payload).once
         expect(authentication).to receive(:receive).with(no_args).and_return(nil).once
         expect(connection).to receive(:channel_open).with(channel_open_payload).once
-        connection.start_connection_loop
+        connection.connection_loop
+      end
+    end
+
+    context "when receives channel request message" do
+      let(:channel_request_message){
+        {
+          "SSH_MSG_CHANNEL_REQUEST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          "recipient channel"       => 0,
+          "request type"            => 'shell',
+          "want reply"              => true,
+        }
+      }
+      let(:channel_request_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.encode channel_request_message
+      }
+
+      it "calls channel_request" do
+        HrrRbSsh::Logger.initialize ::Logger.new(STDOUT)
+        expect(authentication).to receive(:receive).with(no_args).and_return(channel_request_payload).once
+        expect(authentication).to receive(:receive).with(no_args).and_return(nil).once
+        expect(connection).to receive(:channel_request).with(channel_request_payload).once
+        connection.connection_loop
+      end
+    end
+
+    context "when receives channel data message" do
+      let(:channel_data_message){
+        {
+          "SSH_MSG_CHANNEL_DATA" => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          "recipient channel"    => 0,
+          "data"                 => "testing",
+        }
+      }
+      let(:channel_data_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.encode channel_data_message
+      }
+
+      it "calls channel_data" do
+        expect(authentication).to receive(:receive).with(no_args).and_return(channel_data_payload).once
+        expect(authentication).to receive(:receive).with(no_args).and_return(nil).once
+        expect(connection).to receive(:channel_data).with(channel_data_payload).once
+        connection.connection_loop
       end
     end
   end
@@ -103,6 +145,77 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:send).with(channel_open_confirmation_payload).once
         connection.channel_open channel_open_payload
         expect(connection.instance_variable_get('@channels')).to include(channel_open_message['sender channel'])
+      end
+    end
+  end
+
+  describe '#channel_request' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:options){ Hash.new }
+    let(:connection){ described_class.new authentication, options }
+
+    context "when receives valid channel request message" do
+      let(:channel_request_message){
+        {
+          "SSH_MSG_CHANNEL_REQUEST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          "recipient channel"       => 0,
+          "request type"            => 'shell',
+          "want reply"              => true,
+        }
+      }
+      let(:channel_request_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.encode channel_request_message
+      }
+
+      let(:channel){ double('channel') }
+      let(:receive_queue){ Queue.new }
+
+      before :example do
+        connection.instance_variable_get('@channels')[0] = channel
+      end
+
+      it "calls channel_request" do
+        allow(channel).to receive(:receive_queue).and_return(receive_queue)
+        connection.channel_request channel_request_payload
+        expect(connection.instance_variable_get('@channels')[0].receive_queue.pop).to eq channel_request_message
+      end
+    end
+  end
+
+  describe '#channel_data' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:options){ Hash.new }
+    let(:connection){ described_class.new authentication, options }
+
+    context "when receives valid channel data message" do
+      let(:channel_data_message){
+        {
+          "SSH_MSG_CHANNEL_DATA" => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          "recipient channel"    => 0,
+          "data"                 => "testing",
+        }
+      }
+      let(:channel_data_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.encode channel_data_message
+      }
+
+      let(:channel){ double('channel') }
+      let(:receive_queue){ Queue.new }
+
+      before :example do
+        connection.instance_variable_get('@channels')[0] = channel
+      end
+
+      it "calls channel_data" do
+        allow(channel).to receive(:receive_queue).and_return(receive_queue)
+        connection.channel_data channel_data_payload
+        expect(connection.instance_variable_get('@channels')[0].receive_queue.pop).to eq channel_data_message
       end
     end
   end

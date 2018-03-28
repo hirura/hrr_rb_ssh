@@ -14,9 +14,15 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     let(:remote_channel){ 0 }
     let(:initial_window_size){ 2097152 }
     let(:maximum_packet_size){ 32768 }
+    let(:channel){ described_class.new(connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size) }
 
     it "takes six arguments: connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size" do
-      expect { described_class.new(connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size) }.not_to raise_error
+      expect { channel }.not_to raise_error
+    end
+
+    it "initializes receive_queue readable" do
+      expect(channel.receive_queue).to be_an_instance_of ::Queue
+      expect(channel.receive_queue.size).to eq 0
     end
   end
 end

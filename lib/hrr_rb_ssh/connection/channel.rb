@@ -18,6 +18,9 @@ module HrrRbSsh
         @@type_list.keys
       end
 
+      attr_reader \
+        :receive_queue
+
       def initialize connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
         @logger = HrrRbSsh::Logger.new self.class.name
 
@@ -27,6 +30,8 @@ module HrrRbSsh
         @remote_channel = remote_channel
         @initial_window_size = initial_window_size
         @maximum_packet_size = maximum_packet_size
+
+        @receive_queue = Queue.new
       end
     end
   end
