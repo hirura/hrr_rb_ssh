@@ -50,6 +50,7 @@ module HrrRbSsh
       maximum_packet_size = message['maximum packet size']
       channel = Channel.new self, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
       @channels[local_channel] = channel
+      channel.start
       send_channel_open_confirmation channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
     end
 
