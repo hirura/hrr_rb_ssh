@@ -82,20 +82,16 @@ conn_shell = HrrRbSsh::Connection::RequestHandler.new { |context|
     }
     threads.push Thread.start {
       loop do
-        begin
-          ptm.write context.io.readpartial(1024)
-        rescue EOFError => e
-          context.logger.info("io is closed")
-          break
-        end
+        ptm.write context.io.readpartial(1024)
       end
     }
 
-    Process.waitpid pid
-    ptm.close
-    context.io.close
+    pid, status = Process.waitpid2 pid
     threads.each(&:exit)
     threads.each(&:join)
+    ptm.close
+
+    status.exitstatus
   }
 }
 
