@@ -3,6 +3,7 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/message'
+require 'hrr_rb_ssh/closed_authentication_error'
 require 'hrr_rb_ssh/authentication/authenticator'
 require 'hrr_rb_ssh/authentication/method'
 
@@ -17,20 +18,41 @@ module HrrRbSsh
       @logger = HrrRbSsh::Logger.new self.class.name
 
       @transport.register_acceptable_service SERVICE_NAME
+
+      @closed = nil
     end
 
     def send payload
-      @transport.send payload
+      raise HrrRbSsh::ClosedAuthenticationError if @closed
+      begin
+        @transport.send payload
+      rescue HrrRbSsh::ClosedTransportError
+        raise HrrRbSsh::ClosedAuthenticationError
+      end
     end
 
     def receive
-      @transport.receive
+      raise HrrRbSsh::ClosedAuthenticationError if @closed
+      begin
+        @transport.receive
+      rescue HrrRbSsh::ClosedTransportError
+        raise HrrRbSsh::ClosedAuthenticationError
+      end
     end
 
     def start
       @transport.start
-
       authenticate
+    end
+
+    def close
+      return if @closed
+      @closed = true
+      @transport.close
+    end
+
+    def closed?
+      @closed
     end
 
     def authenticate
@@ -43,12 +65,14 @@ module HrrRbSsh
           method = Method[method_name].new(@options)
           if method.authenticate(userauth_request_message)
             send_userauth_success
+            @closed = false
             break
           else
             send_userauth_failure
+            @closed = true
           end
-
         else
+          @closed = true
           raise
         end
       end

@@ -40,9 +40,18 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:authentication){ described_class.new(transport) }
     let(:payload){ "testing" }
 
-    it "sends payload" do
-      expect(transport).to receive(:send).with(payload).once
-      authentication.send payload
+    context "when transport is not closed" do
+      it "sends payload" do
+        expect(transport).to receive(:send).with(payload).once
+        authentication.send payload
+      end
+    end
+
+    context "when transport is closed" do
+      it "raises ClosedAuthenticationError" do
+        expect(transport).to receive(:send).with(payload).and_raise(HrrRbSsh::ClosedTransportError).once
+        expect { authentication.send payload }.to raise_error HrrRbSsh::ClosedAuthenticationError
+      end
     end
   end
 
@@ -53,9 +62,18 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:authentication){ described_class.new(transport) }
     let(:payload){ "testing" }
 
-    it "receives payload" do
-      expect(transport).to receive(:receive).with(no_args).and_return(payload).once
-      expect(authentication.receive).to eq payload
+    context "when transport is not closed" do
+      it "receives payload" do
+        expect(transport).to receive(:receive).with(no_args).and_return(payload).once
+        expect(authentication.receive).to eq payload
+      end
+    end
+
+    context "when transport is closed" do
+      it "raises ClosedAuthenticationError" do
+        expect(transport).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedTransportError).once
+        expect { authentication.receive }.to raise_error HrrRbSsh::ClosedAuthenticationError
+      end
     end
   end
 
@@ -70,6 +88,56 @@ RSpec.describe HrrRbSsh::Authentication do
       expect( authentication ).to receive(:authenticate).with(no_args).once
 
       authentication.start
+    end
+  end
+
+  describe '#close' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ described_class.new(transport) }
+
+    context "when not closed" do
+      before :example do
+        authentication.instance_variable_set('@closed', false)
+      end
+
+      it "closes self" do
+        authentication.close
+        expect(authentication.closed?).to be true
+      end
+
+      it "calls transport.close" do
+        expect(transport).to receive(:close).with(no_args).once
+        authentication.close
+      end
+    end
+  end
+
+  describe '#closed?' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ described_class.new(transport) }
+
+    context "when not closed" do
+      before :example do
+        authentication.instance_variable_set('@closed', false)
+      end
+
+      it "returns false" do
+        expect(authentication.closed?).to be false
+      end
+    end
+
+    context "when closed" do
+      before :example do
+        authentication.instance_variable_set('@closed', true)
+      end
+
+      it "returns true" do
+        expect(authentication.closed?).to be true
+      end
     end
   end
 
@@ -120,6 +188,8 @@ RSpec.describe HrrRbSsh::Authentication do
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
         authentication.authenticate
+
+        expect( authentication.closed? ).to be false
       end
     end
 
@@ -167,6 +237,8 @@ RSpec.describe HrrRbSsh::Authentication do
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
         authentication.authenticate
+
+        expect( authentication.closed? ).to be false
       end
     end
 
@@ -187,6 +259,8 @@ RSpec.describe HrrRbSsh::Authentication do
         expect( transport ).to receive(:receive).with(no_args).and_return(not_userauth_request_payload).once
 
         expect { authentication.authenticate }.to raise_error RuntimeError
+
+        expect( authentication.closed? ).to be true
       end
     end
   end
