@@ -30,9 +30,18 @@ module HrrRbSsh
 
         block_size                 = [transport.incoming_encryption_algorithm.block_size, minimum_block_size].max
         initial_encrypted_packet   = transport.io.read block_size
+        if (initial_encrypted_packet == nil) || (initial_encrypted_packet.length != block_size)
+          @logger.warn("IO is EOF")
+          raise EOFError
+        end
         initial_unencrypted_packet = transport.incoming_encryption_algorithm.decrypt initial_encrypted_packet
         packet_length              = initial_unencrypted_packet[0,4].unpack("N")[0]
-        last_encrypted_packet      = transport.io.read (packet_length_field_length + packet_length - block_size)
+        last_packet_length         = packet_length_field_length + packet_length - block_size
+        last_encrypted_packet      = transport.io.read last_packet_length
+        if (last_encrypted_packet == nil) || (last_encrypted_packet.length != last_packet_length)
+          @logger.warn("IO is EOF")
+          raise EOFError
+        end
         last_unencrypted_packet    = transport.incoming_encryption_algorithm.decrypt last_encrypted_packet
         encrypted_packet           = initial_encrypted_packet + last_encrypted_packet
         unencrypted_packet         = initial_unencrypted_packet + last_unencrypted_packet
@@ -41,7 +50,13 @@ module HrrRbSsh
       end
 
       def receive_mac transport
-        transport.io.read transport.incoming_mac_algorithm.digest_length
+        mac_length = transport.incoming_mac_algorithm.digest_length
+        mac = transport.io.read mac_length
+        if (mac == nil) || (mac.length != mac_length)
+          @logger.warn("IO is EOF")
+          raise EOFError
+        end
+        mac
       end
 
       def receive transport
