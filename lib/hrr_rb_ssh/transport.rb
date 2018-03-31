@@ -43,11 +43,17 @@ module HrrRbSsh
 
       @logger = HrrRbSsh::Logger.new self.class.name
 
+      @closed = nil
+      @disconnected = nil
+
       @sender   = HrrRbSsh::Transport::Sender.new
       @receiver = HrrRbSsh::Transport::Receiver.new
 
       @send_queue    = Queue.new
       @receive_queue = Queue.new
+
+      @sender_thread   = nil
+      @receiver_thread = nil
 
       @local_version  = "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}".force_encoding(Encoding::ASCII_8BIT)
       @remote_version = "".force_encoding(Encoding::ASCII_8BIT)
@@ -66,14 +72,24 @@ module HrrRbSsh
     end
 
     def send payload
-      @send_queue.enq payload
+      begin
+        @send_queue.enq payload
+      rescue ClosedQueueError => e
+        raise HrrRbSsh::ClosedTransportError
+      end
     end
 
     def receive
-      @receive_queue.deq
+      payload = @receive_queue.deq
+      if @receive_queue.closed?
+        raise HrrRbSsh::ClosedTransportError
+      end
+      payload
     end
 
     def start
+      @logger.info("start transport")
+
       exchange_version
       exchange_key
 
@@ -82,8 +98,38 @@ module HrrRbSsh
         verify_service_request
       end
 
-      start_sender_thread
-      start_receiver_thread
+      @closed = false
+
+      @sender_thread   = sender_thread
+      @receiver_thread = receiver_thread
+
+      @logger.info("transport started")
+    end
+
+    def close
+      return if @closed
+      @logger.info("close transport")
+      @closed = true
+      @send_queue.close
+      @receive_queue.close
+      disconnect
+      @logger.info("transport closed")
+    end
+
+    def closed?
+      @closed
+    end
+
+    def disconnect
+      return if @disconnected
+      @logger.info("disconnect transport")
+      @disconnected = true
+      begin
+        send_disconnect
+      rescue => e
+        @logger.warn(e.full_message)
+      end
+      @logger.info("transport disconnected")
     end
 
     def exchange_version
@@ -115,44 +161,66 @@ module HrrRbSsh
       if @acceptable_services.include? service_name
         send_service_accept service_name
       else
-        # TODO
-        # send disconnect
-        # and raise error
+        close
       end
     end
 
-    def start_sender_thread
+    def sender_thread
       Thread.start {
+        @logger.info("start sender thread")
         loop do
-          payload = @send_queue.deq
-          break if nil == payload && @send_queue.closed?
-          @sender.send self, payload
+          begin
+            payload = @send_queue.deq
+            if @send_queue.closed?
+              @logger.info("closing sender thread")
+              break
+            end
+            @sender.send self, payload
+          rescue => e
+            @logger.error(e.full_message)
+            close
+          end
         end
+        @logger.info("sender thread closed")
       }
     end
 
-    def start_receiver_thread
+    def receiver_thread
       Thread.start {
+        @logger.info("start receiver thread")
         loop do
-          payload = @receiver.receive self
-          case payload[0,1].unpack("C")[0]
-          when HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE
-            message = HrrRbSsh::Message::SSH_MSG_DISCONNECT.decode payload
-            @logger.debug("received disconnect message: #{message.inspect}")
+          if @receive_queue.closed?
+            @logger.info("closing receiver thread")
             break
-          when HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE
-            message = HrrRbSsh::Message::SSH_MSG_IGNORE.decode payload
-            @logger.debug("received ignore message: #{message.inspect}")
-          when HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE
-            message = HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.decode payload
-            @logger.debug("received unimplemented message: #{message.inspect}")
-          when HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE
-            message = HrrRbSsh::Message::SSH_MSG_DEBUG.decode payload
-            @logger.debug("received debug message: #{message.inspect}")
-          else
-            @receive_queue.enq payload
+          end
+          begin
+            payload = @receiver.receive self
+            case payload[0,1].unpack("C")[0]
+            when HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE
+              message = HrrRbSsh::Message::SSH_MSG_DISCONNECT.decode payload
+              @logger.debug("received disconnect message: #{message.inspect}")
+              @disconnected = true
+              close
+            when HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE
+              message = HrrRbSsh::Message::SSH_MSG_IGNORE.decode payload
+              @logger.debug("received ignore message: #{message.inspect}")
+            when HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE
+              message = HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.decode payload
+              @logger.debug("received unimplemented message: #{message.inspect}")
+            when HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE
+              message = HrrRbSsh::Message::SSH_MSG_DEBUG.decode payload
+              @logger.debug("received debug message: #{message.inspect}")
+            else
+              @receive_queue.enq payload
+            end
+          rescue EOFError => e
+            close
+          rescue => e
+            @logger.error(e.full_message)
+            close
           end
         end
+        @logger.info("receiver thread closed")
       }
     end
 
@@ -205,6 +273,17 @@ module HrrRbSsh
         @v_c = @local_version
         @v_s = @remote_version
       end
+    end
+
+    def send_disconnect
+      message = {
+        "SSH_MSG_DISCONNECT" => 1,
+        "reason code"        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+        "description"        => "disconnected by user",
+        "language tag"       => ""
+      }
+      payload = HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode message
+      @sender.send self, payload
     end
 
     def send_kexinit

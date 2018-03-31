@@ -88,9 +88,21 @@ RSpec.describe HrrRbSsh::Transport do
     let(:mock_sender){ double("mock sender") }
     let(:payload){ "testing" }
 
-    it "sends payload" do
-      transport.send payload
-      expect(transport.instance_variable_get('@send_queue').deq).to eq payload
+    context "when send_queue is not closed" do
+      it "sends payload" do
+        transport.send payload
+        expect(transport.instance_variable_get('@send_queue').deq).to eq payload
+      end
+    end
+
+    context "when send_queue is closed" do
+      before :example do
+        transport.instance_variable_get('@send_queue').close
+      end
+
+      it "raises HrrRbSsh::ClosedTransportError" do
+        expect { transport.send payload }.to raise_error HrrRbSsh::ClosedTransportError
+      end
     end
   end
 
@@ -101,9 +113,24 @@ RSpec.describe HrrRbSsh::Transport do
     let(:mock_receiver){ double("mock receiver") }
     let(:payload){ "testing" }
 
-    it "receives payload" do
-      transport.instance_variable_get('@receive_queue').enq payload
-      expect(transport.receive).to eq payload
+    context "when receive_queue is not closed" do
+      before :example do
+        transport.instance_variable_get('@receive_queue').enq payload
+      end
+
+      it "receives payload" do
+        expect(transport.receive).to eq payload
+      end
+    end
+
+    context "when receive_queue is closed" do
+      before :example do
+        transport.instance_variable_get('@receive_queue').close
+      end
+
+      it "raises HrrRbSsh::ClosedTransportError" do
+        expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+      end
     end
   end
 
@@ -114,14 +141,92 @@ RSpec.describe HrrRbSsh::Transport do
     describe "#start" do
       let(:transport){ described_class.new io, mode }
 
-      it "calls #exchange_version, #exchange_key, #verify_service_request, #start_sender_thread, and #start_receiver_thread" do
+      it "calls #exchange_version, #exchange_key, #verify_service_request, #sender_thread, and #receiver_thread" do
         expect(transport).to receive(:exchange_version).with(no_args).once
         expect(transport).to receive(:exchange_key).with(no_args).once
         expect(transport).to receive(:verify_service_request).with(no_args).once
-        expect(transport).to receive(:start_sender_thread).with(no_args).once
-        expect(transport).to receive(:start_receiver_thread).with(no_args).once
+        expect(transport).to receive(:sender_thread).with(no_args).once
+        expect(transport).to receive(:receiver_thread).with(no_args).once
 
         transport.start
+      end
+    end
+
+    describe "#close" do
+      let(:transport){ described_class.new io, mode }
+
+      before :example do
+        transport.instance_variable_set('@closed', false)
+      end
+
+      it "closes @send_queue and @receive_queue, and calls disconnect" do
+        expect(transport).to receive(:disconnect).with(no_args).once
+
+        expect(transport.instance_variable_get('@send_queue').closed?).to be false
+        expect(transport.instance_variable_get('@receive_queue').closed?).to be false
+        transport.close
+        expect(transport.instance_variable_get('@send_queue').closed?).to be true
+        expect(transport.instance_variable_get('@receive_queue').closed?).to be true
+      end
+    end
+
+    describe "#closed?" do
+      let(:transport){ described_class.new io, mode }
+
+      context "when opened" do
+        before :example do
+          transport.instance_variable_set('@closed', false)
+        end
+
+        it "returns false" do
+          expect(transport.closed?).to be false
+        end
+      end
+
+      context "when closed" do
+        before :example do
+          transport.instance_variable_set('@closed', true)
+        end
+
+        it "returns true" do
+          expect(transport.closed?).to be true
+        end
+      end
+    end
+
+    describe "#disconnect" do
+      let(:transport){ described_class.new io, mode }
+
+      let(:disconnect_message){
+        {
+          "SSH_MSG_DISCONNECT" => 1,
+          "reason code"        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+          "description"        => "disconnected by user",
+          "language tag"       => ""
+        }
+      }
+      let(:disconnect_payload){
+        HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+      }
+      let(:mock_sender  ){ double("mock sender") }
+
+      before :example do
+        transport.instance_variable_set('@disconnected', false)
+        transport.instance_variable_set('@sender', mock_sender  )
+      end
+
+      context "when disconnect message can be sent" do
+        it "sends disconnect" do
+          expect(mock_sender).to receive(:send).with(transport, disconnect_payload).once
+          expect { transport.disconnect }.not_to raise_error
+        end
+      end
+
+      context "when disconnect message can not be sent" do
+        it "can not send disconnect" do
+          expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(RuntimeError).once
+          expect { transport.disconnect }.not_to raise_error
+        end
       end
     end
 
@@ -369,31 +474,71 @@ RSpec.describe HrrRbSsh::Transport do
           transport.verify_service_request
         end
       end
+
+      context "when 'ssh-userauth' is not registered as acceptable service" do
+        let(:acceptable_service){ 'ssh-never-match-service' }
+
+        it "receives service request and service accept" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(service_request_payload).once
+          expect(mock_sender).to   receive(:send).with(transport, service_accept_payload).once
+
+          expect(transport).to receive(:close).with(no_args).once
+
+          transport.register_acceptable_service acceptable_service
+          transport.verify_service_request
+        end
+      end
     end
 
-    describe "#start_sender_thread" do
+    describe "#sender_thread" do
       let(:transport){ described_class.new io, mode }
 
       let(:payload){ "testing" }
 
       let(:mock_sender){ double("mock sender") }
-      let(:send_queue){ Queue.new }
 
       before :example do
         transport.instance_variable_set('@sender', mock_sender)
-        transport.instance_variable_set('@send_queue', send_queue)
       end
 
-      it "dequeues a payload and sends the payload" do
-        send_queue.enq payload
-        send_queue.close
-        expect(mock_sender).to receive(:send).with(transport, payload).once
-        t = transport.start_sender_thread
-        t.join
+      context "with no error" do
+        let(:mock_send_queue){ double("mock send_queue") }
+
+        before :example do
+          transport.instance_variable_set('@send_queue', mock_send_queue)
+        end
+
+        it "dequeues a payload and sends the payload, and exit when send_queue is closed" do
+          expect(mock_send_queue).to receive(:deq).with(no_args).and_return(payload).once
+          expect(mock_send_queue).to receive(:closed?).with(no_args).and_return(false).once
+          expect(mock_send_queue).to receive(:deq).with(no_args).and_return(nil).once
+          expect(mock_send_queue).to receive(:closed?).with(no_args).and_return(true).once
+
+          expect(mock_sender).to receive(:send).with(transport, payload).once
+          t = transport.sender_thread
+          expect { t.join }.not_to raise_error
+        end
+      end
+
+      context "with error" do
+        let(:send_queue){ transport.instance_variable_get('@send_queue') }
+
+        before :example do
+          transport.instance_variable_set('@closed', false)
+          transport.instance_variable_set('@disconnected', true)
+          send_queue.enq payload
+        end
+
+        it "dequeues a payload and sends the payload, and exit when send_queue is closed" do
+          expect(mock_sender).to receive(:send).with(transport, payload).and_raise(RuntimeError).once
+
+          t = transport.sender_thread
+          expect { t.join }.not_to raise_error
+        end
       end
     end
 
-    describe "#start_receiver_thread" do
+    describe "#receiver_thread" do
       let(:transport){ described_class.new io, mode }
 
       let(:disconnect_message){
@@ -419,7 +564,7 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives disconnect message" do
         it "is finished" do
           expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.start_receiver_thread
+          t = transport.receiver_thread
           t.join
           expect(receive_queue.size).to eq 0
         end
@@ -439,7 +584,7 @@ RSpec.describe HrrRbSsh::Transport do
         it "ignores message and is finished" do
           expect(mock_receiver).to receive(:receive).with(transport).and_return(ignore_payload).once
           expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.start_receiver_thread
+          t = transport.receiver_thread
           t.join
           expect(receive_queue.size).to eq 0
         end
@@ -459,7 +604,7 @@ RSpec.describe HrrRbSsh::Transport do
         it "receives unimplemented message and is finished" do
           expect(mock_receiver).to receive(:receive).with(transport).and_return(unimplemented_payload).once
           expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.start_receiver_thread
+          t = transport.receiver_thread
           t.join
           expect(receive_queue.size).to eq 0
         end
@@ -481,7 +626,7 @@ RSpec.describe HrrRbSsh::Transport do
         it "receive debug message and is finished" do
           expect(mock_receiver).to receive(:receive).with(transport).and_return(debug_payload).once
           expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.start_receiver_thread
+          t = transport.receiver_thread
           t.join
           expect(receive_queue.size).to eq 0
         end
@@ -501,10 +646,28 @@ RSpec.describe HrrRbSsh::Transport do
         it "receive service_request message and is finished" do
           expect(mock_receiver).to receive(:receive).with(transport).and_return(service_request_payload).once
           expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.start_receiver_thread
+          t = transport.receiver_thread
           t.join
           expect(receive_queue.size).to eq 1
           expect(receive_queue.pop).to eq service_request_payload
+          expect(receive_queue.size).to eq 0
+        end
+      end
+
+      context "when @receiver.receive returns EOFError" do
+        it "is finished" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_raise(EOFError).once
+          t = transport.receiver_thread
+          t.join
+          expect(receive_queue.size).to eq 0
+        end
+      end
+
+      context "when @receiver.receive returns RuntimeError" do
+        it "is finished" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_raise(RuntimeError).once
+          t = transport.receiver_thread
+          t.join
           expect(receive_queue.size).to eq 0
         end
       end
