@@ -90,7 +90,7 @@ module HrrRbSsh
 
       def request message, variables
         request_type = message['request type']
-        @@type_list[@channel_type][request_type].run @proc_chain, @request_handler_io, variables, message, @connection.options
+        @@type_list[@channel_type][request_type].run @proc_chain, @connection.username, @request_handler_io, variables, message, @connection.options
       end
 
       def send_channel_success

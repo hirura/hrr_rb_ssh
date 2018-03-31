@@ -11,6 +11,7 @@ module HrrRbSsh
           class Context
             attr_reader \
               :logger,
+              :username,
               :io,
               :variables,
               :vars,
@@ -21,10 +22,11 @@ module HrrRbSsh
               :terminal_height_pixels,
               :encoded_terminal_modes
 
-            def initialize proc_chain, io, variables, message
+            def initialize proc_chain, username, io, variables, message
               @logger = HrrRbSsh::Logger.new self.class.name
 
               @proc_chain = proc_chain
+              @username   = username
               @io         = io
               @variables  = variables
               @vars       = variables

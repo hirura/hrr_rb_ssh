@@ -12,6 +12,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::Session::Exec do
 
   describe ".run" do
     let(:proc_chain){ double("proc_chain") }
+    let(:username){ 'username' }
     let(:io){ 'dummy' }
     let(:variables){ Hash.new }
     let(:message){ Hash.new }
@@ -21,7 +22,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::Session::Exec do
 
       it "calls proc_chain.connect" do
         expect( proc_chain ).to receive(:connect).with(nil).once
-        described_class.run proc_chain, io, variables, message, options
+        described_class.run proc_chain, username, io, variables, message, options
       end
     end
 
@@ -39,7 +40,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::Session::Exec do
 
       it "calls proc_chain.connect" do
         expect(proc_chain).to receive(:connect).with(chain_proc).once
-        described_class.run proc_chain, io, variables, message, options
+        described_class.run proc_chain, username, io, variables, message, options
       end
     end
   end

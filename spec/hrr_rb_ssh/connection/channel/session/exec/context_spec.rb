@@ -3,6 +3,7 @@
 
 RSpec.describe HrrRbSsh::Connection::Channel::Session::Exec::Context do
   let(:proc_chain){ "proc_chain" }
+  let(:username){ "username" }
   let(:io){ 'dummy' }
   let(:variables){ Hash.new }
   let(:message){
@@ -14,16 +15,15 @@ RSpec.describe HrrRbSsh::Connection::Channel::Session::Exec::Context do
       'command'                                     => 'command',
     }
   }
+  let(:context){ described_class.new proc_chain, username, io, variables, message }
 
   describe ".new" do
     it "takes 4 arguments" do
-      expect { described_class.new proc_chain, io, variables, message }.not_to raise_error
+      expect { context }.not_to raise_error
     end
   end
 
   describe "#chain_proc" do
-    let(:context){ described_class.new proc_chain, io, variables, message }
-
     context "with block" do
       let(:chain_proc){
         Proc.new {}
@@ -44,40 +44,30 @@ RSpec.describe HrrRbSsh::Connection::Channel::Session::Exec::Context do
   end
 
   describe "#logger" do
-    let(:context){ described_class.new proc_chain, io, variables, message }
-
     it "returns an instance of HrrRbSsh::Logger" do
       expect(context.logger).to be_an_instance_of HrrRbSsh::Logger
     end
   end
 
   describe "#io" do
-    let(:context){ described_class.new proc_chain, io, variables, message }
-
     it "returns 'io' object" do
       expect(context.io).to be io
     end
   end
 
   describe "#variables" do
-    let(:context){ described_class.new proc_chain, io, variables, message }
-
     it "returns 'variables' object" do
       expect(context.variables).to be variables
     end
   end
 
   describe "#vars" do
-    let(:context){ described_class.new proc_chain, io, variables, message }
-
     it "returns 'variables' object" do
       expect(context.vars).to be variables
     end
   end
 
   describe "#command" do
-    let(:context){ described_class.new proc_chain, io, variables, message }
-
     it "returns message['command']" do
       expect(context.command).to be message['command']
     end

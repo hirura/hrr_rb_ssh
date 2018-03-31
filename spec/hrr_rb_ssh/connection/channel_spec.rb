@@ -171,6 +171,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     let(:arguments){
       [
         channel.instance_variable_get('@proc_chain'),
+        channel.instance_variable_get('@username'),
         channel.instance_variable_get('@request_handler_io'),
         variables,
         channel_request_message,

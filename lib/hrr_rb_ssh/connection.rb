@@ -7,6 +7,7 @@ require 'hrr_rb_ssh/connection/channel'
 module HrrRbSsh
   class Connection
     attr_reader \
+      :username,
       :options
 
     def initialize authentication, options={}
@@ -16,6 +17,8 @@ module HrrRbSsh
       @options = options
 
       @channels = Hash.new
+
+      @username = nil
     end
 
     def send payload
@@ -29,6 +32,7 @@ module HrrRbSsh
 
     def connection_loop
       while payload = @authentication.receive
+        @username ||= @authentication.username
         case payload[0,1].unpack("C")[0]
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE
           channel_open payload

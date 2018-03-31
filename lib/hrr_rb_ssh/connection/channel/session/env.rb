@@ -12,10 +12,10 @@ module HrrRbSsh
         request_type = 'env'
 
         class Env
-          def self.run proc_chain, io, variables, message, options
+          def self.run proc_chain, username, io, variables, message, options
             logger = HrrRbSsh::Logger.new self.class.name
 
-            context = Context.new proc_chain, io, variables, message
+            context = Context.new proc_chain, username, io, variables, message
             handler = options.fetch('connection_channel_request_env', RequestHandler.new {})
             handler.run context
 
