@@ -164,6 +164,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:userauth_success_payload){
       HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS.encode userauth_success_message
     }
+    let(:username){ "username" }
 
     context "when accept none method" do
       let(:options){
@@ -174,7 +175,7 @@ RSpec.describe HrrRbSsh::Authentication do
       let(:userauth_request_with_none_method_message){
         {
           "SSH_MSG_USERAUTH_REQUEST" => 50,
-          "user name"                => "username",
+          "user name"                => username,
           "service name"             => "ssh-connection",
           "method name"              => "none",
         }
@@ -183,13 +184,14 @@ RSpec.describe HrrRbSsh::Authentication do
         HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_none_method_message
       }
 
-      it "sends userauth success message for none method" do
+      it "sends userauth success message for none method, and will return authenticated username" do
         expect( transport ).to receive(:receive).with(no_args).and_return(userauth_request_with_none_method_payload).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
         authentication.authenticate
 
         expect( authentication.closed? ).to be false
+        expect( authentication.username ).to eq username
       end
     end
 
@@ -203,7 +205,7 @@ RSpec.describe HrrRbSsh::Authentication do
       let(:userauth_request_with_none_method_message){
         {
           "SSH_MSG_USERAUTH_REQUEST" => 50,
-          "user name"                => "username",
+          "user name"                => username,
           "service name"             => "ssh-connection",
           "method name"              => "none",
         }
@@ -214,7 +216,7 @@ RSpec.describe HrrRbSsh::Authentication do
       let(:userauth_request_with_password_method_message){
         {
           "SSH_MSG_USERAUTH_REQUEST" => 50,
-          "user name"                => "username",
+          "user name"                => username,
           "service name"             => "ssh-connection",
           "method name"              => "password",
           "FALSE"                    => false, 
@@ -231,7 +233,7 @@ RSpec.describe HrrRbSsh::Authentication do
         ]
       }
 
-      it "sends userauth success message for password method after userauth failure message for none method" do
+      it "sends userauth success message for password method after userauth failure message for none method, and will return authenticated username" do
         expect( transport ).to receive(:receive).with(no_args).and_return(*userauth_requests).twice
         expect( transport ).to receive(:send).with(userauth_failure_payload).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
@@ -239,6 +241,7 @@ RSpec.describe HrrRbSsh::Authentication do
         authentication.authenticate
 
         expect( authentication.closed? ).to be false
+        expect( authentication.username ).to eq username
       end
     end
 
@@ -261,6 +264,35 @@ RSpec.describe HrrRbSsh::Authentication do
         expect { authentication.authenticate }.to raise_error RuntimeError
 
         expect( authentication.closed? ).to be true
+      end
+    end
+  end
+
+  describe '#username' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ described_class.new(transport) }
+    let(:username){ "username" }
+
+    context "when transport is not closed" do
+      before :example do
+        authentication.instance_variable_set('@closed', false)
+        authentication.instance_variable_set('@username', username)
+      end
+
+      it "returns authenticated username" do
+        expect(authentication.username).to eq username
+      end
+    end
+
+    context "when transport is closed" do
+      before :example do
+        authentication.instance_variable_set('@closed', true)
+      end
+
+      it "raises ClosedAuthenticationError" do
+        expect { authentication.username }.to raise_error HrrRbSsh::ClosedAuthenticationError
       end
     end
   end

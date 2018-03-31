@@ -20,6 +20,8 @@ module HrrRbSsh
       @transport.register_acceptable_service SERVICE_NAME
 
       @closed = nil
+
+      @username = nil
     end
 
     def send payload
@@ -55,6 +57,11 @@ module HrrRbSsh
       @closed
     end
 
+    def username
+      raise HrrRbSsh::ClosedAuthenticationError if @closed
+      @username
+    end
+
     def authenticate
       loop do
         payload = @transport.receive
@@ -65,6 +72,7 @@ module HrrRbSsh
           method = Method[method_name].new(@options)
           if method.authenticate(userauth_request_message)
             send_userauth_success
+            @username = userauth_request_message['user name']
             @closed = false
             break
           else
