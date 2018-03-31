@@ -476,15 +476,27 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       context "when 'ssh-userauth' is not registered as acceptable service" do
-        let(:acceptable_service){ 'ssh-never-match-service' }
+        let(:disconnect_message){
+          {
+            'SSH_MSG_DISCONNECT' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+            'reason code'        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+            'description'        => 'disconnected by user',
+            'language tag'       => '',
+          }
+        }
+        let(:disconnect_payload){
+          HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+        }
 
-        it "receives service request and service accept" do
+        before :example do
+          transport.instance_variable_set('@closed', false)
+          transport.instance_variable_set('@disconnected', false)
+        end
+
+        it "receives service request and sends disconnect and close" do
           expect(mock_receiver).to receive(:receive).with(transport).and_return(service_request_payload).once
-          expect(mock_sender).to   receive(:send).with(transport, service_accept_payload).once
+          expect(mock_sender).to   receive(:send).with(transport, disconnect_payload).once
 
-          expect(transport).to receive(:close).with(no_args).once
-
-          transport.register_acceptable_service acceptable_service
           transport.verify_service_request
         end
       end
@@ -545,8 +557,8 @@ RSpec.describe HrrRbSsh::Transport do
         {
           'SSH_MSG_DISCONNECT' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
           'reason code'        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-          'description'        => 'description',
-          'language tag'       => 'language tag',
+          'description'        => 'disconnected by user',
+          'language tag'       => '',
         }
       }
       let(:disconnect_payload){
