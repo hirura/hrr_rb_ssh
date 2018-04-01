@@ -14,7 +14,7 @@ end
 
 
 logger = Logger.new STDOUT
-logger.level = :debug
+logger.level = :info
 HrrRbSsh::Logger.initialize logger
 
 
@@ -40,8 +40,6 @@ conn_pty = HrrRbSsh::Connection::RequestHandler.new { |context|
   context.chain_proc { |chain|
     begin
       chain.call_next
-    rescue => e
-      context.logger.error e.full_message
     ensure
       context.vars[:ptm].close
       context.vars[:pts].close
@@ -65,32 +63,54 @@ conn_shell = HrrRbSsh::Connection::RequestHandler.new { |context|
       STDERR.reopen pts, 'w'
       pts.close
       context.vars[:env] ||= Hash.new
-      exec context.vars[:env], ['/bin/bash', '-bash']
+      exec context.vars[:env], 'login', '-f', context.username
     end
 
     pts.close
+
     threads = []
     threads.push Thread.start {
       loop do
         begin
           context.io.write ptm.readpartial(1024)
         rescue EOFError => e
-          context.logger.info("ptm is closed")
+          context.logger.info("ptm is EOF")
+          break
+        rescue IOError => e
+          context.logger.warn("IO is closed")
+          break
+        rescue => e
+          context.logger.error(e.full_message)
           break
         end
       end
     }
     threads.push Thread.start {
       loop do
-        ptm.write context.io.readpartial(1024)
+        begin
+          ptm.write context.io.readpartial(1024)
+        rescue EOFError => e
+          context.logger.info("IO is EOF")
+          break
+        rescue IOError => e
+          context.logger.warn("IO is closed")
+          break
+        rescue => e
+          context.logger.error(e.full_message)
+          break
+        end
       end
     }
 
     pid, status = Process.waitpid2 pid
-    threads.each(&:exit)
-    threads.each(&:join)
-    ptm.close
-
+    threads.each do |t|
+      begin
+        t.exit
+        t.join
+      rescue => e
+        context.logger.error(e.full_message)
+      end
+    end
     status.exitstatus
   }
 }
