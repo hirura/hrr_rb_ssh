@@ -4,15 +4,9 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/f5dfdb97d72f24ca5939/maintainability)](https://codeclimate.com/github/hirura/hrr_rb_ssh/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f5dfdb97d72f24ca5939/test_coverage)](https://codeclimate.com/github/hirura/hrr_rb_ssh/test_coverage)
 
+hrr_rb_ssh is a pure Ruby SSHv2 server implementation.
+
 ## Installation
-
-This library is not packaged and listed in Rubygems yet. So, instead, please use `git clone` command to run.
-
-```
-git clone https://github.com/hirura/hrr_rb_ssh.git
-```
-
-For the future, the below procedure must be available.
 
 Add this line to your application's Gemfile:
 
