@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["hirura"]
   spec.email         = ["hirura@gmail.com"]
 
-  spec.summary       = %q{SSH2 protocol implementation}
-  spec.description   = %q{SSH2 protocol implementation}
+  spec.summary       = %q{Pure Ruby SSH2 server implementation}
+  spec.description   = %q{Pure Ruby SSH2 server implementation}
   spec.homepage      = "https://github.com/hirura/hrr_rb_ssh"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
