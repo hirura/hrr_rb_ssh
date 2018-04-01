@@ -63,8 +63,16 @@ module HrrRbSsh
         end
         @receive_payload_queue.close
         @receive_data_queue.close
-        @request_handler_io.close
-        @channel_io.close
+        begin
+          @request_handler_io.close
+        rescue IOError # for compatibility for Ruby version < 2.3
+          Thread.pass
+        end
+        begin
+          @channel_io.close
+        rescue IOError # for compatibility for Ruby version < 2.3
+          Thread.pass
+        end
         begin
           if from == :proc_chain_thread
             send_channel_eof
@@ -140,7 +148,11 @@ module HrrRbSsh
               send_channel_data sending_data if sendable_size > 0
               @remote_window_size -= sendable_size
             rescue EOFError => e
-              @channel_io.close
+              begin
+                @channel_io.close
+              rescue IOError # for compatibility for Ruby version < 2.3
+                Thread.pass
+              end
             rescue IOError => e
               @logger.warn("channel IO is closed")
               close
