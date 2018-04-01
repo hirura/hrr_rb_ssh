@@ -55,15 +55,64 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
       context "from proc_chain_thread" do
         context "when connection is not closed" do
-          it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
-            expect(channel).to receive(:send_channel_eof).with(no_args).once
-            expect(channel).to receive(:send_channel_close).with(no_args).once
-            channel.close from=:proc_chain_thread
-            expect(channel.instance_variable_get('@closed')).to be true
-            expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
-            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
-            expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
-            expect(channel.instance_variable_get('@channel_io').closed?).to be true
+          let(:channel_eof_message){
+            {
+              "SSH_MSG_CHANNEL_EOF" => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+              "recipient channel"   => 0,
+            }
+          }
+          let(:channel_eof_payload){
+            HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.encode channel_eof_message
+          }
+          let(:channel_request_exit_status_message){
+            {
+              "SSH_MSG_CHANNEL_REQUEST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+              "recipient channel"       => 0,
+              'request type'            => 'exit-status',
+              'want reply'              => false,
+              'exit status'             => exitstatus,
+            }
+          }
+          let(:channel_request_exit_status_payload){
+            HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.encode channel_request_exit_status_message
+          }
+          let(:channel_close_message){
+            {
+              "SSH_MSG_CHANNEL_CLOSE" => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+              "recipient channel"     => 0,
+            }
+          }
+          let(:channel_close_payload){
+            HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.encode channel_close_message
+          }
+
+          context "when exit-status is an instance of Integer" do
+            let(:exitstatus){ 0 }
+            it "updates closed with true, closes queues and IOs, and send EOF, exit-status, and CLOSE" do
+              expect(connection).to receive(:send).with(channel_eof_payload).once
+              expect(connection).to receive(:send).with(channel_request_exit_status_payload).once
+              expect(connection).to receive(:send).with(channel_close_payload).once
+              channel.close from=:proc_chain_thread, exitstatus
+              expect(channel.instance_variable_get('@closed')).to be true
+              expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+              expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
+              expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
+              expect(channel.instance_variable_get('@channel_io').closed?).to be true
+            end
+          end
+
+          context "when exit-status is not an instance of Integer" do
+            let(:exitstatus){ 'string' }
+            it "updates closed with true, closes queues and IOs, and send EOF, exit-status, and CLOSE" do
+              expect(connection).to receive(:send).with(channel_eof_payload).once
+              expect(connection).to receive(:send).with(channel_close_payload).once
+              channel.close from=:proc_chain_thread, exitstatus
+              expect(channel.instance_variable_get('@closed')).to be true
+              expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+              expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
+              expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
+              expect(channel.instance_variable_get('@channel_io').closed?).to be true
+            end
           end
         end
 
@@ -99,7 +148,6 @@ RSpec.describe HrrRbSsh::Connection::Channel do
           end
 
           it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
-            expect(channel).to receive(:send_channel_eof).with(no_args).once
             expect(channel).to receive(:send_channel_close).with(no_args).once
             channel.close
             expect(channel.instance_variable_get('@closed')).to be true

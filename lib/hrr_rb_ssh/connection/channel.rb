@@ -49,7 +49,7 @@ module HrrRbSsh
         @closed = false
       end
 
-      def close from=:outside
+      def close from=:outside, exitstatus=0
         return if @closed
         @logger.info("close channel")
         @closed = true
@@ -61,7 +61,15 @@ module HrrRbSsh
         @request_handler_io.close
         @channel_io.close
         begin
-          send_channel_eof
+          if from == :proc_chain_thread
+            send_channel_eof
+            case exitstatus
+            when Integer
+              send_channel_request_exit_status exitstatus
+            else
+              @logger.warn("skip sending exit-status because exitstatus is not an instance of Integer")
+            end
+          end
           send_channel_close
         rescue HrrRbSsh::ClosedConnectionError => e
           Thread.pass
@@ -161,12 +169,13 @@ module HrrRbSsh
         Thread.start {
           @logger.info("start proc chain thread")
           begin
-            @proc_chain.call_next
+            exitstatus = @proc_chain.call_next
           rescue => e
             @logger.error(e.full_message)
+            exitstatus = 1
           ensure
             @logger.info("closing proc chain thread")
-            close from=:proc_chain_thread
+            close from=:proc_chain_thread, exitstatus=exitstatus
             @logger.info("proc chain thread closed")
           end
         }
@@ -193,6 +202,18 @@ module HrrRbSsh
           'data'                 => data,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.encode message
+        @connection.send payload
+      end
+
+      def send_channel_request_exit_status exitstatus
+        message = {
+          'SSH_MSG_CHANNEL_REQUEST' => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          'recipient channel'       => @remote_channel,
+          'request type'            => 'exit-status',
+          'want reply'              => false,
+          'exit status'             => exitstatus,
+        }
+        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.encode message
         @connection.send payload
       end
 
