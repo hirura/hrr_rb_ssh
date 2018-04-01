@@ -64,6 +64,8 @@ module HrrRbSsh
         end
         @username ||= @authentication.username
         case payload[0,1].unpack("C")[0]
+        when HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE
+          global_request payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE
           channel_open payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
@@ -81,6 +83,15 @@ module HrrRbSsh
       @logger.info("closing connection")
       close
       @logger.info("connection closed")
+    end
+
+    def global_request payload
+      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::ID)
+      message = HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.decode payload
+      if message['want reply']
+        # returns always failure because global request is not supported so far
+        send_request_failure
+      end
     end
 
     def channel_open payload
@@ -125,6 +136,22 @@ module HrrRbSsh
       channel = @channels[local_channel]
       channel.close
       @channels.delete local_channel
+    end
+
+    def send_request_success
+      message = {
+        'SSH_MSG_REQUEST_SUCCESS' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
+      }
+      payload = HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS.encode message
+      @authentication.send payload
+    end
+
+    def send_request_failure
+      message = {
+        'SSH_MSG_REQUEST_FAILURE' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
+      }
+      payload = HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE.encode message
+      @authentication.send payload
     end
 
     def send_channel_open_confirmation channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size

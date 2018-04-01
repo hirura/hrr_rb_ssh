@@ -159,6 +159,27 @@ RSpec.describe HrrRbSsh::Connection do
     let(:options){ Hash.new }
     let(:connection){ described_class.new authentication, options }
 
+    context "when receives global request message" do
+      let(:global_request_message){
+        {
+          "SSH_MSG_GLOBAL_REQUEST" => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
+          "request name"           => 'dummy',
+          "want reply"             => true,
+        }
+      }
+      let(:global_request_payload){
+        HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.encode global_request_message
+      }
+
+      it "calls global_request" do
+        expect(authentication).to receive(:receive).with(no_args).and_return(global_request_payload).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(connection).to receive(:global_request).with(global_request_payload).once
+        expect(connection).to receive(:close).with(no_args).once
+        connection.connection_loop
+      end
+    end
+
     context "when receives channel open message" do
       let(:channel_open_message){
         {
@@ -286,6 +307,41 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
+      end
+    end
+  end
+
+  describe '#global_request' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:options){ Hash.new }
+    let(:connection){ described_class.new authentication, options }
+
+    context "when receives valid channel open message" do
+      let(:global_request_message){
+        {
+          "SSH_MSG_GLOBAL_REQUEST" => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
+          "request name"           => 'dummy',
+          "want reply"             => true,
+        }
+      }
+      let(:global_request_payload){
+        HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.encode global_request_message
+      }
+      let(:request_failure_message){
+        {
+          "SSH_MSG_REQUEST_FAILURE" => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
+        }
+      }
+      let(:request_failure_payload){
+        HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE.encode request_failure_message
+      }
+
+      it "calls global_request" do
+        expect(authentication).to receive(:send).with(request_failure_payload).once
+        connection.global_request global_request_payload
       end
     end
   end
@@ -475,6 +531,29 @@ RSpec.describe HrrRbSsh::Connection do
         connection.channel_close channel_close_payload
         expect(channels).to eq( { 1 => channel1 } )
       end
+    end
+  end
+
+  describe '#send_request_success' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:options){ Hash.new }
+    let(:connection){ described_class.new authentication, options }
+
+    let(:request_success_message){
+      {
+        "SSH_MSG_REQUEST_SUCCESS" => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
+      }
+    }
+    let(:request_success_payload){
+      HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS.encode request_success_message
+    }
+
+    it "calls global_request" do
+      expect(authentication).to receive(:send).with(request_success_payload).once
+      connection.send_request_success
     end
   end
 end
