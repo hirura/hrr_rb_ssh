@@ -379,10 +379,6 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     end
 
     context "when IOError occurs" do
-      before :example do
-        HrrRbSsh::Logger.initialize(::Logger.new(STDOUT, :debug))
-      end
-
       it "receives data from UNIX socket pair and send the data" do
         expect(connection).to receive(:send).with(channel_data_payload).and_raise(IOError).once
         allow(channel).to receive(:send_channel_eof).with(no_args).once
