@@ -1,11 +1,38 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-class ClosedQueueError < StandardError
+if RUBY_VERSION < "2.1"
+  class Array
+    def to_h
+      h = Hash.new
+      self.each do |k, v|
+        h[k] = v
+      end
+      h
+    end
+  end
+
+  require 'openssl'
+  class OpenSSL::BN
+    alias_method :__initialize__, :initialize
+
+    def initialize *args
+      args[0] = case args[0]
+                when OpenSSL::BN, Fixnum, Bignum
+                  args[0].to_s
+                else
+                  args[0]
+                end
+      __initialize__ *args
+    end
+  end
 end
 
-class Queue
-  if RUBY_VERSION < "2.3"
+if RUBY_VERSION < "2.3"
+  class ClosedQueueError < StandardError
+  end
+
+  class Queue
     require 'timeout'
 
     alias_method :__enq__, :enq

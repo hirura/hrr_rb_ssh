@@ -44,15 +44,11 @@ module HrrRbSsh
         end
 
         def shared_secret
-          k = OpenSSL::BN.new(@dh.compute_key(@e), 2).to_i
-
-          k
+          k = OpenSSL::BN.new(@dh.compute_key(OpenSSL::BN.new(@e)), 2).to_i
         end
 
         def pub_key
           f = @dh.pub_key.to_i
-
-          f
         end
 
         def hash transport

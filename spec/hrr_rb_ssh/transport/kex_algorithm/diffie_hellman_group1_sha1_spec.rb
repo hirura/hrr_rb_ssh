@@ -28,7 +28,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup1Sha1 do
     dh
   }
   let(:remote_dh_pub_key){ 
-    OpenSSL::BN.new(remote_dh.pub_key, 2).to_i
+    remote_dh.pub_key.to_i
   }
 
   it "is registered as diffie-hellman-group1-sha1-rsa in HrrRbSsh::Transport::KexAlgorithm.list" do
