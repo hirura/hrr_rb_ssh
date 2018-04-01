@@ -223,9 +223,18 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       context "when disconnect message can not be sent" do
-        it "can not send disconnect" do
-          expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(RuntimeError).once
-          expect { transport.disconnect }.not_to raise_error
+        context "due to IOError" do
+          it "can not send disconnect" do
+            expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(IOError).once
+            expect { transport.disconnect }.not_to raise_error
+          end
+        end
+
+        context "due to other error" do
+          it "can not send disconnect" do
+            expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(RuntimeError).once
+            expect { transport.disconnect }.not_to raise_error
+          end
         end
       end
     end

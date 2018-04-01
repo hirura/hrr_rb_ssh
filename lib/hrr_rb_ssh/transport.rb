@@ -127,8 +127,10 @@ module HrrRbSsh
       @disconnected = true
       begin
         send_disconnect
+      rescue IOError
+        @logger.warn("IO is closed")
       rescue => e
-        @logger.warn(e.full_message)
+        @logger.error(e.full_message)
       end
       @logger.info("transport disconnected")
     end
