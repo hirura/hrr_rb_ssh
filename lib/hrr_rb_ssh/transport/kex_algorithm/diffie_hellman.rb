@@ -23,7 +23,12 @@ module HrrRbSsh
           @logger = HrrRbSsh::Logger.new self.class.name
 
           @dh = OpenSSL::PKey::DH.new
-          @dh.set_pqg OpenSSL::BN.new(self.class::P, 16), nil, OpenSSL::BN.new(self.class::G)
+          if @dh.respond_to?(:set_pqg)
+            @dh.set_pqg OpenSSL::BN.new(self.class::P, 16), nil, OpenSSL::BN.new(self.class::G)
+          else
+            @dh.p = OpenSSL::BN.new(self.class::P, 16)
+            @dh.g = OpenSSL::BN.new(self.class::G)
+          end
           @dh.generate_key!
         end
 

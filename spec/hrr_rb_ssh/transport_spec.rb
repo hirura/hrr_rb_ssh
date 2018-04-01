@@ -331,7 +331,12 @@ RSpec.describe HrrRbSsh::Transport do
       }
       let(:remote_dh){
         dh = OpenSSL::PKey::DH.new
-        dh.set_pqg OpenSSL::BN.new(dh_group14_p, 16), nil, OpenSSL::BN.new(dh_group14_g)
+        if dh.respond_to?(:set_pqg)
+          dh.set_pqg OpenSSL::BN.new(dh_group14_p, 16), nil, OpenSSL::BN.new(dh_group14_g)
+        else
+          dh.p = OpenSSL::BN.new(dh_group14_p, 16)
+          dh.g = OpenSSL::BN.new(dh_group14_g)
+        end
         dh.generate_key!
         dh
       }
