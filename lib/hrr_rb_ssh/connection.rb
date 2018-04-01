@@ -43,7 +43,7 @@ module HrrRbSsh
         begin
           channel.close
         rescue => e
-          @logger.error(e.full_message)
+          @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
         end
       end
       @channels.clear

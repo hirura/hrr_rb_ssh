@@ -130,7 +130,7 @@ module HrrRbSsh
       rescue IOError
         @logger.warn("IO is closed")
       rescue => e
-        @logger.error(e.full_message)
+        @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
       end
       @logger.info("transport disconnected")
     end
@@ -180,7 +180,7 @@ module HrrRbSsh
             end
             @sender.send self, payload
           rescue => e
-            @logger.error(e.full_message)
+            @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
             close
           end
         end
@@ -219,7 +219,7 @@ module HrrRbSsh
           rescue EOFError => e
             close
           rescue => e
-            @logger.error(e.full_message)
+            @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
             close
           end
         end

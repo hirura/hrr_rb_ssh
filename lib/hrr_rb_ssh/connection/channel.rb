@@ -79,7 +79,7 @@ module HrrRbSsh
         rescue HrrRbSsh::ClosedConnectionError => e
           Thread.pass
         rescue => e
-          @logger.error(e.full_message)
+          @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
         end
         @logger.info("channel closed")
       end
@@ -116,7 +116,7 @@ module HrrRbSsh
                 @logger.warn("received unsupported message: #{message.inspect}")
               end
             rescue => e
-              @logger.error(e.full_message)
+              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
               break
             end
           end
@@ -145,7 +145,7 @@ module HrrRbSsh
               @logger.warn("channel IO is closed")
               close
             rescue => e
-              @logger.error(e.full_message)
+              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
               close
             end
           end
@@ -174,7 +174,7 @@ module HrrRbSsh
               @logger.warn("channel IO is closed")
               close
             rescue => e
-              @logger.error(e.full_message)
+              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
               close
             end
           end
@@ -188,7 +188,7 @@ module HrrRbSsh
           begin
             exitstatus = @proc_chain.call_next
           rescue => e
-            @logger.error(e.full_message)
+            @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
             exitstatus = 1
           ensure
             @logger.info("closing proc chain thread")
