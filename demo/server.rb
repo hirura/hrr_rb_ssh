@@ -14,7 +14,7 @@ end
 
 
 logger = Logger.new STDOUT
-logger.level = :info
+logger.level = Logger::INFO
 HrrRbSsh::Logger.initialize logger
 
 
