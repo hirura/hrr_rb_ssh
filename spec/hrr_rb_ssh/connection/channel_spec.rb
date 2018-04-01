@@ -20,26 +20,118 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       expect { channel }.not_to raise_error
     end
 
-    it "initializes receive_queue readable" do
-      expect(channel.receive_queue).to be_an_instance_of ::Queue
-      expect(channel.receive_queue.size).to eq 0
+    it "initializes receive_payload_queue readable" do
+      expect(channel.receive_payload_queue).to be_an_instance_of ::Queue
+      expect(channel.receive_payload_queue.size).to eq 0
     end
   end
 
   describe "#start" do
-    it "calls #channel_loop_thread" do
+    it "starts threads and becomes not closed" do
       expect(channel).to receive(:channel_loop_thread).with(no_args).once
-      channel.start
-    end
-
-    it "calls #io_threads" do
-      expect(channel).to receive(:io_threads).with(no_args).once
-      channel.start
-    end
-
-    it "calls #proc_chain_thread" do
+      expect(channel).to receive(:sender_thread).with(no_args).once
+      expect(channel).to receive(:receiver_thread).with(no_args).once
       expect(channel).to receive(:proc_chain_thread).with(no_args).once
       channel.start
+      expect(channel.instance_variable_get('@closed')).to be false
+    end
+  end
+
+  describe "#close" do
+    context "when closed" do
+      before :example do
+        channel.instance_variable_set('@closed', true)
+      end
+
+      it "does nothing" do
+        expect { channel.close }.not_to raise_error
+      end
+    end
+
+    context "when not closed" do
+      before :example do
+        channel.instance_variable_set('@closed', false)
+      end
+
+      context "from proc_chain_thread" do
+        context "when connection is not closed" do
+          it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
+            expect(channel).to receive(:send_channel_eof).with(no_args).once
+            expect(channel).to receive(:send_channel_close).with(no_args).once
+            channel.close from=:proc_chain_thread
+            expect(channel.instance_variable_get('@closed')).to be true
+            expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
+            expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
+            expect(channel.instance_variable_get('@channel_io').closed?).to be true
+          end
+        end
+
+        context "when connection is closed" do
+          it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
+            expect(channel).to receive(:send_channel_eof).with(no_args).and_raise(HrrRbSsh::ClosedConnectionError).once
+            expect { channel.close from=:proc_chain_thread }.not_to raise_error
+            expect(channel.instance_variable_get('@closed')).to be true
+            expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
+            expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
+            expect(channel.instance_variable_get('@channel_io').closed?).to be true
+          end
+        end
+
+        context "when send raises unexpected error" do
+          it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
+            expect(channel).to receive(:send_channel_eof).with(no_args).and_raise(RuntimeError).once
+            expect { channel.close from=:proc_chain_thread }.not_to raise_error
+            expect(channel.instance_variable_get('@closed')).to be true
+            expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
+            expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
+            expect(channel.instance_variable_get('@channel_io').closed?).to be true
+          end
+        end
+      end
+
+      context "from others" do
+        context "when connection is not closed" do
+          before :example do
+            channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+          end
+
+          it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
+            expect(channel).to receive(:send_channel_eof).with(no_args).once
+            expect(channel).to receive(:send_channel_close).with(no_args).once
+            channel.close
+            expect(channel.instance_variable_get('@closed')).to be true
+            expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
+            expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
+            expect(channel.instance_variable_get('@channel_io').closed?).to be true
+          end
+        end
+      end
+    end
+  end
+
+  describe '#closed?' do
+    context "when channel is closed" do
+      before :example do
+        channel.instance_variable_set('@closed', true)
+      end
+
+      it "returns true" do
+        expect(channel.closed?).to be true
+      end
+    end
+
+    context "when channel is not closed" do
+      before :example do
+        channel.instance_variable_set('@closed', false)
+      end
+
+      it "returns false" do
+        expect(channel.closed?).to be false
+      end
     end
   end
 
@@ -69,13 +161,15 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         let(:want_reply){ true }
 
         before :example do
-          channel.receive_queue.enq channel_request_message
-          channel.receive_queue.close
+          channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+          channel.receive_payload_queue.enq channel_request_message
+          channel.receive_payload_queue.close
         end
 
         it "calls #request and returns channel success" do
           expect(channel).to receive(:request).with(channel_request_message, variables).once
           expect(connection).to receive(:send).with(channel_success_payload).once
+          expect(channel).to receive(:close).with(:channel_loop_thread).once
           t = channel.channel_loop_thread
           t.join
         end
@@ -85,12 +179,14 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         let(:want_reply){ false }
 
         before :example do
-          channel.receive_queue.enq channel_request_message
-          channel.receive_queue.close
+          channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+          channel.receive_payload_queue.enq channel_request_message
+          channel.receive_payload_queue.close
         end
 
         it "calls #request and returns channel success" do
           expect(channel).to receive(:request).with(channel_request_message, variables).once
+          expect(channel).to receive(:close).with(:channel_loop_thread).once
           t = channel.channel_loop_thread
           t.join
         end
@@ -107,21 +203,65 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       }
 
       before :example do
-        channel.receive_queue.enq channel_data_message
-        channel.receive_queue.close
+        channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+        channel.receive_payload_queue.enq channel_data_message
+        channel.receive_payload_queue.close
       end
 
       it "enqueues data into @receive_data" do
+        expect(channel).to receive(:close).with(:channel_loop_thread).once
         t = channel.channel_loop_thread
         t.join
-        expect(channel.instance_variable_get('@receive_data').deq).to be channel_data_message['data']
+        expect(channel.instance_variable_get('@receive_data_queue').deq).to be channel_data_message['data']
+      end
+    end
+
+    context "when channel receives unknown message" do
+      let(:unknown_message){
+        {
+          "UNKNOWN_MESSAGE" => 123,
+        }
+      }
+
+      before :example do
+        channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+        channel.receive_payload_queue.enq unknown_message
+        channel.receive_payload_queue.close
+      end
+
+      it "enqueues data into @receive_data_queue" do
+        expect(channel).to receive(:close).with(:channel_loop_thread).once
+        t = channel.channel_loop_thread
+        t.join
+      end
+    end
+
+    context "when error occurs" do
+      let(:channel_data_message){
+        {
+          "SSH_MSG_CHANNEL_DATA" => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          "recipient channel"    => 0,
+          "data"                 => "testing",
+        }
+      }
+
+      before :example do
+        channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+        channel.instance_variable_get('@receive_data_queue').close
+        channel.receive_payload_queue.enq channel_data_message
+        channel.receive_payload_queue.close
+      end
+
+      it "enqueues data into @receive_data_queue" do
+        expect(channel).to receive(:close).with(:channel_loop_thread).once
+        t = channel.channel_loop_thread
+        expect { t.join }.not_to raise_error
       end
     end
   end
 
-  describe '#io_threads' do
+  describe '#sender_thread' do
     let(:send_data){ 'send data' }
-    let(:receive_data){ 'receive data' }
 
     let(:channel_data_message){
       {
@@ -135,26 +275,133 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     }
 
     before :example do
+      channel.instance_variable_set('@closed', false)
+      channel.instance_variable_set('@proc_chain_thread', Thread.new {})
       channel.instance_variable_get('@request_handler_io').write send_data
-      channel.instance_variable_get('@receive_data').enq receive_data
     end
 
-    it "starts two threads using UNIX socket pair to bridge to request handler" do
-      expect(connection).to receive(:send).with(channel_data_payload).once
-      threads = channel.io_threads
-      expect(channel.instance_variable_get('@request_handler_io').recv(12)).to eq receive_data
-      channel.instance_variable_get('@receive_data').close
-      channel.instance_variable_get('@request_handler_io').close
-      threads.each(&:join)
-      channel.instance_variable_get('@channel_io').close
+    context "when no error occurs" do
+      it "receives data from UNIX socket pair and send the data" do
+        expect(connection).to receive(:send).with(channel_data_payload).once
+        allow(channel).to receive(:send_channel_eof).with(no_args).once
+        allow(channel).to receive(:send_channel_close).with(no_args).once
+        t = channel.sender_thread
+        channel.instance_variable_get('@request_handler_io').close
+        t.join
+        expect(channel.closed?).to be false
+        channel.close
+        expect(channel.closed?).to be true
+      end
+    end
+
+    context "when IOError occurs" do
+      before :example do
+        HrrRbSsh::Logger.initialize(::Logger.new(STDOUT, :debug))
+      end
+
+      it "receives data from UNIX socket pair and send the data" do
+        expect(connection).to receive(:send).with(channel_data_payload).and_raise(IOError).once
+        allow(channel).to receive(:send_channel_eof).with(no_args).once
+        allow(channel).to receive(:send_channel_close).with(no_args).once
+        t = channel.sender_thread
+        t.join
+        expect(channel.closed?).to be true
+      end
+    end
+
+    context "when unexpected error occurs" do
+      it "closes itself" do
+        expect(channel).to receive(:send_channel_data).with(send_data).and_raise(RuntimeError).once
+        t = channel.sender_thread
+        t.join
+        expect(channel.closed?).to be true
+      end
+    end
+  end
+
+  describe '#receiver_thread' do
+    let(:receive_data){ 'receive data' }
+
+    before :example do
+      channel.instance_variable_set('@closed', false)
+      channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+    end
+
+    context "when no error occurs" do
+      before :example do
+        channel.instance_variable_get('@receive_data_queue').enq receive_data
+        channel.instance_variable_get('@receive_data_queue').close
+      end
+
+      it "receives data from receive_data_queue and and writes the data into UNIX socket" do
+        allow(channel).to receive(:send_channel_eof).with(no_args).once
+        allow(channel).to receive(:send_channel_close).with(no_args).once
+        t = channel.receiver_thread
+        expect(channel.instance_variable_get('@request_handler_io').read(receive_data.length)).to eq receive_data
+        t.join
+        expect(channel.closed?).to be false
+        channel.close
+        expect(channel.closed?).to be true
+      end
+    end
+
+    context "when IOError occurs" do
+      before :example do
+        channel.instance_variable_get('@receive_data_queue').enq receive_data
+        channel.instance_variable_get('@receive_data_queue').close
+      end
+
+      it "receives data from UNIX socket pair and send the data" do
+        allow(channel).to receive(:send_channel_eof).with(no_args).once
+        allow(channel).to receive(:send_channel_close).with(no_args).once
+        channel.instance_variable_get('@channel_io').close
+        t = channel.receiver_thread
+        t.join
+        expect(channel.closed?).to be true
+      end
+    end
+
+    context "when unexpected error occurs" do
+      let(:mock_receive_data_queue){ double('receive_data_queue') }
+
+      before :example do
+        channel.instance_variable_get('@receive_data_queue').close
+        channel.instance_variable_set('@receive_data_queue', mock_receive_data_queue)
+      end
+
+      it "closes itself" do
+        expect(mock_receive_data_queue).to receive(:deq).with(no_args).and_raise(RuntimeError).once
+        expect(mock_receive_data_queue).to receive(:close).with(no_args).once
+        expect(mock_receive_data_queue).to receive(:deq).with(no_args).and_return(nil).once
+        expect(mock_receive_data_queue).to receive(:closed?).with(no_args).and_return(true).once
+        t = channel.receiver_thread
+        t.join
+        expect(channel.closed?).to be true
+      end
     end
   end
 
   describe '#proc_chain_thread' do
-    it "calls @proc_chain.call_next with no arguments" do
-      expect(channel.instance_variable_get('@proc_chain')).to receive(:call_next).with(no_args).once
-      t = channel.proc_chain_thread
-      t.join
+    before :example do
+      channel.instance_variable_set('@closed', false)
+    end
+
+    context "when no error occurs" do
+      it "calls @proc_chain.call_next with no arguments, and closes itself" do
+        expect(channel.instance_variable_get('@proc_chain')).to receive(:call_next).with(no_args).once
+        t = channel.proc_chain_thread
+        t.join
+        expect(channel.closed?).to be true
+      end
+    end
+
+    context "when error occurs" do
+      it "closes itself as well" do
+        expect(channel.instance_variable_get('@proc_chain')).to receive(:call_next).with(no_args).and_raise(RuntimeError).once
+        t = channel.proc_chain_thread
+        t.join
+        expect(channel.closed?).to be true
+      end
     end
   end
 

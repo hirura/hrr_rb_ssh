@@ -2,6 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/closed_connection_error'
 require 'hrr_rb_ssh/connection/channel'
 
 module HrrRbSsh
@@ -17,21 +18,50 @@ module HrrRbSsh
       @options = options
 
       @channels = Hash.new
-
       @username = nil
+      @closed = nil
     end
 
     def send payload
-      @authentication.send payload
+      raise ClosedConnectionError if @closed
+      begin
+        @authentication.send payload
+      rescue ClosedAuthenticationError
+        raise ClosedConnectionError
+      end
     end
 
     def start
       @authentication.start
+      @closed = false
       connection_loop
     end
 
+    def close
+      @closed = true
+      @channels.values.each do |channel|
+        begin
+          channel.close
+        rescue => e
+          @logger.error(e.full_message)
+        end
+      end
+      @channels.clear
+    end
+
+    def closed?
+      @closed
+    end
+
     def connection_loop
-      while payload = @authentication.receive
+      @logger.info("start connection")
+      loop do
+        begin
+          payload = @authentication.receive
+        rescue HrrRbSsh::ClosedAuthenticationError => e
+          @logger.info("closing connection loop")
+          break
+        end
         @username ||= @authentication.username
         case payload[0,1].unpack("C")[0]
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE
@@ -40,8 +70,15 @@ module HrrRbSsh
           channel_request payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
           channel_data payload
+        when HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE
+          channel_close payload
+        else
+          @logger.warn("received unsupported message: id: #{payload[0,1].unpack("C")[0]}")
         end
       end
+      @logger.info("closing connection")
+      close
+      @logger.info("connection closed")
     end
 
     def channel_open payload
@@ -62,14 +99,23 @@ module HrrRbSsh
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.decode payload
       local_channel = message['recipient channel']
-      @channels[local_channel].receive_queue.enq message
+      @channels[local_channel].receive_payload_queue.enq message
     end
 
     def channel_data payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.decode payload
       local_channel = message['recipient channel']
-      @channels[local_channel].receive_queue.enq message
+      @channels[local_channel].receive_payload_queue.enq message
+    end
+
+    def channel_close payload
+      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::ID)
+      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.decode payload
+      local_channel = message['recipient channel']
+      channel = @channels[local_channel]
+      channel.close
+      @channels.delete local_channel
     end
 
     def send_channel_open_confirmation channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
