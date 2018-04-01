@@ -15,6 +15,18 @@ RSpec.describe HrrRbSsh::Connection::Channel do
   let(:maximum_packet_size){ 32768 }
   let(:channel){ described_class.new(connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size) }
 
+  describe '::INITIAL_WINDOW_SIZE' do
+    it "is defined" do
+      expect(described_class::INITIAL_WINDOW_SIZE).to be > 0
+    end
+  end
+
+  describe '::MAXIMUM_PACKET_SIZE' do
+    it "is defined" do
+      expect(described_class::MAXIMUM_PACKET_SIZE).to be > 0
+    end
+  end
+
   describe '.new' do
     it "takes six arguments: connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size" do
       expect { channel }.not_to raise_error
@@ -264,6 +276,29 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       end
     end
 
+    context "when channel receives channel window adjust" do
+      let(:channel_window_adjust_message){
+        {
+          "SSH_MSG_CHANNEL_WINDOW_ADJUST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          "recipient channel"             => 0,
+          "bytes to add"                  => 12345,
+        }
+      }
+
+      before :example do
+        channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+        channel.receive_payload_queue.enq channel_window_adjust_message
+        channel.receive_payload_queue.close
+      end
+
+      it "updates remote window size" do
+        expect(channel).to receive(:close).with(:channel_loop_thread).once
+        t = channel.channel_loop_thread
+        t.join
+        expect(channel.instance_variable_get('@remote_window_size')).to eq (2097152 + 12345)
+      end
+    end
+
     context "when channel receives unknown message" do
       let(:unknown_message){
         {
@@ -329,7 +364,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     end
 
     context "when no error occurs" do
-      it "receives data from UNIX socket pair and send the data" do
+      it "receives data from UNIX socket pair and send the data, and updates remote window size" do
         expect(connection).to receive(:send).with(channel_data_payload).once
         allow(channel).to receive(:send_channel_eof).with(no_args).once
         allow(channel).to receive(:send_channel_close).with(no_args).once
@@ -339,6 +374,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         expect(channel.closed?).to be false
         channel.close
         expect(channel.closed?).to be true
+        expect(channel.instance_variable_get('@remote_window_size')).to eq (2097152 - send_data.size)
       end
     end
 
@@ -376,20 +412,54 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     end
 
     context "when no error occurs" do
-      before :example do
-        channel.instance_variable_get('@receive_data_queue').enq receive_data
-        channel.instance_variable_get('@receive_data_queue').close
+      context "when local window size is large enough" do
+        before :example do
+          channel.instance_variable_get('@receive_data_queue').enq receive_data
+          channel.instance_variable_get('@receive_data_queue').close
+        end
+
+        it "receives data from receive_data_queue and and writes the data into UNIX socket" do
+          allow(channel).to receive(:send_channel_eof).with(no_args).once
+          allow(channel).to receive(:send_channel_close).with(no_args).once
+          t = channel.receiver_thread
+          expect(channel.instance_variable_get('@request_handler_io').read(receive_data.length)).to eq receive_data
+          t.join
+          expect(channel.closed?).to be false
+          channel.close
+          expect(channel.closed?).to be true
+        end
       end
 
-      it "receives data from receive_data_queue and and writes the data into UNIX socket" do
-        allow(channel).to receive(:send_channel_eof).with(no_args).once
-        allow(channel).to receive(:send_channel_close).with(no_args).once
-        t = channel.receiver_thread
-        expect(channel.instance_variable_get('@request_handler_io').read(receive_data.length)).to eq receive_data
-        t.join
-        expect(channel.closed?).to be false
-        channel.close
-        expect(channel.closed?).to be true
+      context "when local window size is not enough" do
+        let(:channel_window_adjust_message){
+          {
+            "SSH_MSG_CHANNEL_WINDOW_ADJUST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+            "recipient channel"             => 0,
+            "bytes to add"                  => described_class::INITIAL_WINDOW_SIZE,
+          }
+        }
+        let(:channel_window_adjust_payload){
+          HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.encode channel_window_adjust_message
+        }
+
+        before :example do
+          channel.instance_variable_set('@local_window_size', 1000)
+          channel.instance_variable_get('@receive_data_queue').enq receive_data
+          channel.instance_variable_get('@receive_data_queue').close
+        end
+
+        it "receives data from receive_data_queue and and writes the data into UNIX socket, and updates local window size" do
+          allow(channel).to receive(:send_channel_eof).with(no_args).once
+          allow(channel).to receive(:send_channel_close).with(no_args).once
+          expect(connection).to receive(:send).with(channel_window_adjust_payload).once
+          t = channel.receiver_thread
+          expect(channel.instance_variable_get('@request_handler_io').read(receive_data.length)).to eq receive_data
+          t.join
+          expect(channel.closed?).to be false
+          channel.close
+          expect(channel.closed?).to be true
+          expect(channel.instance_variable_get('@local_window_size')).to eq (1000 - receive_data.size + described_class::INITIAL_WINDOW_SIZE)
+        end
       end
     end
 

@@ -19,6 +19,9 @@ module HrrRbSsh
         @@type_list.keys
       end
 
+      INITIAL_WINDOW_SIZE = 100000
+      MAXIMUM_PACKET_SIZE = 100000
+
       attr_reader \
         :receive_payload_queue
 
@@ -29,8 +32,10 @@ module HrrRbSsh
         @channel_type = channel_type
         @local_channel  = local_channel
         @remote_channel = remote_channel
-        @initial_window_size = initial_window_size
-        @maximum_packet_size = maximum_packet_size
+        @local_window_size          = INITIAL_WINDOW_SIZE
+        @local_maximum_packet_size  = MAXIMUM_PACKET_SIZE
+        @remote_window_size         = initial_window_size
+        @remote_maximum_packet_size = maximum_packet_size
 
         @receive_payload_queue = Queue.new
         @receive_data_queue = Queue.new
@@ -104,6 +109,9 @@ module HrrRbSsh
                 @logger.info("received channel data")
                 local_channel = message['recipient channel']
                 @receive_data_queue.enq message['data']
+              elsif message.has_key?(HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID)
+                @logger.debug("received channel window adjust")
+                @remote_window_size = [@remote_window_size + message['bytes to add'], 0xffff_ffff].min
               else
                 @logger.warn("received unsupported message: #{message.inspect}")
               end
@@ -127,7 +135,10 @@ module HrrRbSsh
             end
             begin
               data = @channel_io.readpartial(1024)
-              send_channel_data data
+              sendable_size = [data.size, @remote_window_size].min
+              sending_data = data[0, sendable_size]
+              send_channel_data sending_data if sendable_size > 0
+              @remote_window_size -= sendable_size
             rescue EOFError => e
               @channel_io.close
             rescue IOError => e
@@ -153,6 +164,12 @@ module HrrRbSsh
                 break
               end
               @channel_io.write data
+              @local_window_size -= data.size
+              if @local_window_size < INITIAL_WINDOW_SIZE/2
+                @logger.info("send channel window adjust")
+                send_channel_window_adjust
+                @local_window_size += INITIAL_WINDOW_SIZE
+              end
             rescue IOError => e
               @logger.warn("channel IO is closed")
               close
@@ -192,6 +209,16 @@ module HrrRbSsh
           'recipient channel'       => @remote_channel,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS.encode message
+        @connection.send payload
+      end
+
+      def send_channel_window_adjust
+        message = {
+          'SSH_MSG_CHANNEL_WINDOW_ADJUST' => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          'recipient channel'             => @remote_channel,
+          'bytes to add'                  => INITIAL_WINDOW_SIZE,
+        }
+        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.encode message
         @connection.send payload
       end
 

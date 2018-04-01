@@ -68,6 +68,8 @@ module HrrRbSsh
           channel_open payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
           channel_request payload
+        when HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
+          channel_window_adjust payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
           channel_data payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE
@@ -98,6 +100,13 @@ module HrrRbSsh
     def channel_request payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.decode payload
+      local_channel = message['recipient channel']
+      @channels[local_channel].receive_payload_queue.enq message
+    end
+
+    def channel_window_adjust payload
+      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID)
+      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.decode payload
       local_channel = message['recipient channel']
       @channels[local_channel].receive_payload_queue.enq message
     end

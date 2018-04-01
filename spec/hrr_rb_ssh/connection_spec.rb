@@ -205,6 +205,27 @@ RSpec.describe HrrRbSsh::Connection do
       end
     end
 
+    context "when receives channel window adjust message" do
+      let(:channel_window_adjust_message){
+        {
+          "SSH_MSG_CHANNEL_WINDOW_ADJUST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          "recipient channel"             => 0,
+          "bytes to add"                  => 12345,
+        }
+      }
+      let(:channel_window_adjust_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.encode channel_window_adjust_message
+      }
+
+      it "calls channel_window_adjust" do
+        expect(authentication).to receive(:receive).with(no_args).and_return(channel_window_adjust_payload).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(connection).to receive(:channel_window_adjust).with(channel_window_adjust_payload).once
+        expect(connection).to receive(:close).with(no_args).once
+        connection.connection_loop
+      end
+    end
+
     context "when receives channel data message" do
       let(:channel_data_message){
         {
@@ -344,6 +365,41 @@ RSpec.describe HrrRbSsh::Connection do
         allow(channel).to receive(:receive_payload_queue).and_return(receive_payload_queue)
         connection.channel_request channel_request_payload
         expect(connection.instance_variable_get('@channels')[0].receive_payload_queue.pop).to eq channel_request_message
+      end
+    end
+  end
+
+  describe '#channel_window_adjust' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:options){ Hash.new }
+    let(:connection){ described_class.new authentication, options }
+
+    context "when receives valid channel window adjust message" do
+      let(:channel_window_adjust_message){
+        {
+          "SSH_MSG_CHANNEL_WINDOW_ADJUST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          "recipient channel"             => 0,
+          "bytes to add"                  => 12345,
+        }
+      }
+      let(:channel_window_adjust_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.encode channel_window_adjust_message
+      }
+
+      let(:channel){ double('channel') }
+      let(:receive_payload_queue){ Queue.new }
+
+      before :example do
+        connection.instance_variable_get('@channels')[0] = channel
+      end
+
+      it "calls channel_window_adjust" do
+        allow(channel).to receive(:receive_payload_queue).and_return(receive_payload_queue)
+        connection.channel_window_adjust channel_window_adjust_payload
+        expect(connection.instance_variable_get('@channels')[0].receive_payload_queue.pop).to eq channel_window_adjust_message
       end
     end
   end
