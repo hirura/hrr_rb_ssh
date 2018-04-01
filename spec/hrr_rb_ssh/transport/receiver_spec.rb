@@ -17,7 +17,7 @@ RSpec.describe HrrRbSsh::Transport::Receiver do
           "00000014",
           "0c",
           "testing",
-          "#{Array.new(12){ rand(256).to_s(16) }.join}",
+          "#{Array.new(12){ "%02x" % rand(256) }.join}",
         ].pack("H*" "H*" "a7" "H*")
       }
 
