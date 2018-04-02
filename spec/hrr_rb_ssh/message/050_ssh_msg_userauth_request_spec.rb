@@ -20,15 +20,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
   context "when 'method name' is \"none\"" do
     let(:message){
       {
-        id             => value,
-        'user name'    => 'rspec',
-        'service name' => 'ssh-connection',
-        'method name'  => 'none',
+        'message number' => value,
+        'user name'      => 'rspec',
+        'service name'   => 'ssh-connection',
+        'method name'    => 'none',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['user name']),
         HrrRbSsh::Transport::DataType::String.encode(message['service name']),
         HrrRbSsh::Transport::DataType::String.encode(message['method name']),
@@ -51,7 +51,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
   context "when 'method name' is \"password\"" do
     let(:message){
       {
-        id                   => value,
+        'message number'     => value,
         'user name'          => 'rspec',
         'service name'       => 'ssh-connection',
         'method name'        => 'password',
@@ -61,7 +61,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['user name']),
         HrrRbSsh::Transport::DataType::String.encode(message['service name']),
         HrrRbSsh::Transport::DataType::String.encode(message['method name']),
@@ -87,18 +87,18 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     context "without signature" do
       let(:message){
         {
-          id                           => value,
-          'user name'                  => 'rspec',
-          'service name'               => 'ssh-connection',
-          'method name'                => 'publickey',
-          'with signature'             => false,
-          'public key algorithm name'  => 'ssh-rsa',
-          'public key blob'            => 'dummy',
+          'message number'            => value,
+          'user name'                 => 'rspec',
+          'service name'              => 'ssh-connection',
+          'method name'               => 'publickey',
+          'with signature'            => false,
+          'public key algorithm name' => 'ssh-rsa',
+          'public key blob'           => 'dummy',
         }
       }
       let(:payload){
         [
-          HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+          HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
           HrrRbSsh::Transport::DataType::String.encode(message['user name']),
           HrrRbSsh::Transport::DataType::String.encode(message['service name']),
           HrrRbSsh::Transport::DataType::String.encode(message['method name']),
@@ -125,19 +125,19 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
   context "with signature" do
     let(:message){
       {
-        id                           => value,
-        'user name'                  => 'rspec',
-        'service name'               => 'ssh-connection',
-        'method name'                => 'publickey',
-        'with signature'             => true,
-        'public key algorithm name'  => 'ssh-rsa',
-        'public key blob'            => 'dummy',
-        'signature'                  => 'dummy',
+        'message number'            => value,
+        'user name'                 => 'rspec',
+        'service name'              => 'ssh-connection',
+        'method name'               => 'publickey',
+        'with signature'            => true,
+        'public key algorithm name' => 'ssh-rsa',
+        'public key blob'           => 'dummy',
+        'signature'                 => 'dummy',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['user name']),
         HrrRbSsh::Transport::DataType::String.encode(message['service name']),
         HrrRbSsh::Transport::DataType::String.encode(message['method name']),

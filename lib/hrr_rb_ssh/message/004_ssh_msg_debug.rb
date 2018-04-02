@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_DEBUG'],
+        ['byte',      'message number'],
         ['boolean',   'always_display'],
         ['string',    'message'],
         ['string',    'language tag'],

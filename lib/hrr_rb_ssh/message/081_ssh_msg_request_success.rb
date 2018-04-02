@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_REQUEST_SUCCESS'],
+        ['byte',      'message number'],
       ]
 
       TCPIP_FORWARD_DEFINITION = [

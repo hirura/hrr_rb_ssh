@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_USERAUTH_FAILURE'],
+        ['byte',      'message number'],
         ['name-list', 'authentications that can continue'],
         ['boolean',   'partial success'],
       ]

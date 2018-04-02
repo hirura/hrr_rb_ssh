@@ -139,7 +139,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"pty-req\"" do
     let(:message){
       {
-        id                                => value,
+        'message number'                  => value,
         'recipient channel'               => 1,
         'request type'                    => 'pty-req',
         'want reply'                      => true,
@@ -153,7 +153,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -182,7 +182,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"x11-req\"" do
     let(:message){
       {
-        id                            => value,
+        'message number'              => value,
         'recipient channel'           => 1,
         'request type'                => 'x11-req',
         'want reply'                  => true,
@@ -195,7 +195,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -222,17 +222,17 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"env\"" do
     let(:message){
       {
-        id                    => value,
-        'recipient channel'   => 1,
-        'request type'        => 'env',
-        'want reply'          => true,
-        'variable name'       => 'name',
-        'variable value'      => 'value',
+        'message number'    => value,
+        'recipient channel' => 1,
+        'request type'      => 'env',
+        'want reply'        => true,
+        'variable name'     => 'name',
+        'variable value'    => 'value',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -257,15 +257,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"shell\"" do
     let(:message){
       {
-        id                    => value,
-        'recipient channel'   => 1,
-        'request type'        => 'shell',
-        'want reply'          => true,
+        'message number'    => value,
+        'recipient channel' => 1,
+        'request type'      => 'shell',
+        'want reply'        => true,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -288,7 +288,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"exec\"" do
     let(:message){
       {
-        id                  => value,
+        'message number'    => value,
         'recipient channel' => 1,
         'request type'      => 'exec',
         'want reply'        => true,
@@ -297,7 +297,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -321,7 +321,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"subsystem\"" do
     let(:message){
       {
-        id                  => value,
+        'message number'    => value,
         'recipient channel' => 1,
         'request type'      => 'subsystem',
         'want reply'        => true,
@@ -330,7 +330,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -354,19 +354,19 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"window-change\"" do
     let(:message){
       {
-        id                           => value,
-        'recipient channel'          => 1,
-        'request type'               => 'window-change',
-        'want reply'                 => true,
-        'terminal width, columns'    => 80,
-        'terminal height, rows'      => 24,
-        'terminal width, pixels'     => 400,
-        'terminal height, pixels'    => 120,
+        'message number'          => value,
+        'recipient channel'       => 1,
+        'request type'            => 'window-change',
+        'want reply'              => true,
+        'terminal width, columns' => 80,
+        'terminal height, rows'   => 24,
+        'terminal width, pixels'  => 400,
+        'terminal height, pixels' => 120,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -393,7 +393,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"xon-xoff\"" do
     let(:message){
       {
-        id                  => value,
+        'message number'    => value,
         'recipient channel' => 1,
         'request type'      => 'xon-xoff',
         'want reply'        => true,
@@ -402,7 +402,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -426,16 +426,16 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"signal\"" do
     let(:message){
       {
-        id                    => value,
-        'recipient channel'   => 1,
-        'request type'        => 'signal',
-        'want reply'          => true,
-        'signal name'         => 'signal',
+        'message number'    => value,
+        'recipient channel' => 1,
+        'request type'      => 'signal',
+        'want reply'        => true,
+        'signal name'       => 'signal',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -459,16 +459,16 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"exit-status\"" do
     let(:message){
       {
-        id                    => value,
-        'recipient channel'   => 1,
-        'request type'        => 'exit-status',
-        'want reply'          => true,
-        'exit status'         => 2,
+        'message number'    => value,
+        'recipient channel' => 1,
+        'request type'      => 'exit-status',
+        'want reply'        => true,
+        'exit status'       => 2,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
@@ -492,7 +492,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"exit-signal\"" do
     let(:message){
       {
-        id                  => value,
+        'message number'    => value,
         'recipient channel' => 1,
         'request type'      => 'exit-signal',
         'want reply'        => true,
@@ -504,7 +504,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::String.encode(message['request type']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),

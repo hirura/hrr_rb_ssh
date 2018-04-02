@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_KEXDH_REPLY'],
+        ['byte',      'message number'],
         ['string',    'server public host key and certificates (K_S)'],
         ['mpint',     'f'],
         ['string',    'signature of H'],

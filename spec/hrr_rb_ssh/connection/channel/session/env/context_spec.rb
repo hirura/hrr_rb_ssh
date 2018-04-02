@@ -8,12 +8,12 @@ RSpec.describe HrrRbSsh::Connection::Channel::Session::Env::Context do
   let(:variables){ Hash.new }
   let(:message){
     {
-      HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-      'recipient channel'                            => 1,
-      'request type'                                 => 'env',
-      'want reply'                                   => true,
-      'variable name'                                => 'variable name',
-      'variable value'                               => 'variable value',
+      'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+      'recipient channel' => 1,
+      'request type'      => 'env',
+      'want reply'        => true,
+      'variable name'     => 'variable name',
+      'variable value'    => 'variable value',
     }
   }
   let(:context){ described_class.new proc_chain, username, io, variables, message }

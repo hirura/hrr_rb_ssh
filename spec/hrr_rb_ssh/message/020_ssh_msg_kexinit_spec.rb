@@ -27,7 +27,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXINIT do
   let(:compression_algorithms){ HrrRbSsh::Transport::CompressionAlgorithm.name_list }
   let(:message){
     {
-      id                                        => value,
+      'message number'                          => value,
       'cookie (random byte)'                    => lambda { rand(0x01_00) },
       'kex_algorithms'                          => kex_algorithms,
       'server_host_key_algorithms'              => server_host_key_algorithms,
@@ -45,7 +45,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXINIT do
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
       HrrRbSsh::Transport::DataType::Byte.encode(message['cookie (random byte)'].call),
       HrrRbSsh::Transport::DataType::Byte.encode(message['cookie (random byte)'].call),
       HrrRbSsh::Transport::DataType::Byte.encode(message['cookie (random byte)'].call),
@@ -86,7 +86,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXINIT do
 
   describe ".decode" do
     it "returns message decoded" do
-      expect(described_class.decode(payload)[id]).to eq message[id]
+      expect(described_class.decode(payload)['message number']).to eq message['message number']
       expect(described_class.decode(payload)['kex_algorithms']).to eq message['kex_algorithms']
       expect(described_class.decode(payload)['server_host_key_algorithms']).to eq message['server_host_key_algorithms']
       expect(described_class.decode(payload)['encryption_algorithms_client_to_server']).to eq message['encryption_algorithms_client_to_server']

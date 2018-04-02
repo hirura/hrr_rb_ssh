@@ -1,9 +1,9 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA do
-  let(:id){ 'SSH_MSG_CHANNEL_DATA' }
-  let(:value){ 94 }
+RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF do
+  let(:id){ 'SSH_MSG_CHANNEL_EOF' }
+  let(:value){ 96 }
 
   describe "::ID" do
     it "is defined" do
@@ -19,16 +19,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA do
 
   let(:message){
     {
-      id                  => value,
+      'message number'    => value,
       'recipient channel' => 1,
-      'data'              => 'data',
     }
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
       HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
-      HrrRbSsh::Transport::DataType::String.encode(message['data']),
     ].join
   }
 

@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_KEXDH_INIT'],
+        ['byte',      'message number'],
         ['mpint',     'e'],
       ]
     end

@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_KEXINIT'],
+        ['byte',      'message number'],
         ['byte',      'cookie (random byte)'],
         ['byte',      'cookie (random byte)'],
         ['byte',      'cookie (random byte)'],

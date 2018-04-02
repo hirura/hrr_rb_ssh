@@ -280,10 +280,10 @@ module HrrRbSsh
 
     def send_disconnect
       message = {
-        "SSH_MSG_DISCONNECT" => 1,
-        "reason code"        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-        "description"        => "disconnected by user",
-        "language tag"       => ""
+        'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+        "reason code"    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+        "description"    => "disconnected by user",
+        "language tag"   => ""
       }
       payload = HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode message
       @sender.send self, payload
@@ -291,7 +291,7 @@ module HrrRbSsh
 
     def send_kexinit
       message = {
-        'SSH_MSG_KEXINIT'                         => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+        'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
         'cookie (random byte)'                    => lambda { rand(0x01_00) },
         'kex_algorithms'                          => @local_kex_algorithms,
         'server_host_key_algorithms'              => @local_server_host_key_algorithms,
@@ -343,7 +343,7 @@ module HrrRbSsh
 
     def send_kexdh_reply
         message = {
-          'SSH_MSG_KEXDH_REPLY'                           => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
+          'message number'                                => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
           'server public host key and certificates (K_S)' => @server_host_key_algorithm.server_public_host_key,
           'f'                                             => @kex_algorithm.pub_key,
           'signature of H'                                => @kex_algorithm.sign(self),
@@ -354,7 +354,7 @@ module HrrRbSsh
 
     def send_newkeys
         message = {
-          'SSH_MSG_NEWKEYS' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
+          'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
         }
         payload = HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode message
         @sender.send self, payload
@@ -376,8 +376,8 @@ module HrrRbSsh
 
     def send_service_accept service_name
         message = {
-          'SSH_MSG_SERVICE_ACCEPT' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
-          'service name'           => service_name,
+          'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
+          'service name'   => service_name,
         }
         payload = HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode message
         @sender.send self, payload

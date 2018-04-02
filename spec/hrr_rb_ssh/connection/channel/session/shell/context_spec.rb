@@ -8,10 +8,10 @@ RSpec.describe HrrRbSsh::Connection::Channel::Session::Shell::Context do
   let(:variables){ Hash.new }
   let(:message){
     {
-      HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-      'recipient channel'                            => 1,
-      'request type'                                 => 'shell',
-      'want reply'                                   => true,
+      'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+      'recipient channel' => 1,
+      'request type'      => 'shell',
+      'want reply'        => true,
     }
   }
   let(:context){ described_class.new proc_chain, username, io, variables, message }

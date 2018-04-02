@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_CHANNEL_OPEN_CONFIRMATION'],
+        ['byte',      'message number'],
         ['uint32',    'recipient channel'],
         ['uint32',    'sender channel'],
         ['uint32',    'initial window size'],

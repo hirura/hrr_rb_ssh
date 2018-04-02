@@ -20,7 +20,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_CHANNEL_EXTENDED_DATA'],
+        ['byte',      'message number'],
         ['uint32',    'recipient channel'],
         ['uint32',    'data type code'],
         ['string',    'data'],

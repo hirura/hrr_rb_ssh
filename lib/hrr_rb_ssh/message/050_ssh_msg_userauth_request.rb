@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_USERAUTH_REQUEST'],
+        ['byte',      'message number'],
         ['string',    'user name'],
         ['string',    'service name'],
         ['string',    'method name'],

@@ -1,9 +1,9 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-RSpec.describe HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE do
-  let(:id){ 'SSH_MSG_REQUEST_FAILURE' }
-  let(:value){ 82 }
+RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS do
+  let(:id){ 'SSH_MSG_CHANNEL_SUCCESS' }
+  let(:value){ 99 }
 
   describe "::ID" do
     it "is defined" do
@@ -19,12 +19,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE do
 
   let(:message){
     {
-      id => value,
+      'message number'    => value,
+      'recipient channel' => 1,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
+      HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
     ].join
   }
 

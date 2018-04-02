@@ -20,7 +20,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
   context "when 'channel type' is \"session\"" do
     let(:message){
       {
-        id                    => value,
+        'message number'      => value,
         'recipient channel'   => 1,
         'sender channel'      => 2,
         'initial window size' => 3,
@@ -29,7 +29,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['initial window size']),
@@ -59,7 +59,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
   context "when 'channel type' is \"x11\"" do
     let(:message){
       {
-        id                    => value,
+        'message number'      => value,
         'recipient channel'   => 1,
         'sender channel'      => 2,
         'initial window size' => 3,
@@ -70,7 +70,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['initial window size']),
@@ -102,7 +102,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
   context "when 'channel type' is \"forwarded-tcpip\"" do
     let(:message){
       {
-        id                           => value,
+        'message number'             => value,
         'recipient channel'          => 1,
         'sender channel'             => 2,
         'initial window size'        => 3,
@@ -115,7 +115,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['initial window size']),
@@ -149,7 +149,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
   context "when 'channel type' is \"direct-tcpip\"" do
     let(:message){
       {
-        id                      => value,
+        'message number'        => value,
         'recipient channel'     => 1,
         'sender channel'        => 2,
         'initial window size'   => 3,
@@ -162,7 +162,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['initial window size']),

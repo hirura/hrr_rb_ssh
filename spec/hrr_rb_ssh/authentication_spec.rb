@@ -148,7 +148,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:authentication){ described_class.new(transport, options) }
     let(:userauth_failure_message){
       {
-        "SSH_MSG_USERAUTH_FAILURE"          => 51,
+        'message number'                    => HrrRbSsh::Method::SSH_MSG_USERAUTH_FAILURE::VALUE,
         'authentications that can continue' => HrrRbSsh::Authentication::Method.name_list,
         'partial success'                   => false,
       }
@@ -158,7 +158,7 @@ RSpec.describe HrrRbSsh::Authentication do
     }
     let(:userauth_success_message){
       {
-        "SSH_MSG_USERAUTH_SUCCESS" => 52,
+        'message number' => HrrRbSsh::Method::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
     }
     let(:userauth_success_payload){
@@ -174,10 +174,10 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          "SSH_MSG_USERAUTH_REQUEST" => 50,
-          "user name"                => username,
-          "service name"             => "ssh-connection",
-          "method name"              => "none",
+          'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          "user name"      => username,
+          "service name"   => "ssh-connection",
+          "method name"    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
@@ -204,10 +204,10 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          "SSH_MSG_USERAUTH_REQUEST" => 50,
-          "user name"                => username,
-          "service name"             => "ssh-connection",
-          "method name"              => "none",
+          'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          "user name"      => username,
+          "service name"   => "ssh-connection",
+          "method name"    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
@@ -215,12 +215,12 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_password_method_message){
         {
-          "SSH_MSG_USERAUTH_REQUEST" => 50,
-          "user name"                => username,
-          "service name"             => "ssh-connection",
-          "method name"              => "password",
-          "FALSE"                    => false, 
-          "plaintext password"       => "password"
+          'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          "user name"          => username,
+          "service name"       => "ssh-connection",
+          "method name"        => "password",
+          "FALSE"              => false, 
+          "plaintext password" => "password"
         }
       }
       let(:userauth_request_with_password_method_payload){

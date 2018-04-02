@@ -57,7 +57,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE do
 
   let(:message){
     {
-      id                  => value,
+      'message number'    => value,
       'recipient channel' => 1,
       'reason code'       => 2,
       'description'       => 'description',
@@ -66,7 +66,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE do
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
       HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
       HrrRbSsh::Transport::DataType::Uint32.encode(message['reason code']),
       HrrRbSsh::Transport::DataType::String.encode(message['description']),

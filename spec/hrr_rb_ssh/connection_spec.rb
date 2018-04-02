@@ -162,9 +162,9 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives global request message" do
       let(:global_request_message){
         {
-          "SSH_MSG_GLOBAL_REQUEST" => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
-          "request name"           => 'dummy',
-          "want reply"             => true,
+          'message number' => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
+          "request name"   => 'dummy',
+          "want reply"     => true,
         }
       }
       let(:global_request_payload){
@@ -183,11 +183,11 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel open message" do
       let(:channel_open_message){
         {
-          "SSH_MSG_CHANNEL_OPEN" => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
-          "channel type"         => "session",
-          "sender channel"       => 0,
-          "initial window size"  => 2097152,
-          "maximum packet size"  => 32768,
+          'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+          "channel type"        => "session",
+          "sender channel"      => 0,
+          "initial window size" => 2097152,
+          "maximum packet size" => 32768,
         }
       }
       let(:channel_open_payload){
@@ -206,10 +206,10 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel request message" do
       let(:channel_request_message){
         {
-          "SSH_MSG_CHANNEL_REQUEST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-          "recipient channel"       => 0,
-          "request type"            => 'shell',
-          "want reply"              => true,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          "recipient channel" => 0,
+          "request type"      => 'shell',
+          "want reply"        => true,
         }
       }
       let(:channel_request_payload){
@@ -229,9 +229,9 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel window adjust message" do
       let(:channel_window_adjust_message){
         {
-          "SSH_MSG_CHANNEL_WINDOW_ADJUST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
-          "recipient channel"             => 0,
-          "bytes to add"                  => 12345,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          "recipient channel" => 0,
+          "bytes to add"      => 12345,
         }
       }
       let(:channel_window_adjust_payload){
@@ -250,9 +250,9 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel data message" do
       let(:channel_data_message){
         {
-          "SSH_MSG_CHANNEL_DATA" => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
-          "recipient channel"    => 0,
-          "data"                 => "testing",
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          "recipient channel" => 0,
+          "data"              => "testing",
         }
       }
       let(:channel_data_payload){
@@ -271,8 +271,8 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel close message" do
       let(:channel_close_message){
         {
-          "SSH_MSG_CHANNEL_CLOSE" => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
-          "recipient channel"     => 0,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+          "recipient channel" => 0,
         }
       }
       let(:channel_close_payload){
@@ -291,11 +291,11 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives unknown message" do
       let(:unknown_message){
         {
-          "SSH_MSG_CHANNEL_OPEN" => 123,
-          "channel type"         => "session",
-          "sender channel"       => 0,
-          "initial window size"  => 2097152,
-          "maximum packet size"  => 32768,
+          'message number'      => 123,
+          "channel type"        => "session",
+          "sender channel"      => 0,
+          "initial window size" => 2097152,
+          "maximum packet size" => 32768,
         }
       }
       let(:unknown_payload){
@@ -322,9 +322,9 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel open message" do
       let(:global_request_message){
         {
-          "SSH_MSG_GLOBAL_REQUEST" => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
-          "request name"           => 'dummy',
-          "want reply"             => true,
+          'message number' => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
+          "request name"   => 'dummy',
+          "want reply"     => true,
         }
       }
       let(:global_request_payload){
@@ -332,7 +332,7 @@ RSpec.describe HrrRbSsh::Connection do
       }
       let(:request_failure_message){
         {
-          "SSH_MSG_REQUEST_FAILURE" => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
+          'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
         }
       }
       let(:request_failure_payload){
@@ -357,11 +357,11 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel open message" do
       let(:channel_open_message){
         {
-          "SSH_MSG_CHANNEL_OPEN" => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
-          "channel type"         => "session",
-          "sender channel"       => 0,
-          "initial window size"  => 2097152,
-          "maximum packet size"  => 32768,
+          'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+          "channel type"        => "session",
+          "sender channel"      => 0,
+          "initial window size" => 2097152,
+          "maximum packet size" => 32768,
         }
       }
       let(:channel_open_payload){
@@ -369,12 +369,12 @@ RSpec.describe HrrRbSsh::Connection do
       }
       let(:channel_open_confirmation_message){
         {
-          "SSH_MSG_CHANNEL_OPEN_CONFIRMATION" => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
-          "channel type"                      => "session",
-          "recipient channel"                 => 0,
-          "sender channel"                    => 0,
-          "initial window size"               => 2097152,
-          "maximum packet size"               => 32768,
+          'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
+          "channel type"        => "session",
+          "recipient channel"   => 0,
+          "sender channel"      => 0,
+          "initial window size" => 2097152,
+          "maximum packet size" => 32768,
         }
       }
       let(:channel_open_confirmation_payload){
@@ -400,10 +400,10 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel request message" do
       let(:channel_request_message){
         {
-          "SSH_MSG_CHANNEL_REQUEST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-          "recipient channel"       => 0,
-          "request type"            => 'shell',
-          "want reply"              => true,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          "recipient channel" => 0,
+          "request type"      => 'shell',
+          "want reply"        => true,
         }
       }
       let(:channel_request_payload){
@@ -436,9 +436,9 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel window adjust message" do
       let(:channel_window_adjust_message){
         {
-          "SSH_MSG_CHANNEL_WINDOW_ADJUST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
-          "recipient channel"             => 0,
-          "bytes to add"                  => 12345,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          "recipient channel" => 0,
+          "bytes to add"      => 12345,
         }
       }
       let(:channel_window_adjust_payload){
@@ -471,9 +471,9 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel data message" do
       let(:channel_data_message){
         {
-          "SSH_MSG_CHANNEL_DATA" => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
-          "recipient channel"    => 0,
-          "data"                 => "testing",
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          "recipient channel" => 0,
+          "data"              => "testing",
         }
       }
       let(:channel_data_payload){
@@ -518,8 +518,8 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel close message" do
       let(:channel_close_message){
         {
-          "SSH_MSG_CHANNEL_CLOSE" => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
-          "recipient channel"     => 0,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+          "recipient channel" => 0,
         }
       }
       let(:channel_close_payload){
@@ -544,7 +544,7 @@ RSpec.describe HrrRbSsh::Connection do
 
     let(:request_success_message){
       {
-        "SSH_MSG_REQUEST_SUCCESS" => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
+        'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
       }
     }
     let(:request_success_payload){

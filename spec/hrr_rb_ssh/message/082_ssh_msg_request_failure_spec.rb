@@ -1,9 +1,9 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST do
-  let(:id){ 'SSH_MSG_CHANNEL_WINDOW_ADJUST' }
-  let(:value){ 93 }
+RSpec.describe HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE do
+  let(:id){ 'SSH_MSG_REQUEST_FAILURE' }
+  let(:value){ 82 }
 
   describe "::ID" do
     it "is defined" do
@@ -19,16 +19,12 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST do
 
   let(:message){
     {
-      id                  => value,
-      'recipient channel' => 1,
-      'bytes to add'      => 2,
+      'message number' => value,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
-      HrrRbSsh::Transport::DataType::Uint32.encode(message['recipient channel']),
-      HrrRbSsh::Transport::DataType::Uint32.encode(message['bytes to add']),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
     ].join
   }
 

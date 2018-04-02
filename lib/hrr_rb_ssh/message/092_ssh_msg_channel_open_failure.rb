@@ -23,7 +23,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_CHANNEL_OPEN_FAILURE'],
+        ['byte',      'message number'],
         ['uint32',    'recipient channel'],
         ['uint32',    'reason code'],
         ['string',    'description'],

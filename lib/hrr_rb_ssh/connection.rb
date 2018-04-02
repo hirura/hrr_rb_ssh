@@ -140,7 +140,7 @@ module HrrRbSsh
 
     def send_request_success
       message = {
-        'SSH_MSG_REQUEST_SUCCESS' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
+        'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
       }
       payload = HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS.encode message
       @authentication.send payload
@@ -148,7 +148,7 @@ module HrrRbSsh
 
     def send_request_failure
       message = {
-        'SSH_MSG_REQUEST_FAILURE' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
+        'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
       }
       payload = HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE.encode message
       @authentication.send payload
@@ -156,12 +156,12 @@ module HrrRbSsh
 
     def send_channel_open_confirmation channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
       message = {
-        'SSH_MSG_CHANNEL_OPEN_CONFIRMATION' => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
-        'channel type'                      => channel_type,
-        'recipient channel'                 => remote_channel,
-        'sender channel'                    => local_channel,
-        'initial window size'               => initial_window_size,
-        'maximum packet size'               => maximum_packet_size,
+        'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
+        'channel type'        => channel_type,
+        'recipient channel'   => remote_channel,
+        'sender channel'      => local_channel,
+        'initial window size' => initial_window_size,
+        'maximum packet size' => maximum_packet_size,
       }
       payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.encode message
       @authentication.send payload

@@ -156,15 +156,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_DISCONNECT do
 
   let(:message){
     {
-      id                  => value,
-      'reason code'       => 1,
-      'description'       => 'description',
-      'language tag'      => 'language tag',
+      'message number' => value,
+      'reason code'    => 1,
+      'description'    => 'description',
+      'language tag'   => 'language tag',
     }
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
       HrrRbSsh::Transport::DataType::Uint32.encode(message['reason code']),
       HrrRbSsh::Transport::DataType::String.encode(message['description']),
       HrrRbSsh::Transport::DataType::String.encode(message['language tag']),

@@ -88,7 +88,7 @@ module HrrRbSsh
 
     def send_userauth_failure
       message = {
-        'SSH_MSG_USERAUTH_FAILURE'          => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
         'authentications that can continue' => Method.name_list,
         'partial success'                   => false,
       }
@@ -98,7 +98,7 @@ module HrrRbSsh
 
     def send_userauth_success
       message = {
-        'SSH_MSG_USERAUTH_SUCCESS' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
+        'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
       payload = HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS.encode message
       @transport.send payload

@@ -19,13 +19,13 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED do
 
   let(:message){
     {
-      id                                           => value,
+      'message number'                             => value,
       'packet sequence number of rejected message' => 123,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
       HrrRbSsh::Transport::DataType::Uint32.encode(message['packet sequence number of rejected message']),
     ].join
   }

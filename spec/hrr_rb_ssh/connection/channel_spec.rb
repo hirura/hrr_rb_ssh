@@ -69,8 +69,8 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         context "when connection is not closed" do
           let(:channel_eof_message){
             {
-              "SSH_MSG_CHANNEL_EOF" => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
-              "recipient channel"   => 0,
+              'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+              "recipient channel" => 0,
             }
           }
           let(:channel_eof_payload){
@@ -78,11 +78,11 @@ RSpec.describe HrrRbSsh::Connection::Channel do
           }
           let(:channel_request_exit_status_message){
             {
-              "SSH_MSG_CHANNEL_REQUEST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-              "recipient channel"       => 0,
-              'request type'            => 'exit-status',
-              'want reply'              => false,
-              'exit status'             => exitstatus,
+              'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+              "recipient channel" => 0,
+              'request type'      => 'exit-status',
+              'want reply'        => false,
+              'exit status'       => exitstatus,
             }
           }
           let(:channel_request_exit_status_payload){
@@ -90,8 +90,8 @@ RSpec.describe HrrRbSsh::Connection::Channel do
           }
           let(:channel_close_message){
             {
-              "SSH_MSG_CHANNEL_CLOSE" => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
-              "recipient channel"     => 0,
+              'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+              "recipient channel" => 0,
             }
           }
           let(:channel_close_payload){
@@ -199,18 +199,18 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when channel receives channel request" do
       let(:channel_request_message){
         {
-          "SSH_MSG_CHANNEL_REQUEST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-          "recipient channel"       => 0,
-          "request type"            => 'shell',
-          "want reply"              => want_reply,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          "recipient channel" => 0,
+          "request type"      => 'shell',
+          "want reply"        => want_reply,
         }
       }
       let(:variables){ Hash.new }
 
       let(:channel_success_message){
         {
-          "SSH_MSG_CHANNEL_SUCCESS" => HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
-          "recipient channel"       => 0,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
+          "recipient channel" => 0,
         }
       }
       let(:channel_success_payload){
@@ -256,9 +256,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when channel receives channel data" do
       let(:channel_data_message){
         {
-          "SSH_MSG_CHANNEL_DATA" => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
-          "recipient channel"    => 0,
-          "data"                 => "testing",
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          "recipient channel" => 0,
+          "data"              => "testing",
         }
       }
 
@@ -279,9 +279,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when channel receives channel window adjust" do
       let(:channel_window_adjust_message){
         {
-          "SSH_MSG_CHANNEL_WINDOW_ADJUST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
-          "recipient channel"             => 0,
-          "bytes to add"                  => 12345,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          "recipient channel" => 0,
+          "bytes to add"      => 12345,
         }
       }
 
@@ -322,9 +322,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when error occurs" do
       let(:channel_data_message){
         {
-          "SSH_MSG_CHANNEL_DATA" => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
-          "recipient channel"    => 0,
-          "data"                 => "testing",
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          "recipient channel" => 0,
+          "data"              => "testing",
         }
       }
 
@@ -348,9 +348,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
     let(:channel_data_message){
       {
-        'SSH_MSG_CHANNEL_DATA' => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
-        'recipient channel'    => 0,
-        'data'                 => send_data,
+        'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+        'recipient channel' => 0,
+        'data'              => send_data,
       }
     }
     let(:channel_data_payload){
@@ -429,9 +429,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       context "when local window size is not enough" do
         let(:channel_window_adjust_message){
           {
-            "SSH_MSG_CHANNEL_WINDOW_ADJUST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
-            "recipient channel"             => 0,
-            "bytes to add"                  => described_class::INITIAL_WINDOW_SIZE,
+            'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+            "recipient channel" => 0,
+            "bytes to add"      => described_class::INITIAL_WINDOW_SIZE,
           }
         }
         let(:channel_window_adjust_payload){
@@ -522,10 +522,10 @@ RSpec.describe HrrRbSsh::Connection::Channel do
   describe "#request" do
     let(:channel_request_message){
       {
-        "SSH_MSG_CHANNEL_REQUEST" => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-        "recipient channel"       => 0,
-        "request type"            => 'shell',
-        "want reply"              => true,
+        'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+        "recipient channel" => 0,
+        "request type"      => 'shell',
+        "want reply"        => true,
       }
     }
     let(:variables){ Hash.new }

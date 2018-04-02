@@ -20,7 +20,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST do
   context "when 'request name' is \"tcpip-forward\"" do
     let(:message){
       {
-        id                    => value,
+        'message number'      => value,
         'request name'        => 'tcpip-forward',
         'want reply'          => false,
         'address to bind'     => '0.0.0.0',
@@ -29,7 +29,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['request name']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
         HrrRbSsh::Transport::DataType::String.encode(message['address to bind']),
@@ -53,7 +53,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST do
   context "when 'request name' is \"cancel-tcpip-forward\"" do
     let(:message){
       {
-        id                    => value,
+        'message number'      => value,
         'request name'        => 'cancel-tcpip-forward',
         'want reply'          => false,
         'address to bind'     => '0.0.0.0',
@@ -62,7 +62,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['request name']),
         HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
         HrrRbSsh::Transport::DataType::String.encode(message['address to bind']),

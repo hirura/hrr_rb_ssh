@@ -19,13 +19,13 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST do
 
   let(:message){
     {
-      id             => value,
-      'service name' => 'ssh-userauth',
+      'message number' => value,
+      'service name'   => 'ssh-userauth',
     }
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
       HrrRbSsh::Transport::DataType::String.encode(message['service name']),
     ].join
   }

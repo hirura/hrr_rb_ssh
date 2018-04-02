@@ -19,13 +19,13 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS do
 
   let(:message){
     {
-      id                                  => value,
+      'message number'                    => value,
       'port that was bound on the server' => 1080,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
       HrrRbSsh::Transport::DataType::Uint32.encode(message['port that was bound on the server']),
     ].join
   }

@@ -19,12 +19,12 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_NEWKEYS do
 
   let(:message){
     {
-      id             => value,
+      'message number' => value,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
     ].join
   }
 

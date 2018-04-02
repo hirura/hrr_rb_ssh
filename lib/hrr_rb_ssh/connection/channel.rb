@@ -107,17 +107,18 @@ module HrrRbSsh
                 @logger.info("closing channel loop thread")
                 break
               end
-              if message.has_key?(HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID)
+              case message['message number']
+              when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
                 @logger.info("received channel request: #{message['request type']}")
                 request message, variables
                 if message['want reply']
                   send_channel_success
                 end
-              elsif message.has_key?(HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::ID)
+              when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
                 @logger.info("received channel data")
                 local_channel = message['recipient channel']
                 @receive_data_queue.enq message['data']
-              elsif message.has_key?(HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID)
+              when HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
                 @logger.debug("received channel window adjust")
                 @remote_window_size = [@remote_window_size + message['bytes to add'], 0xffff_ffff].min
               else
@@ -217,8 +218,8 @@ module HrrRbSsh
 
       def send_channel_success
         message = {
-          'SSH_MSG_CHANNEL_SUCCESS' => HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
-          'recipient channel'       => @remote_channel,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
+          'recipient channel' => @remote_channel,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS.encode message
         @connection.send payload
@@ -226,9 +227,9 @@ module HrrRbSsh
 
       def send_channel_window_adjust
         message = {
-          'SSH_MSG_CHANNEL_WINDOW_ADJUST' => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
-          'recipient channel'             => @remote_channel,
-          'bytes to add'                  => INITIAL_WINDOW_SIZE,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          'recipient channel' => @remote_channel,
+          'bytes to add'      => INITIAL_WINDOW_SIZE,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.encode message
         @connection.send payload
@@ -236,9 +237,9 @@ module HrrRbSsh
 
       def send_channel_data data
         message = {
-          'SSH_MSG_CHANNEL_DATA' => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
-          'recipient channel'    => @remote_channel,
-          'data'                 => data,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          'recipient channel' => @remote_channel,
+          'data'              => data,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.encode message
         @connection.send payload
@@ -246,11 +247,11 @@ module HrrRbSsh
 
       def send_channel_request_exit_status exitstatus
         message = {
-          'SSH_MSG_CHANNEL_REQUEST' => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-          'recipient channel'       => @remote_channel,
-          'request type'            => 'exit-status',
-          'want reply'              => false,
-          'exit status'             => exitstatus,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          'recipient channel' => @remote_channel,
+          'request type'      => 'exit-status',
+          'want reply'        => false,
+          'exit status'       => exitstatus,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.encode message
         @connection.send payload
@@ -258,8 +259,8 @@ module HrrRbSsh
 
       def send_channel_eof
         message = {
-          'SSH_MSG_CHANNEL_EOF' => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
-          'recipient channel'   => @remote_channel,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+          'recipient channel' => @remote_channel,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.encode message
         @connection.send payload
@@ -267,8 +268,8 @@ module HrrRbSsh
 
       def send_channel_close
         message = {
-          'SSH_MSG_CHANNEL_CLOSE' => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
-          'recipient channel'     => @remote_channel,
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+          'recipient channel' => @remote_channel,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.encode message
         @connection.send payload

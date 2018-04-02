@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_NEWKEYS'],
+        ['byte',      'message number'],
       ]
     end
   end

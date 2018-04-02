@@ -8,16 +8,16 @@ RSpec.describe HrrRbSsh::Connection::Channel::Session::PtyReq::Context do
   let(:variables){ Hash.new }
   let(:message){
     {
-      HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-      'recipient channel'                            => 1,
-      'request type'                                 => 'pty-req',
-      'want reply'                                   => true,
-      'TERM environment variable value'              => 'foo',
-      'terminal width, characters'                   => 80,
-      'terminal height, rows'                        => 24,
-      'terminal width, pixels'                       => 400,
-      'terminal height, pixels'                      => 120,
-      'encoded terminal modes'                       => 'bar',
+      'message number'                  => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+      'recipient channel'               => 1,
+      'request type'                    => 'pty-req',
+      'want reply'                      => true,
+      'TERM environment variable value' => 'foo',
+      'terminal width, characters'      => 80,
+      'terminal height, rows'           => 24,
+      'terminal width, pixels'          => 400,
+      'terminal height, pixels'         => 120,
+      'encoded terminal modes'          => 'bar',
     }
   }
   let(:context){ described_class.new proc_chain, username, io, variables, message }

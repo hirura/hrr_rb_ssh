@@ -20,7 +20,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
   context "when 'channel type' is \"session\"" do
     let(:message){
       {
-        id                    => value,
+        'message number'      => value,
         'channel type'        => 'session',
         'sender channel'      => 1,
         'initial window size' => 2,
@@ -29,7 +29,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['channel type']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['initial window size']),
@@ -53,7 +53,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
   context "when 'channel type' is \"x11\"" do
     let(:message){
       {
-        id                    => value,
+        'message number'      => value,
         'channel type'        => 'x11',
         'sender channel'      => 1,
         'initial window size' => 2,
@@ -64,7 +64,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['channel type']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['initial window size']),
@@ -90,7 +90,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
   context "when 'channel type' is \"forwarded-tcpip\"" do
     let(:message){
       {
-        id                           => value,
+        'message number'             => value,
         'channel type'               => 'forwarded-tcpip',
         'sender channel'             => 1,
         'initial window size'        => 2,
@@ -103,7 +103,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['channel type']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['initial window size']),
@@ -131,7 +131,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
   context "when 'channel type' is \"direct-tcpip\"" do
     let(:message){
       {
-        id                      => value,
+        'message number'        => value,
         'channel type'          => 'direct-tcpip',
         'sender channel'        => 1,
         'initial window size'   => 2,
@@ -144,7 +144,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message[id]),
+        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
         HrrRbSsh::Transport::DataType::String.encode(message['channel type']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::Transport::DataType::Uint32.encode(message['initial window size']),

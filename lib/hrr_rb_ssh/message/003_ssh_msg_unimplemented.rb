@@ -16,7 +16,7 @@ module HrrRbSsh
 
       DEFINITION = [
         # [Data Type, Field Name]
-        ['byte',      'SSH_MSG_UNIMPLEMENTED'],
+        ['byte',      'message number'],
         ['uint32',    'packet sequence number of rejected message'],
       ]
     end

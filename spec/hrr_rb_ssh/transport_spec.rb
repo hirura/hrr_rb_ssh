@@ -199,10 +199,10 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:disconnect_message){
         {
-          "SSH_MSG_DISCONNECT" => 1,
-          "reason code"        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-          "description"        => "disconnected by user",
-          "language tag"       => ""
+          'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+          "reason code"    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+          "description"    => "disconnected by user",
+          "language tag"   => ""
         }
       }
       let(:disconnect_payload){
@@ -284,7 +284,7 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:remote_kexinit_message){
         {
-          "SSH_MSG_KEXINIT"                         => 20,
+          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE0,
           "cookie (random byte)"                    => 37,
           "kex_algorithms"                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
           "server_host_key_algorithms"              => ["ssh-rsa", "ssh-dss"],
@@ -303,8 +303,8 @@ RSpec.describe HrrRbSsh::Transport do
       let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
       let(:remote_kexdh_init_message){
         {
-          "SSH_MSG_KEXDH_INIT" => 30,
-          "e"                  => remote_dh_pub_key,
+          'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_INIT::VALUE,
+          "e"              => remote_dh_pub_key,
         }
       }
       let(:remote_kexdh_init_payload){ HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.encode remote_kexdh_init_message }
@@ -345,7 +345,7 @@ RSpec.describe HrrRbSsh::Transport do
       }
       let(:remote_newkeys_message){
         {
-          "SSH_MSG_NEWKEYS" => 21,
+          'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
         }
       }
       let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode remote_newkeys_message }
@@ -360,7 +360,7 @@ RSpec.describe HrrRbSsh::Transport do
 
       it "updates i_c and i_s" do
         local_kexinit_message = {
-          "SSH_MSG_KEXINIT"                         => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
           'cookie (random byte)'                    => lambda { rand(0x01_00) },
           "kex_algorithms"                          => HrrRbSsh::Transport::KexAlgorithm.name_list,
           "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list,
@@ -454,8 +454,8 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:service_request_message){
         {
-          "SSH_MSG_SERVICE_REQUEST" => 5,
-          "service name"            => 'ssh-userauth',
+          'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
+          "service name"   => 'ssh-userauth',
         }
       }
       let(:service_request_payload){
@@ -464,8 +464,8 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:service_accept_message){
         {
-          "SSH_MSG_SERVICE_ACCEPT" => 6,
-          "service name"           => 'ssh-userauth',
+          'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
+          "service name"   => 'ssh-userauth',
         }
       }
       let(:service_accept_payload){
@@ -492,7 +492,7 @@ RSpec.describe HrrRbSsh::Transport do
       context "when 'ssh-userauth' is not registered as acceptable service" do
         let(:disconnect_message){
           {
-            'SSH_MSG_DISCONNECT' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+            'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
             'reason code'        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
             'description'        => 'disconnected by user',
             'language tag'       => '',
@@ -569,10 +569,10 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:disconnect_message){
         {
-          'SSH_MSG_DISCONNECT' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
-          'reason code'        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-          'description'        => 'disconnected by user',
-          'language tag'       => '',
+          'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+          'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+          'description'    => 'disconnected by user',
+          'language tag'   => '',
         }
       }
       let(:disconnect_payload){
@@ -599,7 +599,7 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives ignore message and then disconnect message" do
         let(:ignore_message){
           {
-            'SSH_MSG_IGNORE' => HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE,
+            'message number' => HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE,
             'data'           => 'ignored',
           }
         }
@@ -619,7 +619,7 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives unimplemented message and then disconnect message" do
         let(:unimplemented_message){
           {
-            'SSH_MSG_UNIMPLEMENTED'                      => HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE,
+            'message number'                             => HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE,
             'packet sequence number of rejected message' => 123,
           }
         }
@@ -639,7 +639,7 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives debug message and then disconnect message" do
         let(:debug_message){
           {
-            'SSH_MSG_DEBUG'  => HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE,
+            'message number' => HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE,
             'always_display' => true,
             'message'        => 'message',
             'language tag'   => 'language tag',
@@ -661,8 +661,8 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives other message and then disconnect message" do
         let(:service_request_message){
           {
-            'SSH_MSG_SERVICE_REQUEST' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
-            'service name'            => 'service name',
+            'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
+            'service name'   => 'service name',
           }
         }
         let(:service_request_payload){
@@ -749,7 +749,7 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:remote_kexinit_message){
         {
-          "SSH_MSG_KEXINIT"                         => 20,
+          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
           "cookie (random byte)"                    => 37,
           "kex_algorithms"                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
           "server_host_key_algorithms"              => ["ssh-rsa", "ssh-dss"],
@@ -777,7 +777,7 @@ RSpec.describe HrrRbSsh::Transport do
 
       it "updates i_c and i_s" do
         local_kexinit_message = {
-          "SSH_MSG_KEXINIT"                         => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
           'cookie (random byte)'                    => lambda { rand(0x01_00) },
           "kex_algorithms"                          => HrrRbSsh::Transport::KexAlgorithm.name_list,
           "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list,
