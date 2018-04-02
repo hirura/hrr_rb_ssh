@@ -268,6 +268,33 @@ RSpec.describe HrrRbSsh::Connection do
       end
     end
 
+    context "when receives channel eof message" do
+      let(:channel_eof_message){
+        {
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+          "recipient channel" => 0,
+        }
+      }
+      let(:channel_eof_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.encode channel_eof_message
+      }
+
+      let(:channel0){ double('channel0') }
+      let(:channel0_receive_payload_queue){ double('channel0_receive_payload_queue') }
+
+      before :example do
+        connection.instance_variable_get('@channels')[0] = channel0
+      end
+
+      it "calls channel_eof" do
+        expect(authentication).to receive(:receive).with(no_args).and_return(channel_eof_payload).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(connection).to receive(:channel_eof).with(channel_eof_payload).once
+        expect(connection).to receive(:close).with(no_args).once
+        connection.connection_loop
+      end
+    end
+
     context "when receives channel close message" do
       let(:channel_close_message){
         {
@@ -491,6 +518,40 @@ RSpec.describe HrrRbSsh::Connection do
         allow(channel).to receive(:receive_payload_queue).and_return(receive_payload_queue)
         connection.channel_data channel_data_payload
         expect(connection.instance_variable_get('@channels')[0].receive_payload_queue.pop).to eq channel_data_message
+      end
+    end
+  end
+
+  describe '#channel_eof' do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:options){ Hash.new }
+    let(:connection){ described_class.new authentication, options }
+
+    let(:channel0){ double('channel0') }
+    let(:channel0_receive_payload_queue){ double('channel0_receive_payload_queue') }
+
+    before :example do
+      connection.instance_variable_get('@channels')[0] = channel0
+    end
+
+    context "when receives valid channel eof message" do
+      let(:channel_eof_message){
+        {
+          'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+          "recipient channel" => 0,
+        }
+      }
+      let(:channel_eof_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.encode channel_eof_message
+      }
+
+      it "eofs the channel and delete the channel from channels" do
+        expect(channel0).to receive(:receive_payload_queue).with(no_args).and_return(channel0_receive_payload_queue).once
+        expect(channel0_receive_payload_queue).to receive(:close).with(no_args).once
+        connection.channel_eof channel_eof_payload
       end
     end
   end

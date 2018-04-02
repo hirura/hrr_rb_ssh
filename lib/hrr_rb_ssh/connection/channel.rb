@@ -104,6 +104,7 @@ module HrrRbSsh
             begin
               message = @receive_payload_queue.deq
               if message.nil? && @receive_payload_queue.closed?
+                @receive_data_queue.close
                 @logger.info("closing channel loop thread")
                 break
               end
@@ -126,10 +127,10 @@ module HrrRbSsh
               end
             rescue => e
               @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+              close from=:channel_loop_thread
               break
             end
           end
-          close from=:channel_loop_thread
           @logger.info("channel loop thread closed")
         end
       end
@@ -174,6 +175,9 @@ module HrrRbSsh
               data = @receive_data_queue.deq
               if data.nil? && @receive_data_queue.closed?
                 @logger.info("closing receiver thread")
+                @logger.info("closing channel IO write")
+                @channel_io.close_write
+                @logger.info("channel IO write closed")
                 break
               end
               @channel_io.write data
@@ -186,9 +190,11 @@ module HrrRbSsh
             rescue IOError => e
               @logger.warn("channel IO is closed")
               close
+              break
             rescue => e
               @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
               close
+              break
             end
           end
           @logger.info("receiver thread closed")

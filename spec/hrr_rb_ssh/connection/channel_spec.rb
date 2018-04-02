@@ -223,14 +223,15 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         before :example do
           channel.instance_variable_set('@proc_chain_thread', Thread.new {})
           channel.receive_payload_queue.enq channel_request_message
-          channel.receive_payload_queue.close
         end
 
         it "calls #request and returns channel success" do
           expect(channel).to receive(:request).with(channel_request_message, variables).once
           expect(connection).to receive(:send).with(channel_success_payload).once
-          expect(channel).to receive(:close).with(:channel_loop_thread).once
+          allow(connection).to receive(:send).with(any_args)
           t = channel.channel_loop_thread
+          channel.receive_payload_queue.close
+          channel.close
           t.join
         end
       end
@@ -241,13 +242,14 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         before :example do
           channel.instance_variable_set('@proc_chain_thread', Thread.new {})
           channel.receive_payload_queue.enq channel_request_message
-          channel.receive_payload_queue.close
         end
 
         it "calls #request and returns channel success" do
           expect(channel).to receive(:request).with(channel_request_message, variables).once
-          expect(channel).to receive(:close).with(:channel_loop_thread).once
+          allow(connection).to receive(:send).with(any_args)
           t = channel.channel_loop_thread
+          channel.receive_payload_queue.close
+          channel.close
           t.join
         end
       end
@@ -265,14 +267,15 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       before :example do
         channel.instance_variable_set('@proc_chain_thread', Thread.new {})
         channel.receive_payload_queue.enq channel_data_message
-        channel.receive_payload_queue.close
       end
 
       it "enqueues data into @receive_data" do
-        expect(channel).to receive(:close).with(:channel_loop_thread).once
+        allow(connection).to receive(:send).with(any_args)
         t = channel.channel_loop_thread
-        t.join
         expect(channel.instance_variable_get('@receive_data_queue').deq).to be channel_data_message['data']
+        channel.receive_payload_queue.close
+        channel.close
+        t.join
       end
     end
 
@@ -288,12 +291,13 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       before :example do
         channel.instance_variable_set('@proc_chain_thread', Thread.new {})
         channel.receive_payload_queue.enq channel_window_adjust_message
-        channel.receive_payload_queue.close
       end
 
       it "updates remote window size" do
-        expect(channel).to receive(:close).with(:channel_loop_thread).once
+        allow(connection).to receive(:send).with(any_args)
         t = channel.channel_loop_thread
+        channel.receive_payload_queue.close
+        channel.close
         t.join
         expect(channel.instance_variable_get('@remote_window_size')).to eq (2097152 + 12345)
       end
@@ -309,12 +313,13 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       before :example do
         channel.instance_variable_set('@proc_chain_thread', Thread.new {})
         channel.receive_payload_queue.enq unknown_message
-        channel.receive_payload_queue.close
       end
 
-      it "enqueues data into @receive_data_queue" do
-        expect(channel).to receive(:close).with(:channel_loop_thread).once
+      it "do nothing" do
+        allow(connection).to receive(:send).with(any_args)
         t = channel.channel_loop_thread
+        channel.receive_payload_queue.close
+        channel.close
         t.join
       end
     end
@@ -462,13 +467,12 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when IOError occurs" do
       before :example do
         channel.instance_variable_get('@receive_data_queue').enq receive_data
-        channel.instance_variable_get('@receive_data_queue').close
+        channel.instance_variable_get('@channel_io').close
       end
 
       it "receives data from UNIX socket pair and send the data" do
         allow(channel).to receive(:send_channel_eof).with(no_args).once
         allow(channel).to receive(:send_channel_close).with(no_args).once
-        channel.instance_variable_get('@channel_io').close
         t = channel.receiver_thread
         t.join
         expect(channel.closed?).to be true
@@ -479,18 +483,14 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       let(:mock_receive_data_queue){ double('receive_data_queue') }
 
       before :example do
-        channel.instance_variable_get('@receive_data_queue').close
         channel.instance_variable_set('@receive_data_queue', mock_receive_data_queue)
       end
 
       it "closes itself" do
         expect(mock_receive_data_queue).to receive(:deq).with(no_args).and_raise(RuntimeError).once
-        expect(mock_receive_data_queue).to receive(:close).with(no_args).once
-        expect(mock_receive_data_queue).to receive(:deq).with(no_args).and_return(nil).once
-        expect(mock_receive_data_queue).to receive(:closed?).with(no_args).and_return(true).once
+        expect(channel).to receive(:close).with(no_args).once
         t = channel.receiver_thread
         t.join
-        expect(channel.closed?).to be true
       end
     end
   end

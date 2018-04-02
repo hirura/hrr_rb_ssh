@@ -74,6 +74,8 @@ module HrrRbSsh
           channel_window_adjust payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
           channel_data payload
+        when HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE
+          channel_eof payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE
           channel_close payload
         else
@@ -129,13 +131,23 @@ module HrrRbSsh
       @channels[local_channel].receive_payload_queue.enq message
     end
 
+    def channel_eof payload
+      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::ID)
+      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.decode payload
+      local_channel = message['recipient channel']
+      channel = @channels[local_channel]
+      channel.receive_payload_queue.close
+    end
+
     def channel_close payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.decode payload
       local_channel = message['recipient channel']
       channel = @channels[local_channel]
       channel.close
+      @logger.info("deleting channel")
       @channels.delete local_channel
+      @logger.info("channel deleted")
     end
 
     def send_request_success
