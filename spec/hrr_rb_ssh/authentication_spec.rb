@@ -148,7 +148,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:authentication){ described_class.new(transport, options) }
     let(:userauth_failure_message){
       {
-        'message number'                    => HrrRbSsh::Method::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
         'authentications that can continue' => HrrRbSsh::Authentication::Method.name_list,
         'partial success'                   => false,
       }
@@ -158,7 +158,7 @@ RSpec.describe HrrRbSsh::Authentication do
     }
     let(:userauth_success_message){
       {
-        'message number' => HrrRbSsh::Method::SSH_MSG_USERAUTH_SUCCESS::VALUE,
+        'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
     }
     let(:userauth_success_payload){

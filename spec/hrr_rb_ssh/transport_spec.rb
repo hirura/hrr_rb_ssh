@@ -284,7 +284,7 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:remote_kexinit_message){
         {
-          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE0,
+          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
           "cookie (random byte)"                    => 37,
           "kex_algorithms"                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
           "server_host_key_algorithms"              => ["ssh-rsa", "ssh-dss"],
