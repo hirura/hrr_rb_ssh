@@ -114,12 +114,24 @@ conn_shell = HrrRbSsh::Connection::RequestHandler.new { |context|
     status.exitstatus
   }
 }
+conn_exec = HrrRbSsh::Connection::RequestHandler.new { |context|
+  context.chain_proc { |chain|
+    pid = fork do
+      Process.setsid
+      context.vars[:env] ||= Hash.new
+      exec context.vars[:env], context.command, in: context.io, out: context.io, err: context.io
+    end
+    pid, status = Process.waitpid2 pid
+    status.exitstatus
+  }
+}
 
 options['authentication_none_authenticator']     = auth_none
 options['authentication_password_authenticator'] = auth_password
 options['connection_channel_request_pty_req']    = conn_pty
 options['connection_channel_request_env']        = conn_env
 options['connection_channel_request_shell']      = conn_shell
+options['connection_channel_request_exec']       = conn_exec
 
 
 server = TCPServer.new 10022
