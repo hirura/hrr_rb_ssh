@@ -18,10 +18,24 @@ logger.level = Logger::INFO
 HrrRbSsh::Logger.initialize logger
 
 
-options = {}
-
 auth_none = HrrRbSsh::Authentication::Authenticator.new { |context|
   false
+}
+auth_publickey = HrrRbSsh::Authentication::Authenticator.new { |context|
+  username = 'user1'
+  public_key_algorithm_name = 'ssh-rsa'
+  public_key = <<-'EOB'
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3OnIQcRTdeTZFjhGcx8f
+ssCgeqzY47p5KhT/gKMz2nOANNLCBr9e6IGaRePew03St3Cn0ApikuGzPnWxSlBT
+H6OpR/EnUmBttlvcL28CGOsZIwYJtAdVsGXpIXtiPLl2eEzaM9aBsS/LGWKgQNo3
+86UGa5j20yGJfsL9WIMCVoGvsA06+4VX1/zlWXwVJSNep674bmSWPcVtXWWZIk19
+T6b+xuqhfiUpbc/stfdmgDc3B/ZgpFsQh5oWBoAfkL6kAEa4oQBFhqF0QM5ej6h5
+wqbQt4paM0aEuypWE+CaizA0I+El7f0y+59sUqTAN/7F9UlXaOBdd9SZkhACBrAR
+nQIDAQAB
+-----END PUBLIC KEY-----
+  EOB
+  context.verify username, public_key_algorithm_name, public_key
 }
 auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
   user_and_pass = [
@@ -126,12 +140,17 @@ conn_exec = HrrRbSsh::Connection::RequestHandler.new { |context|
   }
 }
 
-options['authentication_none_authenticator']     = auth_none
-options['authentication_password_authenticator'] = auth_password
-options['connection_channel_request_pty_req']    = conn_pty
-options['connection_channel_request_env']        = conn_env
-options['connection_channel_request_shell']      = conn_shell
-options['connection_channel_request_exec']       = conn_exec
+
+options = {}
+
+options['authentication_none_authenticator']      = auth_none
+options['authentication_publickey_authenticator'] = auth_publickey
+options['authentication_password_authenticator']  = auth_password
+
+options['connection_channel_request_pty_req'] = conn_pty
+options['connection_channel_request_env']     = conn_env
+options['connection_channel_request_shell']   = conn_shell
+options['connection_channel_request_exec']    = conn_exec
 
 
 server = TCPServer.new 10022
