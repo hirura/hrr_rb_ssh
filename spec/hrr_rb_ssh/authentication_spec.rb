@@ -245,6 +245,70 @@ RSpec.describe HrrRbSsh::Authentication do
       end
     end
 
+    context "when accept public key method with no signature, and then with sigunature" do
+      let(:options){
+        {
+          'authentication_publickey_authenticator' => HrrRbSsh::Authentication::Authenticator.new { |context| true },
+        }
+      }
+      let(:userauth_request_with_publickey_method_with_no_signature_message){
+        {
+          'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          "user name"                 => username,
+          "service name"              => "ssh-connection",
+          "method name"               => "publickey",
+          "with signature"            => false, 
+          "public key algorithm name" => "ssh-rsa",
+          "public key blob"           => "dummy",
+        }
+      }
+      let(:userauth_request_with_publickey_method_with_no_signature_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_publickey_method_with_no_signature_message
+      }
+      let(:userauth_request_with_publickey_method_with_signature_message){
+        {
+          'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          "user name"                 => username,
+          "service name"              => "ssh-connection",
+          "method name"               => "publickey",
+          "with signature"            => true, 
+          "public key algorithm name" => "ssh-rsa",
+          "public key blob"           => "dummy",
+          "signature"                 => "dummy",
+        }
+      }
+      let(:userauth_request_with_publickey_method_with_signature_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_publickey_method_with_signature_message
+      }
+      let(:userauth_pk_ok_message){
+        {
+          'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
+          'public key algorithm name from the request' => "ssh-rsa",
+          'public key blob from the request'           => "dummy",
+        }
+      }
+      let(:userauth_pk_ok_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.encode userauth_pk_ok_message
+      }
+      let(:userauth_requests){
+        [
+          userauth_request_with_publickey_method_with_no_signature_payload,
+          userauth_request_with_publickey_method_with_signature_payload,
+        ]
+      }
+
+      it "sends userauth success message for publickey method with signature after userauth pk ok message for no signature message, and will return authenticated username" do
+        expect( transport ).to receive(:receive).with(no_args).and_return(*userauth_requests).twice
+        expect( transport ).to receive(:send).with(userauth_pk_ok_payload).once
+        expect( transport ).to receive(:send).with(userauth_success_payload).once
+
+        authentication.authenticate
+
+        expect( authentication.closed? ).to be false
+        expect( authentication.username ).to eq username
+      end
+    end
+
     context "when receives not userauth request" do
       let(:options){ {} }
       let(:not_userauth_request_message){

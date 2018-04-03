@@ -69,15 +69,21 @@ module HrrRbSsh
         when HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE
           userauth_request_message = HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.decode payload
           method_name = userauth_request_message['method name']
-          method = Method[method_name].new(@options)
-          if method.authenticate(userauth_request_message)
+          method = Method[method_name].new({'session id' => @transport.session_id}.merge(@options))
+          result = method.authenticate(userauth_request_message)
+          case result
+          when TrueClass
+            @logger.info("verified")
             send_userauth_success
             @username = userauth_request_message['user name']
             @closed = false
             break
-          else
+          when FalseClass
+            @logger.info("verify failed")
             send_userauth_failure
-            @closed = true
+          when String
+            @logger.info("send method specific message to continue")
+            send_method_specific_message result
           end
         else
           @closed = true
@@ -101,6 +107,10 @@ module HrrRbSsh
         'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
       payload = HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS.encode message
+      @transport.send payload
+    end
+
+    def send_method_specific_message payload
       @transport.send payload
     end
   end

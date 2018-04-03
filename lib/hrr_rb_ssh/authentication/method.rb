@@ -3,6 +3,7 @@
 
 require 'hrr_rb_ssh/authentication/method/none'
 require 'hrr_rb_ssh/authentication/method/password'
+require 'hrr_rb_ssh/authentication/method/publickey'
 
 module HrrRbSsh
   class Authentication
