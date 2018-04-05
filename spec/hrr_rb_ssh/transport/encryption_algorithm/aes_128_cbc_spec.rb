@@ -7,7 +7,11 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc do
   let(:encryption_algorithm){ described_class.new iv, key }
   let(:data){ "1234567890123456" }
 
-  it "is registered as aes128-cbc in HrrRbSsh::Transport::EncryptionAlgorithm.list" do
+  it "is registered in HrrRbSsh::Transport::EncryptionAlgorithm.list" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm.list ).to include described_class
+  end
+
+  it "can be looked up as aes128-cbc in HrrRbSsh::Transport::EncryptionAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::EncryptionAlgorithm['aes128-cbc'] ).to eq described_class
   end
 

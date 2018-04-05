@@ -5,8 +5,12 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::None do
   let(:encryption_algorithm){ HrrRbSsh::Transport::EncryptionAlgorithm::None.new }
   let(:test_data){ "test data" }
 
-  it "is registered as none in HrrRbSsh::Transport::EncryptionAlgorithm.list" do
-    expect( HrrRbSsh::Transport::EncryptionAlgorithm['none'] ).to eq HrrRbSsh::Transport::EncryptionAlgorithm::None
+  it "is registered in HrrRbSsh::Transport::EncryptionAlgorithm.list" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm.list ).to include described_class
+  end
+
+  it "can be looked up as none in HrrRbSsh::Transport::EncryptionAlgorithm dictionary" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm['none'] ).to eq described_class
   end
 
   it "appears as none in HrrRbSsh::Transport::EncryptionAlgorithm.name_list" do

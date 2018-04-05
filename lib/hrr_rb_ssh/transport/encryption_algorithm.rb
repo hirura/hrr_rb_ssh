@@ -4,12 +4,16 @@
 module HrrRbSsh
   class Transport
     class EncryptionAlgorithm
-      def self.[] key
-        EncryptionAlgorithm[key]
+      def self.list
+        EncryptionAlgorithm.list
       end
 
       def self.name_list
         EncryptionAlgorithm.name_list
+      end
+
+      def self.[] key
+        EncryptionAlgorithm[key]
       end
     end
   end
