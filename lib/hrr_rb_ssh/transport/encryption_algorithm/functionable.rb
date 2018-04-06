@@ -22,6 +22,18 @@ module HrrRbSsh
           @cipher.key = key
         end
 
+        def block_size
+          @cipher.block_size
+        end
+
+        def iv_length
+          @cipher.iv_len
+        end
+
+        def key_length
+          @cipher.key_len
+        end
+
         def encrypt data
           if data.empty?
             data

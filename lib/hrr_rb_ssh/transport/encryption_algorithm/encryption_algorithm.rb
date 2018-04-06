@@ -28,18 +28,6 @@ module HrrRbSsh
         def initialize direction, iv, key
           @logger = HrrRbSsh::Logger.new self.class.name
         end
-
-        def block_size
-          self.class::BLOCK_SIZE
-        end
-
-        def iv_length
-          self.class::IV_LENGTH
-        end
-
-        def key_length
-          self.class::KEY_LENGTH
-        end
       end
     end
   end

@@ -10,10 +10,6 @@ module HrrRbSsh
       class None < EncryptionAlgorithm
         NAME = 'none'
 
-        BLOCK_SIZE = 0
-        IV_LENGTH  = 0
-        KEY_LENGTH = 0
-
         def initialize direction=nil, iv=nil, key=nil
           super
         end
