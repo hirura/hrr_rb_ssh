@@ -37,7 +37,7 @@ RSpec.describe HrrRbSsh::Transport::MacAlgorithm::HmacMd5 do
 
   describe '#compute' do
     it "returns expected digest" do
-      expect( mac_algorithm.compute sequence_number, unencrypted_packet ).to eq OpenSSL::HMAC.digest(digest, key, ([sequence_number].pack("N") + unencrypted_packet))
+      expect( mac_algorithm.compute sequence_number, unencrypted_packet ).to eq OpenSSL::HMAC.digest(digest, key, ([sequence_number].pack("N") + unencrypted_packet))[0, digest_length]
     end
   end
 end

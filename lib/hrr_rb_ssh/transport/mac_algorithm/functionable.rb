@@ -23,7 +23,8 @@ module HrrRbSsh
 
         def compute sequence_number, unencrypted_packet
           data = HrrRbSsh::Transport::DataType::Uint32.encode(sequence_number) + unencrypted_packet
-          OpenSSL::HMAC.digest self.class::DIGEST, @key, data
+          digest = OpenSSL::HMAC.digest self.class::DIGEST, @key, data
+          digest[0, digest_length]
         end
       end
     end
