@@ -1,17 +1,15 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/transport/data_type'
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/server_host_key_algorithm'
 
 module HrrRbSsh
   class Transport
     class ServerHostKeyAlgorithm
-      name_list = [
-        'ssh-rsa'
-      ]
+      class SshRsa < ServerHostKeyAlgorithm
+        NAME = 'ssh-rsa'
 
-      class SshRsa
         SECRET_KEY = <<-EOB
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA71zHt9RvbXmxuOCWPKR65iBHO+a8M7Mfo4vRCs/dorZN7XL1
@@ -54,7 +52,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
         ]
 
         def initialize
-          @logger = HrrRbSsh::Logger.new self.class.name
+          super
 
           @rsa = OpenSSL::PKey::RSA.new SECRET_KEY
         end
@@ -97,11 +95,6 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
           payload = decode SIGN_DEFINITION, sign
           payload['ssh-rsa'] == 'ssh-rsa' && @rsa.verify(digest, payload['rsa_signature_blob'], data)
         end
-      end
-
-      @@list ||= Hash.new
-      name_list.each do |name|
-        @@list[name] = SshRsa
       end
     end
   end

@@ -2,14 +2,19 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa do
+  let(:name){ 'ssh-rsa' }
   let(:server_host_key_algorithm){ described_class.new }
 
-  it "is registered as ssh-rsa in HrrRbSsh::Transport::ServerHostKeyAlgorithm.list" do
-    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm['ssh-rsa'] ).to eq described_class
+  it "is registered in HrrRbSsh::Transport::ServerHostKeyAlgorithm.list" do
+    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.list ).to include described_class
   end
 
-  it "appears as ssh-rsa in HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list ).to include 'ssh-rsa'
+  it "can be looked up in in HrrRbSsh::Transport::ServerHostKeyAlgorithm dictionary" do
+    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm[name] ).to eq described_class
+  end
+
+  it "appears in HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list" do
+    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list ).to include name
   end
 
   describe '#server_public_host_key' do
