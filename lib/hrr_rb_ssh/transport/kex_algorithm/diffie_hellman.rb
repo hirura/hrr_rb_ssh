@@ -1,13 +1,13 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'openssl'
 require 'hrr_rb_ssh/transport/data_type'
 
 module HrrRbSsh
   class Transport
     class KexAlgorithm
-      class DiffieHellman
+      module DiffieHellman
         H0_DEFINITION = [
           ['string', 'V_C'],
           ['string', 'V_S'],
@@ -20,7 +20,7 @@ module HrrRbSsh
         ]
 
         def initialize
-          @logger = HrrRbSsh::Logger.new self.class.name
+          super
 
           @dh = OpenSSL::PKey::DH.new
           if @dh.respond_to?(:set_pqg)
@@ -122,7 +122,6 @@ module HrrRbSsh
           key_length = HrrRbSsh::Transport::MacAlgorithm[mac_algorithm_s_to_c_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'F'.ord, transport.session_id, key_length)
         end
-
       end
     end
   end

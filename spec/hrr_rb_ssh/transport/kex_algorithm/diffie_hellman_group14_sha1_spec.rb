@@ -2,6 +2,7 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
+  let(:name){ 'diffie-hellman-group14-sha1' }
   let(:kex_algorithm){ described_class.new }
   let(:dh_group14_p){
     "FFFFFFFF" "FFFFFFFF" "C90FDAA2" "2168C234" \
@@ -39,12 +40,16 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
     remote_dh.pub_key.to_i
   }
 
-  it "is registered as diffie-hellman-group14-sha1-rsa in HrrRbSsh::Transport::KexAlgorithm.list" do
-    expect( HrrRbSsh::Transport::KexAlgorithm['diffie-hellman-group14-sha1'] ).to eq described_class
+  it "is registered in HrrRbSsh::Transport::KexAlgorithm.list" do
+    expect( HrrRbSsh::Transport::KexAlgorithm.list ).to include described_class
   end
 
-  it "appears as diffie-hellman-group14-sha1 in HrrRbSsh::Transport::KexAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::KexAlgorithm.name_list ).to include 'diffie-hellman-group14-sha1'
+  it "can be looked up in HrrRbSsh::Transport::KexAlgorithm dictionary" do
+    expect( HrrRbSsh::Transport::KexAlgorithm[name] ).to eq described_class
+  end
+
+  it "appears in HrrRbSsh::Transport::KexAlgorithm.name_list" do
+    expect( HrrRbSsh::Transport::KexAlgorithm.name_list ).to include name
   end
 
   describe '::P' do
@@ -72,16 +77,8 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
   end
 
   describe '#set_e' do
-    before :example do
-      class HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1
-        def e
-          @e
-        end
-      end
-    end
-
     it "updates remote_dh_pub_key" do
-      expect { kex_algorithm.set_e remote_dh_pub_key }.to change { kex_algorithm.e }.from( nil ).to( remote_dh_pub_key )
+      expect { kex_algorithm.set_e remote_dh_pub_key }.to change { kex_algorithm.instance_variable_get('@e') }.from( nil ).to( remote_dh_pub_key )
     end
   end
 

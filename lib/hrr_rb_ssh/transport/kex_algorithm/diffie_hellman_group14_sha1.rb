@@ -1,16 +1,15 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/transport/kex_algorithm/kex_algorithm'
 require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman'
 
 module HrrRbSsh
   class Transport
     class KexAlgorithm
-      name_list = [
-        'diffie-hellman-group14-sha1'
-      ]
+      class DiffieHellmanGroup14Sha1 < KexAlgorithm
+        NAME = 'diffie-hellman-group14-sha1'
 
-      class DiffieHellmanGroup14Sha1 < DiffieHellman
         P = \
           "FFFFFFFF" "FFFFFFFF" "C90FDAA2" "2168C234" \
           "C4C6628B" "80DC1CD1" "29024E08" "8A67CC74" \
@@ -31,11 +30,8 @@ module HrrRbSsh
         G = 2
 
         DIGEST = 'sha1'
-      end
 
-      @@list ||= Hash.new
-      name_list.each do |name|
-        @@list[name] = DiffieHellmanGroup14Sha1
+        include DiffieHellman
       end
     end
   end
