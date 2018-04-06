@@ -9,7 +9,6 @@ module HrrRbSsh
       module Functionable
         def self.included klass
           cipher = OpenSSL::Cipher.new(klass::CIPHER_NAME)
-          klass.const_set(:BLOCK_SIZE, cipher.block_size)
           klass.const_set(:IV_LENGTH,  cipher.iv_len)
           klass.const_set(:KEY_LENGTH, cipher.key_len)
         end

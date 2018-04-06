@@ -10,6 +10,7 @@ module HrrRbSsh
       class Aes192Cbc < EncryptionAlgorithm
         NAME        = 'aes192-cbc'
         CIPHER_NAME = "AES-192-CBC"
+        BLOCK_SIZE  = 16
 
         include Functionable
       end

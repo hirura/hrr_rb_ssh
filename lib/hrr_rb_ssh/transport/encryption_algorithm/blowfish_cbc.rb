@@ -10,6 +10,7 @@ module HrrRbSsh
       class BlowfishCbc < EncryptionAlgorithm
         NAME        = 'blowfish-cbc'
         CIPHER_NAME = "BF-CBC"
+        BLOCK_SIZE  = 8
 
         include Functionable
       end

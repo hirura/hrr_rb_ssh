@@ -6,7 +6,6 @@ module HrrRbSsh
     class EncryptionAlgorithm
       module Unfunctionable
         def self.included klass
-          klass.const_set(:BLOCK_SIZE, 0)
           klass.const_set(:IV_LENGTH,  0)
           klass.const_set(:KEY_LENGTH, 0)
         end

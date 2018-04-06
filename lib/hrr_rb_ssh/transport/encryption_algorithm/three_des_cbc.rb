@@ -10,6 +10,7 @@ module HrrRbSsh
       class ThreeDesCbc < EncryptionAlgorithm
         NAME        = '3des-cbc'
         CIPHER_NAME = "DES-EDE3-CBC"
+        BLOCK_SIZE  = 8
 
         include Functionable
       end

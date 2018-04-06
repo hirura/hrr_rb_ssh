@@ -8,7 +8,8 @@ module HrrRbSsh
   class Transport
     class EncryptionAlgorithm
       class None < EncryptionAlgorithm
-        NAME = 'none'
+        NAME        = 'none'
+        BLOCK_SIZE  = 0
 
         def initialize direction=nil, iv=nil, key=nil
           super
