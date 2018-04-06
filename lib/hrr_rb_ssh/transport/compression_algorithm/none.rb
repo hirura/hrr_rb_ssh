@@ -1,32 +1,20 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/transport/compression_algorithm/compression_algorithm'
+require 'hrr_rb_ssh/transport/compression_algorithm/unfunctionable'
 
 module HrrRbSsh
   class Transport
     class CompressionAlgorithm
-      name_list = [
-        'none'
-      ]
+      class None < CompressionAlgorithm
+        NAME = 'none'
 
-      class None
-        def initialize
-          @logger = HrrRbSsh::Logger.new self.class.name
+        def initialize direction=nil
+          super
         end
 
-        def deflate data
-          data
-        end
-
-        def inflate data
-          data
-        end
-      end
-
-      @@list ||= Hash.new
-      name_list.each do |name|
-        @@list[name] = None
+        include Unfunctionable
       end
     end
   end

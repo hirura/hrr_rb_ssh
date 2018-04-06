@@ -2,64 +2,77 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::Zlib do
-  let(:compression_algorithm){ described_class.new }
+  let(:name){ 'zlib' }
+  let(:compression_algorithm){ described_class.new direction }
 
-  it "is registered as zlib in HrrRbSsh::Transport::CompressionAlgorithm.list" do
-    expect( HrrRbSsh::Transport::CompressionAlgorithm['zlib'] ).to eq described_class
+  it "is registered in HrrRbSsh::Transport::CompressionAlgorithm.list" do
+    expect( HrrRbSsh::Transport::CompressionAlgorithm.list ).to include described_class
   end
 
-  it "appears as zlib in HrrRbSsh::Transport::CompressionAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::CompressionAlgorithm.name_list ).to include 'zlib'
+  it "can be looked up in HrrRbSsh::Transport::CompressionAlgorithm dictionary" do
+    expect( HrrRbSsh::Transport::CompressionAlgorithm[name] ).to eq described_class
   end
 
-  describe '#deflate' do
-    context "deflate once" do
-      let(:test_data){ "test data" }
-      let(:first_deflated){ ["789c2a492d2e5148492c4904000000ffff"].pack("H*") }
+  it "appears in HrrRbSsh::Transport::CompressionAlgorithm.name_list" do
+    expect( HrrRbSsh::Transport::CompressionAlgorithm.name_list ).to include name
+  end
 
-      it "returns deflated data" do
-        expect( compression_algorithm.deflate test_data ).to eq first_deflated
+  context "when direction is outgoing" do
+    let(:direction){ HrrRbSsh::Transport::Direction::OUTGOING }
+
+    describe '#deflate' do
+      context "deflate once" do
+        let(:test_data){ "test data" }
+        let(:first_deflated){ ["789c2a492d2e5148492c4904000000ffff"].pack("H*") }
+
+        it "returns deflated data" do
+          expect( compression_algorithm.deflate test_data ).to eq first_deflated
+        end
       end
-    end
 
-    context "deflate multiple times" do
-      let(:test_data){ "test data" }
-      let(:first_deflated) { ["789c2a492d2e5148492c4904000000ffff"].pack("H*") }
-      let(:second_deflated){ ["2a813100000000ffff"].pack("H*") }
-      let(:third_deflated) { ["823300000000ffff"].pack("H*") }
-      let(:fourth_deflated){ ["823300000000ffff"].pack("H*") }
+      context "deflate multiple times" do
+        let(:test_data){ "test data" }
+        let(:first_deflated) { ["789c2a492d2e5148492c4904000000ffff"].pack("H*") }
+        let(:second_deflated){ ["2a813100000000ffff"].pack("H*") }
+        let(:third_deflated) { ["823300000000ffff"].pack("H*") }
+        let(:fourth_deflated){ ["823300000000ffff"].pack("H*") }
 
-      it "returns deflated data" do
-        expect( compression_algorithm.deflate test_data ).to eq first_deflated
-        expect( compression_algorithm.deflate test_data ).to eq second_deflated
-        expect( compression_algorithm.deflate test_data ).to eq third_deflated
-        expect( compression_algorithm.deflate test_data ).to eq fourth_deflated
+        it "returns deflated data" do
+          expect( compression_algorithm.deflate test_data ).to eq first_deflated
+          expect( compression_algorithm.deflate test_data ).to eq second_deflated
+          expect( compression_algorithm.deflate test_data ).to eq third_deflated
+          expect( compression_algorithm.deflate test_data ).to eq fourth_deflated
+        end
       end
     end
   end
 
-  describe '#inflate' do
-    context "inflate once" do
-      let(:test_data){ "test data" }
-      let(:first_deflated){ ["789c2a492d2e5148492c4904000000ffff"].pack("H*") }
+  context "when direction is incoming" do
+    let(:direction){ HrrRbSsh::Transport::Direction::INCOMING }
 
-      it "returns data without inflate" do
-        expect( compression_algorithm.inflate first_deflated ).to eq test_data
+    describe '#inflate' do
+      context "inflate once" do
+        let(:test_data){ "test data" }
+        let(:first_deflated){ ["789c2a492d2e5148492c4904000000ffff"].pack("H*") }
+
+        it "returns data without inflate" do
+          expect( compression_algorithm.inflate first_deflated ).to eq test_data
+        end
       end
-    end
 
-    context "inflate multiple times" do
-      let(:test_data){ "test data" }
-      let(:first_deflated ){ ["789c2a492d2e5148492c4904000000ffff"].pack("H*") }
-      let(:second_deflated){ ["2a813100000000ffff"].pack("H*") }
-      let(:third_deflated ){ ["823300000000ffff"].pack("H*") }
-      let(:fourth_deflated){ ["823300000000ffff"].pack("H*") }
+      context "inflate multiple times" do
+        let(:test_data){ "test data" }
+        let(:first_deflated ){ ["789c2a492d2e5148492c4904000000ffff"].pack("H*") }
+        let(:second_deflated){ ["2a813100000000ffff"].pack("H*") }
+        let(:third_deflated ){ ["823300000000ffff"].pack("H*") }
+        let(:fourth_deflated){ ["823300000000ffff"].pack("H*") }
 
-      it "returns inflated data" do
-        expect( compression_algorithm.inflate first_deflated  ).to eq test_data
-        expect( compression_algorithm.inflate second_deflated ).to eq test_data
-        expect( compression_algorithm.inflate third_deflated  ).to eq test_data
-        expect( compression_algorithm.inflate fourth_deflated ).to eq test_data
+        it "returns inflated data" do
+          expect( compression_algorithm.inflate first_deflated  ).to eq test_data
+          expect( compression_algorithm.inflate second_deflated ).to eq test_data
+          expect( compression_algorithm.inflate third_deflated  ).to eq test_data
+          expect( compression_algorithm.inflate fourth_deflated ).to eq test_data
+        end
       end
     end
   end

@@ -460,8 +460,8 @@ module HrrRbSsh
         incoming_compression_algorithm_name = compression_algorithm_c_to_s_name
         outgoing_compression_algorithm_name = compression_algorithm_s_to_c_name
       end
-      @incoming_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[incoming_compression_algorithm_name].new
-      @outgoing_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[outgoing_compression_algorithm_name].new
+      @incoming_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[incoming_compression_algorithm_name].new HrrRbSsh::Transport::Direction::INCOMING
+      @outgoing_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[outgoing_compression_algorithm_name].new HrrRbSsh::Transport::Direction::OUTGOING
     end
   end
 end
