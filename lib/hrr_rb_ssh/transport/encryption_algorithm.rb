@@ -22,6 +22,7 @@ end
 require 'hrr_rb_ssh/transport/encryption_algorithm/encryption_algorithm'
 require 'hrr_rb_ssh/transport/encryption_algorithm/none'
 require 'hrr_rb_ssh/transport/encryption_algorithm/three_des_cbc'
+require 'hrr_rb_ssh/transport/encryption_algorithm/blowfish_cbc'
 require 'hrr_rb_ssh/transport/encryption_algorithm/aes_128_cbc'
 require 'hrr_rb_ssh/transport/encryption_algorithm/aes_192_cbc'
 require 'hrr_rb_ssh/transport/encryption_algorithm/aes_256_cbc'
