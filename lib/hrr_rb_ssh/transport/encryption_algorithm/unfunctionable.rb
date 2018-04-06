@@ -5,16 +5,22 @@ module HrrRbSsh
   class Transport
     class EncryptionAlgorithm
       module Unfunctionable
+        def self.included klass
+          klass.const_set(:BLOCK_SIZE, 0)
+          klass.const_set(:IV_LENGTH,  0)
+          klass.const_set(:KEY_LENGTH, 0)
+        end
+
         def block_size
-          0
+          self.class::BLOCK_SIZE
         end
 
         def iv_length
-          0
+          self.class::IV_LENGTH
         end
 
         def key_length
-          0
+          self.class::KEY_LENGTH
         end
 
         def encrypt data

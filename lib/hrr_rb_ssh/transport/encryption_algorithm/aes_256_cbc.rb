@@ -11,10 +11,6 @@ module HrrRbSsh
         NAME        = 'aes256-cbc'
         CIPHER_NAME = "AES-256-CBC"
 
-        BLOCK_SIZE  = 16
-        IV_LENGTH   = 16
-        KEY_LENGTH  = 32
-
         include Functionable
       end
     end
