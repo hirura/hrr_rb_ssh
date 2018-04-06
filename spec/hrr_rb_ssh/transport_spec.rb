@@ -285,7 +285,7 @@ RSpec.describe HrrRbSsh::Transport do
       let(:remote_kexinit_message){
         {
           'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
-          "cookie (random byte)"                    => 37,
+          "cookie (random byte)"                    => 0,
           "kex_algorithms"                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
           "server_host_key_algorithms"              => ["ssh-rsa", "ssh-dss"],
           "encryption_algorithms_client_to_server"  => ["aes128-cbc", "aes256-cbc"],
@@ -359,29 +359,10 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       it "updates i_c and i_s" do
-        local_kexinit_message = {
-          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
-          'cookie (random byte)'                    => lambda { rand(0x01_00) },
-          "kex_algorithms"                          => HrrRbSsh::Transport::KexAlgorithm.name_list,
-          "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list,
-          "encryption_algorithms_client_to_server"  => HrrRbSsh::Transport::EncryptionAlgorithm.name_list,
-          "encryption_algorithms_server_to_client"  => HrrRbSsh::Transport::EncryptionAlgorithm.name_list,
-          "mac_algorithms_client_to_server"         => HrrRbSsh::Transport::MacAlgorithm.name_list,
-          "mac_algorithms_server_to_client"         => HrrRbSsh::Transport::MacAlgorithm.name_list,
-          "compression_algorithms_client_to_server" => HrrRbSsh::Transport::CompressionAlgorithm.name_list,
-          "compression_algorithms_server_to_client" => HrrRbSsh::Transport::CompressionAlgorithm.name_list,
-          "languages_client_to_server"              => [],
-          "languages_server_to_client"              => [],
-          "first_kex_packet_follows"                => false,
-          "0 (reserved for future extension)"       => 0
-        }
-        local_kexinit_payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode(local_kexinit_message)
-
         expect(transport.i_c).to be nil
         expect(transport.i_s).to be nil
 
-        expect(mock_sender).to   receive(:send).with(transport, match(local_kexinit_payload[17..(local_kexinit_payload.length-1)])).once
-        expect(mock_sender).to   receive(:send).with(transport, anything).twice
+        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(3).times
         expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
 
         transport.exchange_key
@@ -797,7 +778,7 @@ RSpec.describe HrrRbSsh::Transport do
         expect(transport.i_c).to be nil
         expect(transport.i_s).to be nil
 
-        expect(mock_sender).to   receive(:send).with(transport, match(local_kexinit_payload[17..(local_kexinit_payload.length-1)])).once
+        expect(mock_sender).to   receive(:send).with(transport, anything).once
         expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload).once
 
         transport.exchange_key
