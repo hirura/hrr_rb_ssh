@@ -22,3 +22,6 @@ end
 require 'hrr_rb_ssh/transport/mac_algorithm/mac_algorithm'
 require 'hrr_rb_ssh/transport/mac_algorithm/none'
 require 'hrr_rb_ssh/transport/mac_algorithm/hmac_sha1'
+require 'hrr_rb_ssh/transport/mac_algorithm/hmac_sha1_96'
+require 'hrr_rb_ssh/transport/mac_algorithm/hmac_md5'
+require 'hrr_rb_ssh/transport/mac_algorithm/hmac_md5_96'
