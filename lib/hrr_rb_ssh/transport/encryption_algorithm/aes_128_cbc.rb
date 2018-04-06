@@ -15,10 +15,6 @@ module HrrRbSsh
         IV_LENGTH   = 16
         KEY_LENGTH  = 16
 
-        def initialize iv, key
-          super
-        end
-
         include Functionable
       end
     end
