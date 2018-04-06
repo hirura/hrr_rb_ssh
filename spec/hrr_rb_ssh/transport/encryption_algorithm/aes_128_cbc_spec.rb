@@ -2,41 +2,46 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc do
-  let(:iv){ [Array.new(16){ |i| "%02x" % i }.join].pack("H*") }
-  let(:key){ [Array.new(16){ |i| "%02x" % i }.join].pack("H*") }
+  let(:name){ 'aes128-cbc' }
+  let(:cipher_name){ "AES-128-CBC" }
+  let(:block_size){ 16 }
+  let(:iv_length){ 16 }
+  let(:key_length){ 16 }
+  let(:iv){ [Array.new(iv_length){ |i| "%02x" % i }.join].pack("H*") }
+  let(:key){ [Array.new(key_length){ |i| "%02x" % i }.join].pack("H*") }
   let(:encryption_algorithm){ described_class.new direction, iv, key }
-  let(:data){ "1234567890123456" }
+  let(:data){ ('a'..'z').to_a.sample(block_size).join }
 
   it "is registered in HrrRbSsh::Transport::EncryptionAlgorithm.list" do
     expect( HrrRbSsh::Transport::EncryptionAlgorithm.list ).to include described_class
   end
 
-  it "can be looked up as aes128-cbc in HrrRbSsh::Transport::EncryptionAlgorithm dictionary" do
-    expect( HrrRbSsh::Transport::EncryptionAlgorithm['aes128-cbc'] ).to eq described_class
+  it "can be looked up in HrrRbSsh::Transport::EncryptionAlgorithm dictionary" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm[name] ).to eq described_class
   end
 
-  it "appears as aes128-cbc in HrrRbSsh::Transport::EncryptionAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::EncryptionAlgorithm.name_list ).to include 'aes128-cbc'
+  it "appears in HrrRbSsh::Transport::EncryptionAlgorithm.name_list" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm.name_list ).to include name
   end
 
   context "when direction is outgoing" do
     let(:direction){ HrrRbSsh::Transport::Direction::OUTGOING }
 
     describe '#block_size' do
-      it "returns 16" do
-        expect( encryption_algorithm.block_size ).to eq 16
+      it "returns expected block size" do
+        expect( encryption_algorithm.block_size ).to eq block_size
       end
     end
 
     describe '#iv_length' do
-      it "returns 16" do
-        expect( encryption_algorithm.iv_length ).to eq 16
+      it "returns expected iv length" do
+        expect( encryption_algorithm.iv_length ).to eq iv_length
       end
     end
 
     describe '#key_length' do
-      it "returns 16" do
-        expect( encryption_algorithm.key_length ).to eq 16
+      it "returns expected key length" do
+        expect( encryption_algorithm.key_length ).to eq key_length
       end
     end
 
@@ -69,20 +74,20 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc do
     let(:direction){ HrrRbSsh::Transport::Direction::INCOMING }
 
     describe '#block_size' do
-      it "returns 16" do
-        expect( encryption_algorithm.block_size ).to eq 16
+      it "returns expected block size" do
+        expect( encryption_algorithm.block_size ).to eq block_size
       end
     end
 
     describe '#iv_length' do
-      it "returns 16" do
-        expect( encryption_algorithm.iv_length ).to eq 16
+      it "returns expected iv length" do
+        expect( encryption_algorithm.iv_length ).to eq iv_length
       end
     end
 
     describe '#key_length' do
-      it "returns 16" do
-        expect( encryption_algorithm.key_length ).to eq 16
+      it "returns expected key length" do
+        expect( encryption_algorithm.key_length ).to eq key_length
       end
     end
 
@@ -97,7 +102,7 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc do
 
       context "when data length is a multiple of block length" do
         let(:encrypted_data){
-          cipher = OpenSSL::Cipher.new("AES-128-CBC")
+          cipher = OpenSSL::Cipher.new(cipher_name)
           cipher.encrypt
           cipher.padding = 0
           cipher.iv  = iv
@@ -112,7 +117,7 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc do
 
       context "when data length is not a multiple of block length" do
         let(:encrypted_data){
-          cipher = OpenSSL::Cipher.new("AES-128-CBC")
+          cipher = OpenSSL::Cipher.new(cipher_name)
           cipher.encrypt
           cipher.padding = 0
           cipher.iv  = iv
