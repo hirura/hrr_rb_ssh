@@ -5,10 +5,6 @@ module HrrRbSsh
   class Transport
     class EncryptionAlgorithm
       module Unfunctionable
-        def initialize iv, key
-          super
-        end
-
         def encrypt data
           data
         end
