@@ -7,6 +7,7 @@ require 'hrr_rb_ssh/message'
 require 'hrr_rb_ssh/closed_transport_error'
 require 'hrr_rb_ssh/transport/constant'
 require 'hrr_rb_ssh/transport/mode'
+require 'hrr_rb_ssh/transport/direction'
 require 'hrr_rb_ssh/transport/data_type'
 require 'hrr_rb_ssh/transport/sequence_number'
 require 'hrr_rb_ssh/transport/sender'
@@ -91,20 +92,27 @@ module HrrRbSsh
     def start
       @logger.info("start transport")
 
-      exchange_version
-      exchange_key
+      begin
+        exchange_version
+        exchange_key
 
-      case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
-        verify_service_request
+        case @mode
+        when HrrRbSsh::Transport::Mode::SERVER
+          verify_service_request
+        end
+
+        @closed = false
+      rescue EOFError => e
+        close
+      rescue => e
+        @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+        close
+      else
+        @sender_thread   = sender_thread
+        @receiver_thread = receiver_thread
+
+        @logger.info("transport started")
       end
-
-      @closed = false
-
-      @sender_thread   = sender_thread
-      @receiver_thread = receiver_thread
-
-      @logger.info("transport started")
     end
 
     def close
@@ -426,8 +434,8 @@ module HrrRbSsh
         incoming_crpt_key = @kex_algorithm.key_c_to_s self, incoming_encryption_algorithm_name
         outgoing_crpt_key = @kex_algorithm.key_s_to_c self, outgoing_encryption_algorithm_name
       end
-      @incoming_encryption_algorithm = HrrRbSsh::Transport::EncryptionAlgorithm[incoming_encryption_algorithm_name].new incoming_crpt_iv, incoming_crpt_key
-      @outgoing_encryption_algorithm = HrrRbSsh::Transport::EncryptionAlgorithm[outgoing_encryption_algorithm_name].new outgoing_crpt_iv, outgoing_crpt_key
+      @incoming_encryption_algorithm = HrrRbSsh::Transport::EncryptionAlgorithm[incoming_encryption_algorithm_name].new Direction::INCOMING, incoming_crpt_iv, incoming_crpt_key
+      @outgoing_encryption_algorithm = HrrRbSsh::Transport::EncryptionAlgorithm[outgoing_encryption_algorithm_name].new Direction::OUTGOING, outgoing_crpt_iv, outgoing_crpt_key
     end
 
     def update_mac_algorithm

@@ -7,27 +7,26 @@ module HrrRbSsh
   class Transport
     class EncryptionAlgorithm
       module Functionable
-        def initialize iv, key
+        def initialize direction, iv, key
           super
 
-          @encryptor = OpenSSL::Cipher.new(self.class::CIPHER_NAME)
-          @encryptor.encrypt
-          @encryptor.padding = 0
-          @encryptor.iv  = iv
-          @encryptor.key = key
-
-          @decryptor = OpenSSL::Cipher.new(self.class::CIPHER_NAME)
-          @decryptor.decrypt
-          @decryptor.padding = 0
-          @decryptor.iv  = iv
-          @decryptor.key = key
+          @cipher = OpenSSL::Cipher.new(self.class::CIPHER_NAME)
+          case direction
+          when HrrRbSsh::Transport::Direction::OUTGOING
+            @cipher.encrypt
+          when HrrRbSsh::Transport::Direction::INCOMING
+            @cipher.decrypt
+          end
+          @cipher.padding = 0
+          @cipher.iv  = iv
+          @cipher.key = key
         end
 
         def encrypt data
           if data.empty?
             data
           else
-            @encryptor.update(data) + @encryptor.final
+            @cipher.update(data) + @cipher.final
           end
         end
 
@@ -35,7 +34,7 @@ module HrrRbSsh
           if data.empty?
             data
           else
-            @decryptor.update(data) + @decryptor.final
+            @cipher.update(data) + @cipher.final
           end
         end
       end

@@ -25,7 +25,7 @@ module HrrRbSsh
           @@list.find{ |klass| key == klass::NAME }
         end
 
-        def initialize iv, key
+        def initialize direction, iv, key
           @logger = HrrRbSsh::Logger.new self.class.name
         end
 

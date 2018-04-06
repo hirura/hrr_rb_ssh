@@ -14,7 +14,7 @@ module HrrRbSsh
         IV_LENGTH  = 0
         KEY_LENGTH = 0
 
-        def initialize iv=nil, key=nil
+        def initialize direction=nil, iv=nil, key=nil
           super
         end
 
