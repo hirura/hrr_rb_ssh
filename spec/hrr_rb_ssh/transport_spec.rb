@@ -811,8 +811,8 @@ RSpec.describe HrrRbSsh::Transport do
 
         transport.exchange_key
 
-        expect(transport.server_host_key_algorithm).to be_an_instance_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa
-        expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup1Sha1
+        expect(transport.server_host_key_algorithm).to be_a_kind_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::ServerHostKeyAlgorithm
+        expect(transport.instance_variable_get('@kex_algorithm')).to be_a_kind_of HrrRbSsh::Transport::KexAlgorithm::KexAlgorithm
       end
     end
   end

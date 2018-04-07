@@ -19,4 +19,5 @@ module HrrRbSsh
   end
 end
 
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_dss'
 require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_rsa'
