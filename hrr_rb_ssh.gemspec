@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.name          = "hrr_rb_ssh"
   spec.version       = HrrRbSsh::VERSION
   spec.license       = 'Apache-2.0'
-  spec.summary       = %q{Pure Ruby SSH2 server implementation}
-  spec.description   = %q{Pure Ruby SSH2 server implementation}
+  spec.summary       = %q{Pure Ruby SSH 2.0 server implementation}
+  spec.description   = %q{Pure Ruby SSH 2.0 server implementation}
   spec.authors       = ["hirura"]
   spec.email         = ["hirura@gmail.com"]
   spec.homepage      = "https://github.com/hirura/hrr_rb_ssh"

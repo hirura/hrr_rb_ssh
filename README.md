@@ -5,7 +5,7 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f5dfdb97d72f24ca5939/test_coverage)](https://codeclimate.com/github/hirura/hrr_rb_ssh/test_coverage)
 [![Gem Version](https://badge.fury.io/rb/hrr_rb_ssh.svg)](https://badge.fury.io/rb/hrr_rb_ssh)
 
-hrr_rb_ssh is a pure Ruby SSH2 server implementation.
+hrr_rb_ssh is a pure Ruby SSH 2.0 server implementation.
 
 ## Installation
 
