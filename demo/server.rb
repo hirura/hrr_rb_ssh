@@ -23,8 +23,23 @@ auth_none = HrrRbSsh::Authentication::Authenticator.new { |context|
 }
 auth_publickey = HrrRbSsh::Authentication::Authenticator.new { |context|
   username = 'user1'
-  public_key_algorithm_name = 'ssh-rsa'
-  public_key = <<-'EOB'
+  dss_public_key_algorithm_name = 'ssh-dss'
+  dss_public_key = <<-'EOB'
+-----BEGIN PUBLIC KEY-----
+  MIIBtzCCASwGByqGSM44BAEwggEfAoGBAKh2ZJp4ao8Xaexa0sk68VqMCaOaTi19
+YIqo2+t2t8ve4QSHvk/NbFIDTGq90lHziakTqwKaaswWLB7cSRPTcXjLv16Zmazg
+JRvh1jZ3ikuBME2G/B+EptlQ00dMa+5W/Acp2P6Cv5NRgA/tx0AyCJaItSpLXG+k
+B+HMp9LQ8WotAhUAk/yyvpsY9sVSyeN3lHvg5Nsl568CgYEAj4rqF241ROP2olNh
+VJUF0K5N4dSBCfcPnSPYuGPCi7qV229RISET3LOwrCXEUwSwlKoe/lLb2mcaeC84
+NIeN6pQnRTE6zajJ9UUeGErOFRm1x6E+FMtlVp/fwUE1Ra+AscHVKwMUehz7sA6A
+ZxJK7UvLs+R6s1eYhrES0bcorLIDgYQAAoGAd6XKzevlwzt6aCYdBRdN+BT4BQUw
+/L3MVYG0kDV9WqPcyAFvLO54xAUf9LxYM0e8X8J5ECp4oEGOcK1ilXEw3LPMJGmY
+IB56R9izS1t636kxnJTYNGQY+XvjAeuP7nC2WVNHNz7vXprT4Sq+hQaNkaKPu/3/
+48xJs2mYbxfyHCQ=
+-----END PUBLIC KEY-----
+  EOB
+  rsa_public_key_algorithm_name = 'ssh-rsa'
+  rsa_public_key = <<-'EOB'
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3OnIQcRTdeTZFjhGcx8f
 ssCgeqzY47p5KhT/gKMz2nOANNLCBr9e6IGaRePew03St3Cn0ApikuGzPnWxSlBT
@@ -35,7 +50,12 @@ wqbQt4paM0aEuypWE+CaizA0I+El7f0y+59sUqTAN/7F9UlXaOBdd9SZkhACBrAR
 nQIDAQAB
 -----END PUBLIC KEY-----
   EOB
-  context.verify username, public_key_algorithm_name, public_key
+  [
+    [dss_public_key_algorithm_name, dss_public_key],
+    [rsa_public_key_algorithm_name, rsa_public_key],
+  ].any? { |public_key_algorithm_name, public_key|
+    context.verify username, public_key_algorithm_name, public_key
+  }
 }
 auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
   user_and_pass = [
