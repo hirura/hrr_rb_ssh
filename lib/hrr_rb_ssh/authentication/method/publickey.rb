@@ -3,6 +3,7 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/authentication/method/publickey/context'
+require 'hrr_rb_ssh/authentication/method/publickey/ssh_dss'
 require 'hrr_rb_ssh/authentication/method/publickey/ssh_rsa'
 
 module HrrRbSsh
