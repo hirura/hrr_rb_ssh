@@ -9,18 +9,6 @@ module HrrRbSsh
       module ChannelType
         class Session < ChannelType
           NAME = 'session'
-
-          def self.list
-            RequestType.list
-          end
-
-          def self.name_list
-            RequestType.name_list
-          end
-
-          def self.[] key
-            RequestType[key]
-          end
         end
       end
     end

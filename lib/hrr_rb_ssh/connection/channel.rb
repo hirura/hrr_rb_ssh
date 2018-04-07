@@ -209,7 +209,7 @@ module HrrRbSsh
 
       def request message, variables
         request_type = message['request type']
-        ChannelType[@channel_type][request_type].run @proc_chain, @connection.username, @request_handler_io, variables, message, @connection.options
+        ChannelType[@channel_type]::RequestType[request_type].run @proc_chain, @connection.username, @request_handler_io, variables, message, @connection.options
       end
 
       def send_channel_success
