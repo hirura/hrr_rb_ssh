@@ -2,6 +2,20 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Authentication::Method::None do
+  let(:name){ 'none' }
+
+  it "is registered in HrrRbSsh::Authentication::Method.list" do
+    expect( HrrRbSsh::Authentication::Method.list ).to include described_class
+  end
+
+  it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
+    expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
+  end
+
+  it "appears in HrrRbSsh::Authentication::Method.name_list" do
+    expect( HrrRbSsh::Authentication::Method.name_list ).to include name
+  end
+
   describe ".new" do
     it "can take one argument: options" do
       expect { described_class.new({}) }.not_to raise_error

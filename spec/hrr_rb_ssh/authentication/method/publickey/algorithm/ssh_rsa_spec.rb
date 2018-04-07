@@ -1,31 +1,37 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-RSpec.describe HrrRbSsh::Authentication::Method::Publickey::SshRsa do
-  let(:publickey){ described_class.new }
+RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Algorithm::SshRsa do
+  let(:name){ 'ssh-rsa' }
+  let(:digest){ 'sha1' }
+  let(:algorithm){ described_class.new }
 
-  it "is registered as ssh-rsa in HrrRbSsh::Authentication::Method::Publickey.list" do
-    expect( HrrRbSsh::Authentication::Method::Publickey['ssh-rsa'] ).to eq described_class
-  end
+  it "is registered in HrrRbSsh::Authentication::Method::Publickey::Algorithm.list" do
+    expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm.list ).to include described_class
+  end         
 
-  it "appears as ssh-rsa in HrrRbSsh::Authentication::Method::Publickey.name_list" do
-    expect( HrrRbSsh::Authentication::Method::Publickey.algorithm_name_list ).to include 'ssh-rsa'
-  end
+  it "can be looked up in HrrRbSsh::Authentication::Method::Publickey::Algorithm dictionary" do
+    expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm[name] ).to eq described_class
+  end           
+
+  it "appears in HrrRbSsh::Authentication::Method::Publickey::Algorithm.name_list" do
+    expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm.name_list ).to include name
+  end             
 
   describe "::NAME" do
-    it "is \"ssh-rsa\"" do
-      expect( described_class::NAME ).to eq 'ssh-rsa'
+    it "is available" do
+      expect( described_class::NAME ).to eq name
     end
   end
 
   describe "::DIGEST" do
-    it "is \"sha1\"" do
-      expect( described_class::DIGEST ).to eq 'sha1'
+    it "is available" do
+      expect( described_class::DIGEST ).to eq digest
     end
   end
 
   describe '#verify_public_key' do
-    let(:public_key_algorithm_name){ 'ssh-rsa' }
+    let(:public_key_algorithm_name){ name }
     let(:public_key_str){
       <<-'EOB'
 -----BEGIN PUBLIC KEY-----
@@ -44,7 +50,7 @@ nQIDAQAB
     }
     let(:public_key_blob){
       [
-        HrrRbSsh::Transport::DataType::String.encode('ssh-rsa'),
+        HrrRbSsh::Transport::DataType::String.encode(public_key_algorithm_name),
         HrrRbSsh::Transport::DataType::Mpint.encode(public_key.e.to_i),
         HrrRbSsh::Transport::DataType::Mpint.encode(public_key.n.to_i),
       ].join
@@ -53,13 +59,13 @@ nQIDAQAB
     context "with correct arguments" do
       context "when public_key is an instance of String" do
         it "returns true" do
-          expect(publickey.verify_public_key public_key_algorithm_name, public_key_str, public_key_blob).to be true
+          expect(algorithm.verify_public_key public_key_algorithm_name, public_key_str, public_key_blob).to be true
         end
       end
 
       context "when public_key is an instance of OpenSSL::PKey::RSA" do
         it "returns true" do
-          expect(publickey.verify_public_key public_key_algorithm_name, public_key, public_key_blob).to be true
+          expect(algorithm.verify_public_key public_key_algorithm_name, public_key, public_key_blob).to be true
         end
       end
     end
@@ -69,7 +75,7 @@ nQIDAQAB
         let(:incorrect_public_key_algorithm_name){ 'incorrect' }
 
         it "returns false" do
-          expect(publickey.verify_public_key incorrect_public_key_algorithm_name, public_key, public_key_blob).to be false
+          expect(algorithm.verify_public_key incorrect_public_key_algorithm_name, public_key, public_key_blob).to be false
         end
       end
 
@@ -77,15 +83,15 @@ nQIDAQAB
         let(:incorrect_public_key){ nil }
 
         it "returns false" do
-          expect(publickey.verify_public_key public_key_algorithm_name, incorrect_public_key, public_key_blob).to be false
+          expect(algorithm.verify_public_key public_key_algorithm_name, incorrect_public_key, public_key_blob).to be false
         end
       end
 
-      context "when public_key_blob is broken" do
-        let(:broken_public_key_blob){ String.new }
+      context "when public_key_blob is incorrect" do
+        let(:incorrect_public_key_blob){ String.new }
 
         it "returns false" do
-          expect(publickey.verify_public_key public_key_algorithm_name, public_key, broken_public_key_blob).to be false
+          expect(algorithm.verify_public_key public_key_algorithm_name, public_key, incorrect_public_key_blob).to be false
         end
       end
     end
@@ -123,27 +129,27 @@ RiRsowkxGlUrp56nZQ0Rj3JNmQeafYplYLNAv3/3vWGiFRUZALIjMg==
 -----END RSA PRIVATE KEY-----
       EOB
     }
-    let(:algorithm){ OpenSSL::PKey::RSA.new private_key_str }
+    let(:pkey){ OpenSSL::PKey::RSA.new private_key_str }
     let(:public_key_blob){
       [
-        HrrRbSsh::Transport::DataType::String.encode('ssh-rsa'),
-        HrrRbSsh::Transport::DataType::Mpint.encode(algorithm.e.to_i),
-        HrrRbSsh::Transport::DataType::Mpint.encode(algorithm.n.to_i),
+        HrrRbSsh::Transport::DataType::String.encode(name),
+        HrrRbSsh::Transport::DataType::Mpint.encode(pkey.e.to_i),
+        HrrRbSsh::Transport::DataType::Mpint.encode(pkey.n.to_i),
       ].join
     }
     let(:session_id){ 'session id' }
     let(:username){ 'username' }
     let(:message){
       {
-      'session identifier'        => session_id,
-      'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
-      'user name'                 => username,
-      'service name'              => 'ssh-connection',
-      'method name'               => 'publickey',
-      'with signature'            => true,
-      'public key algorithm name' => 'ssh-rsa',
-      'public key blob'           => public_key_blob,
-      'signature'                 => signature,
+        'session identifier'        => session_id,
+        'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        'user name'                 => username,
+        'service name'              => 'ssh-connection',
+        'method name'               => 'publickey',
+        'with signature'            => true,
+        'public key algorithm name' => name,
+        'public key blob'           => public_key_blob,
+        'signature'                 => signature,
       }
     }
     let(:data){
@@ -154,27 +160,27 @@ RiRsowkxGlUrp56nZQ0Rj3JNmQeafYplYLNAv3/3vWGiFRUZALIjMg==
         HrrRbSsh::Transport::DataType::String.encode('ssh-connection'),
         HrrRbSsh::Transport::DataType::String.encode('publickey'),
         HrrRbSsh::Transport::DataType::Boolean.encode(true),
-        HrrRbSsh::Transport::DataType::String.encode('ssh-rsa'),
+        HrrRbSsh::Transport::DataType::String.encode(name),
         HrrRbSsh::Transport::DataType::String.encode(public_key_blob),
       ].join
     }
 
     context "with correct signature" do
-      let(:signature_blob){ algorithm.sign('sha1', data) }
+      let(:signature_blob){ pkey.sign(digest, data) }
       let(:signature){
         [
-          HrrRbSsh::Transport::DataType::String.encode('ssh-rsa'),
+          HrrRbSsh::Transport::DataType::String.encode(name),
           HrrRbSsh::Transport::DataType::String.encode(signature_blob),
         ].join
       }
 
       it "returns true" do
-        expect( publickey.verify_signature(session_id, message) ).to be true
+        expect( algorithm.verify_signature(session_id, message) ).to be true
       end
     end
 
-    context "with incorrect algorithm" do
-      let(:signature_blob){ algorithm.sign('sha1', data) }
+    context "with incorrect algorithm name" do
+      let(:signature_blob){ pkey.sign(digest, data) }
       let(:signature){
         [
           HrrRbSsh::Transport::DataType::String.encode('incorrect'),
@@ -183,22 +189,22 @@ RiRsowkxGlUrp56nZQ0Rj3JNmQeafYplYLNAv3/3vWGiFRUZALIjMg==
       }
 
       it "returns false" do
-        expect( publickey.verify_signature(session_id, message) ).to be false
+        expect( algorithm.verify_signature(session_id, message) ).to be false
       end
     end
 
     context "with incorrect signature" do
-      let(:signature_blob){ algorithm.sign('sha1', data) }
+      let(:signature_blob){ pkey.sign(digest, data) }
       let(:incorrect_signature_blob){ 'incorrect' + signature_blob }
       let(:signature){
         [
-          HrrRbSsh::Transport::DataType::String.encode('ssh-rsa'),
+          HrrRbSsh::Transport::DataType::String.encode(name),
           HrrRbSsh::Transport::DataType::String.encode(incorrect_signature_blob),
         ].join
       }
 
       it "returns false" do
-        expect( publickey.verify_signature(session_id, message) ).to be false
+        expect( algorithm.verify_signature(session_id, message) ).to be false
       end
     end
   end

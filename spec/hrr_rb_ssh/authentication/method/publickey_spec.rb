@@ -2,19 +2,19 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
-  describe '.[]' do
-    context "when arg is unregistered" do
-      it "returns nil" do
-        expect( HrrRbSsh::Authentication::Method::Publickey['unregistered'] ).to be nil
-      end
-    end
-  end
+  let(:name){ 'publickey' }
 
-  describe '.name_list' do
-    it "returns an instance of Array" do
-      expect( HrrRbSsh::Authentication::Method::Publickey.algorithm_name_list ).to be_an_instance_of Array
-    end
-  end
+  it "is registered in HrrRbSsh::Authentication::Method.list" do
+    expect( HrrRbSsh::Authentication::Method.list ).to include described_class
+  end         
+
+  it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
+    expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
+  end           
+
+  it "appears in HrrRbSsh::Authentication::Method.name_list" do
+    expect( HrrRbSsh::Authentication::Method.name_list ).to include name
+  end             
 
   let(:session_id){ 'session id' }
   let(:authentication_publickey_authenticator){ 'authentication_publickey_authenticator' }
@@ -56,15 +56,16 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
     context "when 'public key algorithm name' is supported" do
       let(:algorithm_class){
         class AlgorithmClass
+          NAME = 'supported'
         end
         AlgorithmClass
       }
       before :example do
-        HrrRbSsh::Authentication::Method::Publickey.class_variable_get('@@algorithm_list')['supported'] = algorithm_class
+        HrrRbSsh::Authentication::Method::Publickey::Algorithm.list.push algorithm_class
       end
 
       after :example do
-        HrrRbSsh::Authentication::Method::Publickey.class_variable_get('@@algorithm_list').delete 'supported'
+        HrrRbSsh::Authentication::Method::Publickey::Algorithm.list.delete algorithm_class
       end
 
       context "when 'with signature' is false" do

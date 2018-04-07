@@ -1,19 +1,16 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
-require 'hrr_rb_ssh/authentication/method/password/context'
+require 'hrr_rb_ssh/authentication/method/method'
 
 module HrrRbSsh
   class Authentication
     module Method
-      name_list = [
-        'password'
-      ]
+      class Password < Method
+        NAME = 'password'
 
-      class Password
         def initialize options
-          @logger = HrrRbSsh::Logger.new self.class.name
+          super
 
           @authenticator = options.fetch( 'authentication_password_authenticator', Authenticator.new { false } )
         end
@@ -27,11 +24,8 @@ module HrrRbSsh
           @authenticator.authenticate context
         end
       end
-
-      @@list ||= Hash.new
-      name_list.each do |name|
-        @@list[name] = Password
-      end
     end
   end
 end
+
+require 'hrr_rb_ssh/authentication/method/password/context'
