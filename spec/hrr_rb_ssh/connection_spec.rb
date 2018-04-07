@@ -217,7 +217,6 @@ RSpec.describe HrrRbSsh::Connection do
       }
 
       it "calls channel_request" do
-        HrrRbSsh::Logger.initialize ::Logger.new(STDOUT)
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_request_payload).once
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
         expect(connection).to receive(:channel_request).with(channel_request_payload).once
