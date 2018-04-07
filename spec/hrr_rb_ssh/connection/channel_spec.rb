@@ -520,11 +520,12 @@ RSpec.describe HrrRbSsh::Connection::Channel do
   end
 
   describe "#request" do
+    let(:request_type){ 'shell' }
     let(:channel_request_message){
       {
         'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
         "recipient channel" => 0,
-        "request type"      => 'shell',
+        "request type"      => request_type,
         "want reply"        => true,
       }
     }
@@ -540,8 +541,8 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       ]
     }
 
-    it "calls @@type_list['session']['shell'].run" do
-      expect(HrrRbSsh::Connection::Channel::Session::Shell).to receive(:run).with(*arguments).once
+    it "calls ChannelType['session']['shell'].run" do
+      expect(HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Shell).to receive(:run).with(*arguments).once
       channel.request(channel_request_message, variables)
     end
   end

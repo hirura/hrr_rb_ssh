@@ -4,21 +4,11 @@
 require 'socket'
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/channel/proc_chain'
-require 'hrr_rb_ssh/connection/channel/session'
+require 'hrr_rb_ssh/connection/channel/channel_type'
 
 module HrrRbSsh
   class Connection
     class Channel
-      @@type_list ||= Hash.new
-
-      def self.[] key
-        @@type_list[key]
-      end
-
-      def self.type_list
-        @@type_list.keys
-      end
-
       INITIAL_WINDOW_SIZE = 100000
       MAXIMUM_PACKET_SIZE = 100000
 
@@ -219,7 +209,7 @@ module HrrRbSsh
 
       def request message, variables
         request_type = message['request type']
-        @@type_list[@channel_type][request_type].run @proc_chain, @connection.username, @request_handler_io, variables, message, @connection.options
+        ChannelType[@channel_type][request_type].run @proc_chain, @connection.username, @request_handler_io, variables, message, @connection.options
       end
 
       def send_channel_success
