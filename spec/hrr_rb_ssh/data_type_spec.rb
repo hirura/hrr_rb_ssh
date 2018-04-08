@@ -28,7 +28,7 @@ RSpec.describe HrrRbSsh::DataType do
           256,
         ].each do |int|
           it "encodes #{"%3d" % int} with error" do
-            expect { HrrRbSsh::DataType::Byte.encode int }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::Byte.encode int }.to raise_error ArgumentError
           end
         end
       end
@@ -79,7 +79,7 @@ RSpec.describe HrrRbSsh::DataType do
           value_pretty = value.inspect.ljust(8, ' ')
 
           it "encodes #{value_pretty} with error" do
-            expect { HrrRbSsh::DataType::Boolean.encode value }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::Boolean.encode value }.to raise_error ArgumentError
           end
         end
       end
@@ -137,11 +137,11 @@ RSpec.describe HrrRbSsh::DataType do
 
       context "when arg is not within uint32 value" do
         it "encodes (0x0000_0000 - 1) with error" do
-          expect { HrrRbSsh::DataType::Uint32.encode (0x0000_0000 - 1) }.to raise_error RuntimeError
+          expect { HrrRbSsh::DataType::Uint32.encode (0x0000_0000 - 1) }.to raise_error ArgumentError
         end
 
         it "encodes (0xffff_ffff + 1) with error" do
-          expect { HrrRbSsh::DataType::Uint32.encode (0xffff_ffff + 1) }.to raise_error RuntimeError
+          expect { HrrRbSsh::DataType::Uint32.encode (0xffff_ffff + 1) }.to raise_error ArgumentError
         end
       end
     end
@@ -184,11 +184,11 @@ RSpec.describe HrrRbSsh::DataType do
 
       context "when arg is not within uint64 value" do
         it "encodes (0x0000_0000_0000_0000 - 1) with error" do
-          expect { HrrRbSsh::DataType::Uint64.encode (0x0000_0000_0000_0000 - 1) }.to raise_error RuntimeError
+          expect { HrrRbSsh::DataType::Uint64.encode (0x0000_0000_0000_0000 - 1) }.to raise_error ArgumentError
         end
 
         it "encodes (0xffff_ffff_ffff_ffff + 1) with error" do
-          expect { HrrRbSsh::DataType::Uint64.encode (0xffff_ffff_ffff_ffff + 1) }.to raise_error RuntimeError
+          expect { HrrRbSsh::DataType::Uint64.encode (0xffff_ffff_ffff_ffff + 1) }.to raise_error ArgumentError
         end
       end
     end
@@ -237,9 +237,9 @@ RSpec.describe HrrRbSsh::DataType do
             str_mock = double('str mock with length (0xffff_ffff + 1)')
 
             expect(str_mock).to receive(:kind_of?).with(::String).and_return(true).once
-            expect(str_mock).to receive(:length).with(no_args).and_return(0xffff_ffff + 1).once
+            expect(str_mock).to receive(:length).with(no_args).and_return(0xffff_ffff + 1).twice
 
-            expect { HrrRbSsh::DataType::String.encode str_mock }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::String.encode str_mock }.to raise_error ArgumentError
           end
         end
       end
@@ -256,7 +256,7 @@ RSpec.describe HrrRbSsh::DataType do
           value_pretty = value.inspect.ljust(6, ' ')
 
           it "encodes #{value_pretty} with error" do
-            expect { HrrRbSsh::DataType::String.encode value }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::String.encode value }.to raise_error ArgumentError
           end
         end
       end
@@ -303,7 +303,7 @@ RSpec.describe HrrRbSsh::DataType do
 
       context "when arg is not within mpint value" do
         it "encodes (1 << ((8 * 0xffff_ffff) + 1)); requires 0xffff_ffff + 1 bytes; with error" do
-          #expect { HrrRbSsh::DataType::Mpint.encode (1 << ((8 * 0xffff_ffff) + 1)) }.to raise_error RuntimeError
+          #expect { HrrRbSsh::DataType::Mpint.encode (1 << ((8 * 0xffff_ffff) + 1)) }.to raise_error ArgumentError
         end
       end
     end
@@ -359,9 +359,9 @@ RSpec.describe HrrRbSsh::DataType do
             expect(array_mock).to receive(:kind_of?).with(Array).and_return(true).once
             expect(array_mock).to receive(:map).with(any_args).and_return([::String]).once
             expect(array_mock).to receive(:join).with(',').and_return(string_mock).once
-            expect(string_mock).to receive(:length).with(no_args).and_return(0xffff_ffff + 1).once
+            expect(string_mock).to receive(:length).with(no_args).and_return(0xffff_ffff + 1).twice
 
-            expect { HrrRbSsh::DataType::NameList.encode array_mock }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::NameList.encode array_mock }.to raise_error ArgumentError
           end
         end
       end
@@ -381,7 +381,7 @@ RSpec.describe HrrRbSsh::DataType do
           value_pretty = value.inspect.ljust(8, ' ')
 
           it "encodes #{value_pretty} with error" do
-            expect { HrrRbSsh::DataType::NameList.encode value }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::NameList.encode value }.to raise_error ArgumentError
           end
         end
       end
@@ -412,7 +412,7 @@ RSpec.describe HrrRbSsh::DataType do
           value_pretty = value.inspect.ljust(18, ' ')
 
           it "encodes #{value_pretty} with error" do
-            expect { HrrRbSsh::DataType::NameList.encode value }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::NameList.encode value }.to raise_error ArgumentError
           end
         end
       end

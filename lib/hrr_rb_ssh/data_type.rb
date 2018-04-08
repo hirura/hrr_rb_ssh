@@ -11,7 +11,7 @@ module HrrRbSsh
         when 0x00..0xff
           [arg].pack("C")
         else
-          raise
+          raise ArgumentError, "must be in #{0x00}..#{0xff}, but got #{arg.inspect}"
         end
       end
 
@@ -28,7 +28,7 @@ module HrrRbSsh
         when true
           [1].pack("C")
         else
-          raise
+          raise ArgumentError, "must be #{true} or #{false}, but got #{arg.inspect}"
         end
       end
 
@@ -47,7 +47,7 @@ module HrrRbSsh
         when 0x0000_0000..0xffff_ffff
           [arg].pack("N")
         else
-          raise
+          raise ArgumentError, "must be in #{0x0000_0000}..#{0xffff_ffff}, but got #{arg.inspect}"
         end
       end
 
@@ -62,7 +62,7 @@ module HrrRbSsh
         when 0x0000_0000_0000_0000..0xffff_ffff_ffff_ffff
           [arg >> 32].pack("N") + [arg & 0x0000_0000_ffff_ffff].pack("N")
         else
-          raise
+          raise ArgumentError, "must be in #{0x0000_0000_0000_0000}..#{0xffff_ffff_ffff_ffff}, but got #{arg.inspect}"
         end
       end
 
@@ -73,8 +73,12 @@ module HrrRbSsh
 
     class String
       def self.encode arg
-        raise unless arg.kind_of? ::String
-        raise if     arg.length > 0xffff_ffff
+        unless arg.kind_of? ::String
+          raise ArgumentError, "must be a kind of String, but got #{arg.inspect}"
+        end
+        if arg.length > 0xffff_ffff
+          raise ArgumentError, "must be shorter than or equal to #{0xffff_ffff}, but got length #{arg.length}"
+        end
         [arg.length, arg].pack("Na*")
       end
 
@@ -86,10 +90,13 @@ module HrrRbSsh
 
     class Mpint
       def self.encode arg
-        raise unless arg.kind_of? ::Integer
-        raise if     arg.size > 0xffff_ffff
+        unless arg.kind_of? ::Integer
+          raise ArgumentError, "must be a kind of Integer, but got #{arg.inspect}"
+        end
+        if arg.size > 0xffff_ffff
+          raise ArgumentError, "must be shorter than or equal to #{0xffff_ffff}, but got length #{arg.size}"
+        end
         bn = ::OpenSSL::BN.new(arg)
-
         if bn < 0
           # get 2's complement
           tc = bn.to_i & ((1 << (bn.num_bytes * 8)) - 1)
@@ -111,7 +118,6 @@ module HrrRbSsh
         hex_str = io.read(length).unpack("H*")[0]
         # get temporal integer value
         value = hex_str.hex
-
         if length == 0
           0
         elsif value[(length * 8) - 1] == 0
@@ -125,10 +131,17 @@ module HrrRbSsh
 
     class NameList
       def self.encode arg
-        raise unless arg.kind_of? Array
-        raise unless (arg.map(&:class) - [::String]).empty?
-        raise if     arg.join(',').length > 0xffff_ffff
-        [arg.join(',').length, arg.join(',')].pack("Na*")
+        unless arg.kind_of? Array
+          raise ArgumentError, "must be a kind of Array, but got #{arg.inspect}"
+        end
+        unless (arg.map(&:class) - [::String]).empty?
+          raise ArgumentError, "must be with all elements of String, but got #{arg.inspect}"
+        end
+        joined_arg = arg.join(',')
+        if joined_arg.length > 0xffff_ffff
+          raise ArgumentError, "must be shorter than or equal to #{0xffff_ffff}, but got length #{joined_arg.length}"
+        end
+        [joined_arg.length, joined_arg].pack("Na*")
       end
 
       def self.decode io
