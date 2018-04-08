@@ -28,10 +28,10 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::Transport::DataType::String.encode(message['user name']),
-        HrrRbSsh::Transport::DataType::String.encode(message['service name']),
-        HrrRbSsh::Transport::DataType::String.encode(message['method name']),
+        HrrRbSsh::DataType::Byte.encode(message['message number']),
+        HrrRbSsh::DataType::String.encode(message['user name']),
+        HrrRbSsh::DataType::String.encode(message['service name']),
+        HrrRbSsh::DataType::String.encode(message['method name']),
       ].join
     }
 
@@ -61,12 +61,12 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::Transport::DataType::String.encode(message['user name']),
-        HrrRbSsh::Transport::DataType::String.encode(message['service name']),
-        HrrRbSsh::Transport::DataType::String.encode(message['method name']),
-        HrrRbSsh::Transport::DataType::Boolean.encode(message['FALSE']),
-        HrrRbSsh::Transport::DataType::String.encode(message['plaintext password']),
+        HrrRbSsh::DataType::Byte.encode(message['message number']),
+        HrrRbSsh::DataType::String.encode(message['user name']),
+        HrrRbSsh::DataType::String.encode(message['service name']),
+        HrrRbSsh::DataType::String.encode(message['method name']),
+        HrrRbSsh::DataType::Boolean.encode(message['FALSE']),
+        HrrRbSsh::DataType::String.encode(message['plaintext password']),
       ].join
     }
 
@@ -98,13 +98,13 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
       }
       let(:payload){
         [
-          HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-          HrrRbSsh::Transport::DataType::String.encode(message['user name']),
-          HrrRbSsh::Transport::DataType::String.encode(message['service name']),
-          HrrRbSsh::Transport::DataType::String.encode(message['method name']),
-          HrrRbSsh::Transport::DataType::Boolean.encode(message['with signature']),
-          HrrRbSsh::Transport::DataType::String.encode(message['public key algorithm name']),
-          HrrRbSsh::Transport::DataType::String.encode(message['public key blob']),
+          HrrRbSsh::DataType::Byte.encode(message['message number']),
+          HrrRbSsh::DataType::String.encode(message['user name']),
+          HrrRbSsh::DataType::String.encode(message['service name']),
+          HrrRbSsh::DataType::String.encode(message['method name']),
+          HrrRbSsh::DataType::Boolean.encode(message['with signature']),
+          HrrRbSsh::DataType::String.encode(message['public key algorithm name']),
+          HrrRbSsh::DataType::String.encode(message['public key blob']),
         ].join
       }
 
@@ -137,14 +137,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::Transport::DataType::String.encode(message['user name']),
-        HrrRbSsh::Transport::DataType::String.encode(message['service name']),
-        HrrRbSsh::Transport::DataType::String.encode(message['method name']),
-        HrrRbSsh::Transport::DataType::Boolean.encode(message['with signature']),
-        HrrRbSsh::Transport::DataType::String.encode(message['public key algorithm name']),
-        HrrRbSsh::Transport::DataType::String.encode(message['public key blob']),
-        HrrRbSsh::Transport::DataType::String.encode(message['signature']),
+        HrrRbSsh::DataType::Byte.encode(message['message number']),
+        HrrRbSsh::DataType::String.encode(message['user name']),
+        HrrRbSsh::DataType::String.encode(message['service name']),
+        HrrRbSsh::DataType::String.encode(message['method name']),
+        HrrRbSsh::DataType::Boolean.encode(message['with signature']),
+        HrrRbSsh::DataType::String.encode(message['public key algorithm name']),
+        HrrRbSsh::DataType::String.encode(message['public key blob']),
+        HrrRbSsh::DataType::String.encode(message['signature']),
       ].join
     }
 

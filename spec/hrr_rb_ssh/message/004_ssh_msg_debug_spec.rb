@@ -27,10 +27,10 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_DEBUG do
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::Transport::DataType::Boolean.encode(message['always_display']),
-      HrrRbSsh::Transport::DataType::String.encode(message['message']),
-      HrrRbSsh::Transport::DataType::String.encode(message['language tag']),
+      HrrRbSsh::DataType::Byte.encode(message['message number']),
+      HrrRbSsh::DataType::Boolean.encode(message['always_display']),
+      HrrRbSsh::DataType::String.encode(message['message']),
+      HrrRbSsh::DataType::String.encode(message['language tag']),
     ].join
   }
 

@@ -25,8 +25,8 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXDH_INIT do
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::Transport::DataType::Mpint.encode(message['e']),
+      HrrRbSsh::DataType::Byte.encode(message['message number']),
+      HrrRbSsh::DataType::Mpint.encode(message['e']),
     ].join
   }
 

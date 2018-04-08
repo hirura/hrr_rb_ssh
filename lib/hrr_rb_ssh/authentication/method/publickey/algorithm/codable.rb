@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/transport/data_type'
+require 'hrr_rb_ssh/data_type'
 
 module HrrRbSsh
   class Authentication
@@ -12,7 +12,7 @@ module HrrRbSsh
             def encode definition, payload
               definition.map{ |data_type, field_name|
                 field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-                HrrRbSsh::Transport::DataType[data_type].encode(field_value)
+                HrrRbSsh::DataType[data_type].encode(field_value)
               }.join
             end
 
@@ -21,7 +21,7 @@ module HrrRbSsh
               definition.map{ |data_type, field_name|
                 [
                   field_name,
-                  HrrRbSsh::Transport::DataType[data_type].decode(payload_io)
+                  HrrRbSsh::DataType[data_type].decode(payload_io)
                 ]
               }.to_h
             end

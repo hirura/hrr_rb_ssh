@@ -3,12 +3,12 @@
 
 require 'hrr_rb_ssh/version'
 require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/message'
 require 'hrr_rb_ssh/closed_transport_error'
 require 'hrr_rb_ssh/transport/constant'
 require 'hrr_rb_ssh/transport/mode'
 require 'hrr_rb_ssh/transport/direction'
-require 'hrr_rb_ssh/transport/data_type'
 require 'hrr_rb_ssh/transport/sequence_number'
 require 'hrr_rb_ssh/transport/sender'
 require 'hrr_rb_ssh/transport/receiver'

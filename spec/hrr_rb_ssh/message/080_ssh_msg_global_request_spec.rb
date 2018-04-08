@@ -29,11 +29,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::Transport::DataType::String.encode(message['request name']),
-        HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::Transport::DataType::String.encode(message['address to bind']),
-        HrrRbSsh::Transport::DataType::Uint32.encode(message['port number to bind']),
+        HrrRbSsh::DataType::Byte.encode(message['message number']),
+        HrrRbSsh::DataType::String.encode(message['request name']),
+        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
+        HrrRbSsh::DataType::String.encode(message['address to bind']),
+        HrrRbSsh::DataType::Uint32.encode(message['port number to bind']),
       ].join
     }
 
@@ -62,11 +62,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::Transport::DataType::String.encode(message['request name']),
-        HrrRbSsh::Transport::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::Transport::DataType::String.encode(message['address to bind']),
-        HrrRbSsh::Transport::DataType::Uint32.encode(message['port number to bind']),
+        HrrRbSsh::DataType::Byte.encode(message['message number']),
+        HrrRbSsh::DataType::String.encode(message['request name']),
+        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
+        HrrRbSsh::DataType::String.encode(message['address to bind']),
+        HrrRbSsh::DataType::Uint32.encode(message['port number to bind']),
       ].join
     }
 

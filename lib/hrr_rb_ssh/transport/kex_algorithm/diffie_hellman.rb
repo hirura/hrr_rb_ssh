@@ -2,7 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'openssl'
-require 'hrr_rb_ssh/transport/data_type'
+require 'hrr_rb_ssh/data_type'
 
 module HrrRbSsh
   class Transport
@@ -35,7 +35,7 @@ module HrrRbSsh
         def encode definition, payload
           definition.map{ |data_type, field_name|
             field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-            HrrRbSsh::Transport::DataType[data_type].encode(field_value)
+            HrrRbSsh::DataType[data_type].encode(field_value)
           }.join
         end
 
@@ -81,8 +81,8 @@ module HrrRbSsh
         end
 
         def build_key(_k, h, _x, session_id, key_length)
-          k = HrrRbSsh::Transport::DataType::Mpint.encode _k
-          x = HrrRbSsh::Transport::DataType::Byte.encode _x
+          k = HrrRbSsh::DataType::Mpint.encode _k
+          x = HrrRbSsh::DataType::Byte.encode _x
 
           key = OpenSSL::Digest.digest(self.class::DIGEST, k + h + x + session_id)
 

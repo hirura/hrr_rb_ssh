@@ -374,18 +374,18 @@ RSpec.describe HrrRbSsh::Transport do
         16.times do
           expect(i_s.read(1).unpack("C")[0]).to be_between(0x00, 0xff).inclusive
         end
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::KexAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq []
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_s).to eq []
-        expect(HrrRbSsh::Transport::DataType::Boolean.decode i_s).to eq false
-        expect(HrrRbSsh::Transport::DataType::Uint32.decode i_s).to eq 0
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::KexAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq []
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq []
+        expect(HrrRbSsh::DataType::Boolean.decode i_s).to eq false
+        expect(HrrRbSsh::DataType::Uint32.decode i_s).to eq 0
         expect(i_s.read).to eq ""
       end
 
@@ -790,18 +790,18 @@ RSpec.describe HrrRbSsh::Transport do
         16.times do
           expect(i_c.read(1).unpack("C")[0]).to be_between(0x00, 0xff).inclusive
         end
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::KexAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.name_list
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq []
-        expect(HrrRbSsh::Transport::DataType::NameList.decode i_c).to eq []
-        expect(HrrRbSsh::Transport::DataType::Boolean.decode i_c).to eq false
-        expect(HrrRbSsh::Transport::DataType::Uint32.decode i_c).to eq 0
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::KexAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq []
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq []
+        expect(HrrRbSsh::DataType::Boolean.decode i_c).to eq false
+        expect(HrrRbSsh::DataType::Uint32.decode i_c).to eq 0
         expect(i_c.read).to eq ""
       end
 

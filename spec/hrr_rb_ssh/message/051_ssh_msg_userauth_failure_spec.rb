@@ -26,9 +26,9 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE do
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::Transport::DataType::NameList.encode(message['authentications that can continue']),
-      HrrRbSsh::Transport::DataType::Boolean.encode(message['partial success']),
+      HrrRbSsh::DataType::Byte.encode(message['message number']),
+      HrrRbSsh::DataType::NameList.encode(message['authentications that can continue']),
+      HrrRbSsh::DataType::Boolean.encode(message['partial success']),
     ].join
   }
 

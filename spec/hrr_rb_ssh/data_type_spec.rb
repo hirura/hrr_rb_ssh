@@ -3,24 +3,24 @@
 
 require 'stringio'
 
-RSpec.describe HrrRbSsh::Transport::DataType do
+RSpec.describe HrrRbSsh::DataType do
   describe ".[]" do
     [
-      ['byte',      HrrRbSsh::Transport::DataType::Byte    ],
-      ['boolean',   HrrRbSsh::Transport::DataType::Boolean ],
-      ['uint32',    HrrRbSsh::Transport::DataType::Uint32  ],
-      ['uint64',    HrrRbSsh::Transport::DataType::Uint64  ],
-      ['string',    HrrRbSsh::Transport::DataType::String  ],
-      ['mpint',     HrrRbSsh::Transport::DataType::Mpint   ],
-      ['name-list', HrrRbSsh::Transport::DataType::NameList],
+      ['byte',      HrrRbSsh::DataType::Byte    ],
+      ['boolean',   HrrRbSsh::DataType::Boolean ],
+      ['uint32',    HrrRbSsh::DataType::Uint32  ],
+      ['uint64',    HrrRbSsh::DataType::Uint64  ],
+      ['string',    HrrRbSsh::DataType::String  ],
+      ['mpint',     HrrRbSsh::DataType::Mpint   ],
+      ['name-list', HrrRbSsh::DataType::NameList],
     ].each do |key, value|
       it "has #{key.ljust(9, ' ')} key" do
-        expect(HrrRbSsh::Transport::DataType[key]).to eq value
+        expect(HrrRbSsh::DataType[key]).to eq value
       end
     end
   end
 
-  describe HrrRbSsh::Transport::DataType::Byte do
+  describe HrrRbSsh::DataType::Byte do
     describe ".encode" do
       context "when arg is within byte value" do
         [
@@ -33,7 +33,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           hex_str_pretty = "0x" + hex_str
 
           it "encodes #{"%3d" % hex_str.hex} to #{hex_str_pretty}" do
-            expect(HrrRbSsh::Transport::DataType::Byte.encode hex_str.hex).to eq [hex_str].pack("H*")
+            expect(HrrRbSsh::DataType::Byte.encode hex_str.hex).to eq [hex_str].pack("H*")
           end
         end
       end
@@ -44,7 +44,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           256,
         ].each do |int|
           it "encodes #{"%3d" % int} with error" do
-            expect { HrrRbSsh::Transport::DataType::Byte.encode int }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::Byte.encode int }.to raise_error RuntimeError
           end
         end
       end
@@ -62,13 +62,13 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
         it "decodes #{hex_str_pretty} to #{"%3d" % hex_str.hex}" do
           io = StringIO.new [hex_str].pack("H*"), 'r'
-          expect(HrrRbSsh::Transport::DataType::Byte.decode io).to eq hex_str.hex
+          expect(HrrRbSsh::DataType::Byte.decode io).to eq hex_str.hex
         end
       end
     end
   end
 
-  describe HrrRbSsh::Transport::DataType::Boolean do
+  describe HrrRbSsh::DataType::Boolean do
     describe ".encode" do
       [
         [false, "00"],
@@ -78,7 +78,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
         context "when arg is #{boolean} value" do
           it "encodes true to #{hex_str_pretty}" do
-            expect(HrrRbSsh::Transport::DataType::Boolean.encode boolean).to eq [hex_str].pack("H*")
+            expect(HrrRbSsh::DataType::Boolean.encode boolean).to eq [hex_str].pack("H*")
           end
         end
       end
@@ -95,7 +95,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           value_pretty = value.inspect.ljust(8, ' ')
 
           it "encodes #{value_pretty} with error" do
-            expect { HrrRbSsh::Transport::DataType::Boolean.encode value }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::Boolean.encode value }.to raise_error RuntimeError
           end
         end
       end
@@ -110,7 +110,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
           it "decodes #{hex_str_pretty} to #{boolean}" do
             io = StringIO.new [hex_str].pack("H*"), 'r'
-            expect(HrrRbSsh::Transport::DataType::Boolean.decode io).to be boolean
+            expect(HrrRbSsh::DataType::Boolean.decode io).to be boolean
           end
         end
       end
@@ -126,14 +126,14 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
           it "decodes #{hex_str_pretty} to #{boolean}" do
             io = StringIO.new [hex_str].pack("H*"), 'r'
-            expect(HrrRbSsh::Transport::DataType::Boolean.decode io).to be boolean
+            expect(HrrRbSsh::DataType::Boolean.decode io).to be boolean
           end
         end
       end
     end
   end
 
-  describe HrrRbSsh::Transport::DataType::Uint32 do
+  describe HrrRbSsh::DataType::Uint32 do
     describe ".encode" do
       context "when arg is within uint32 value" do
         [
@@ -146,18 +146,18 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           hex_str_pretty = "0x" + hex_str.each_char.each_slice(4).map(&:join).join('_')
 
           it "encodes #{"%10d" % hex_str.hex} to #{hex_str_pretty}" do
-            expect(HrrRbSsh::Transport::DataType::Uint32.encode hex_str.hex).to eq [hex_str].pack("H*")
+            expect(HrrRbSsh::DataType::Uint32.encode hex_str.hex).to eq [hex_str].pack("H*")
           end
         end
       end
 
       context "when arg is not within uint32 value" do
         it "encodes (0x0000_0000 - 1) with error" do
-          expect { HrrRbSsh::Transport::DataType::Uint32.encode (0x0000_0000 - 1) }.to raise_error RuntimeError
+          expect { HrrRbSsh::DataType::Uint32.encode (0x0000_0000 - 1) }.to raise_error RuntimeError
         end
 
         it "encodes (0xffff_ffff + 1) with error" do
-          expect { HrrRbSsh::Transport::DataType::Uint32.encode (0xffff_ffff + 1) }.to raise_error RuntimeError
+          expect { HrrRbSsh::DataType::Uint32.encode (0xffff_ffff + 1) }.to raise_error RuntimeError
         end
       end
     end
@@ -174,13 +174,13 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
         it "decodes #{hex_str_pretty} to #{"%10d" % hex_str.hex}" do
           io = StringIO.new [hex_str].pack("H*"), 'r'
-          expect(HrrRbSsh::Transport::DataType::Uint32.decode io).to eq hex_str.hex
+          expect(HrrRbSsh::DataType::Uint32.decode io).to eq hex_str.hex
         end
       end
     end
   end
 
-  describe HrrRbSsh::Transport::DataType::Uint64 do
+  describe HrrRbSsh::DataType::Uint64 do
     describe ".encode" do
       context "when arg is within uint64 value" do
         [
@@ -193,18 +193,18 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           hex_str_pretty = "0x" + hex_str.each_char.each_slice(4).map(&:join).join('_')
 
           it "encodes #{"%20d" % hex_str.hex} to #{hex_str_pretty}" do
-            expect(HrrRbSsh::Transport::DataType::Uint64.encode hex_str.hex).to eq [hex_str].pack("H*")
+            expect(HrrRbSsh::DataType::Uint64.encode hex_str.hex).to eq [hex_str].pack("H*")
           end
         end
       end
 
       context "when arg is not within uint64 value" do
         it "encodes (0x0000_0000_0000_0000 - 1) with error" do
-          expect { HrrRbSsh::Transport::DataType::Uint64.encode (0x0000_0000_0000_0000 - 1) }.to raise_error RuntimeError
+          expect { HrrRbSsh::DataType::Uint64.encode (0x0000_0000_0000_0000 - 1) }.to raise_error RuntimeError
         end
 
         it "encodes (0xffff_ffff_ffff_ffff + 1) with error" do
-          expect { HrrRbSsh::Transport::DataType::Uint64.encode (0xffff_ffff_ffff_ffff + 1) }.to raise_error RuntimeError
+          expect { HrrRbSsh::DataType::Uint64.encode (0xffff_ffff_ffff_ffff + 1) }.to raise_error RuntimeError
         end
       end
     end
@@ -221,13 +221,13 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
         it "decodes #{hex_str_pretty} to #{"%20d" % hex_str.hex}" do
           io = StringIO.new [hex_str].pack("H*"), 'r'
-          expect(HrrRbSsh::Transport::DataType::Uint64.decode io).to eq hex_str.hex
+          expect(HrrRbSsh::DataType::Uint64.decode io).to eq hex_str.hex
         end
       end
     end
   end
 
-  describe HrrRbSsh::Transport::DataType::String do
+  describe HrrRbSsh::DataType::String do
     describe ".encode" do
       context "when arg is string value" do
         context "with length less than or equal to 0xffff_ffff" do
@@ -243,7 +243,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
             encoded_pretty            = if str_pretty.empty? then str_length_hex_str_pretty else [str_length_hex_str_pretty, str_pretty].join(' ') end
 
             it "encodes #{("\"%s\"" % (if str.length > 10 then str[0,10] + '...' else str end)).ljust(15, ' ')} to #{"\"%s\"" % encoded_pretty}" do
-              expect(HrrRbSsh::Transport::DataType::String.encode str).to eq ([str_length_hex_str].pack("H*") + str)
+              expect(HrrRbSsh::DataType::String.encode str).to eq ([str_length_hex_str].pack("H*") + str)
             end
           end
         end
@@ -255,7 +255,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
             expect(str_mock).to receive(:kind_of?).with(::String).and_return(true).once
             expect(str_mock).to receive(:length).with(no_args).and_return(0xffff_ffff + 1).once
 
-            expect { HrrRbSsh::Transport::DataType::String.encode str_mock }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::String.encode str_mock }.to raise_error RuntimeError
           end
         end
       end
@@ -272,7 +272,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           value_pretty = value.inspect.ljust(6, ' ')
 
           it "encodes #{value_pretty} with error" do
-            expect { HrrRbSsh::Transport::DataType::String.encode value }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::String.encode value }.to raise_error RuntimeError
           end
         end
       end
@@ -292,13 +292,13 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
         it "decodes #{("\"%s\"" % encoded_pretty).ljust(37, ' ')} to #{"\"%s\"" % (if str.length > 10 then str[0,10] + '...' else str end)}" do
           io = StringIO.new ([str_length_hex_str].pack("H*") + str), 'r'
-          expect(HrrRbSsh::Transport::DataType::String.decode io).to eq str
+          expect(HrrRbSsh::DataType::String.decode io).to eq str
         end
       end
     end
   end
 
-  describe HrrRbSsh::Transport::DataType::Mpint do
+  describe HrrRbSsh::DataType::Mpint do
     describe ".encode" do
       context "when arg is within mpint value" do
         [
@@ -312,14 +312,14 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           hex_rpr_pretty = hex_rpr.each_char.each_slice(2).map(&:join).join(' ')
 
           it "encodes #{hex_str.ljust(15, ' ')} to #{hex_rpr_pretty}" do
-            expect(HrrRbSsh::Transport::DataType::Mpint.encode hex_str.hex).to eq [hex_rpr].pack("H*")
+            expect(HrrRbSsh::DataType::Mpint.encode hex_str.hex).to eq [hex_rpr].pack("H*")
           end
         end
       end
 
       context "when arg is not within mpint value" do
         it "encodes (1 << ((8 * 0xffff_ffff) + 1)); requires 0xffff_ffff + 1 bytes; with error" do
-          #expect { HrrRbSsh::Transport::DataType::Mpint.encode (1 << ((8 * 0xffff_ffff) + 1)) }.to raise_error RuntimeError
+          #expect { HrrRbSsh::DataType::Mpint.encode (1 << ((8 * 0xffff_ffff) + 1)) }.to raise_error RuntimeError
         end
       end
     end
@@ -337,13 +337,13 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
         it "decodes #{hex_rpr_pretty.ljust(35, ' ')} to #{hex_str}" do
           io = StringIO.new [hex_rpr].pack("H*"), 'r'
-          expect(HrrRbSsh::Transport::DataType::Mpint.decode io).to eq hex_str.hex
+          expect(HrrRbSsh::DataType::Mpint.decode io).to eq hex_str.hex
         end
       end
     end
   end
 
-  describe HrrRbSsh::Transport::DataType::NameList do
+  describe HrrRbSsh::DataType::NameList do
     describe ".encode" do
       context "when arg is array of string value" do
         context "with length less than or equal to 0xffff_ffff" do
@@ -362,7 +362,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
             array_pretty              = if array.inspect.length > 16 then array.inspect[0,16] + ' ...' else array.inspect end
 
             it "encodes #{array_pretty.ljust(20, ' ')} to #{"\"%s\"" % encoded_pretty}" do
-              expect(HrrRbSsh::Transport::DataType::NameList.encode array).to eq ([str_length_hex_str].pack("H*") + str)
+              expect(HrrRbSsh::DataType::NameList.encode array).to eq ([str_length_hex_str].pack("H*") + str)
             end
           end
         end
@@ -377,7 +377,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
             expect(array_mock).to receive(:join).with(',').and_return(string_mock).once
             expect(string_mock).to receive(:length).with(no_args).and_return(0xffff_ffff + 1).once
 
-            expect { HrrRbSsh::Transport::DataType::NameList.encode array_mock }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::NameList.encode array_mock }.to raise_error RuntimeError
           end
         end
       end
@@ -397,7 +397,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           value_pretty = value.inspect.ljust(8, ' ')
 
           it "encodes #{value_pretty} with error" do
-            expect { HrrRbSsh::Transport::DataType::NameList.encode value }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::NameList.encode value }.to raise_error RuntimeError
           end
         end
       end
@@ -428,7 +428,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
           value_pretty = value.inspect.ljust(18, ' ')
 
           it "encodes #{value_pretty} with error" do
-            expect { HrrRbSsh::Transport::DataType::NameList.encode value }.to raise_error RuntimeError
+            expect { HrrRbSsh::DataType::NameList.encode value }.to raise_error RuntimeError
           end
         end
       end
@@ -451,7 +451,7 @@ RSpec.describe HrrRbSsh::Transport::DataType do
 
         it "decodes #{("\"%s\"" % encoded_pretty).ljust(37, ' ')} to #{array_pretty}" do
           io = StringIO.new ([str_length_hex_str].pack("H*") + str), 'r'
-          expect(HrrRbSsh::Transport::DataType::NameList.decode io).to eq array
+          expect(HrrRbSsh::DataType::NameList.decode io).to eq array
         end
       end
     end

@@ -24,7 +24,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS do
   }
   let(:payload){
     [
-      HrrRbSsh::Transport::DataType::Byte.encode(message['message number']),
+      HrrRbSsh::DataType::Byte.encode(message['message number']),
     ].join
   }
 

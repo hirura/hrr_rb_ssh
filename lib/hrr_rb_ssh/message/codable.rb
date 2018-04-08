@@ -2,7 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/logger'
-require 'hrr_rb_ssh/transport/data_type'
+require 'hrr_rb_ssh/data_type'
 
 module HrrRbSsh
   module Message
@@ -28,7 +28,7 @@ module HrrRbSsh
         definition = common_definition + conditional_definition(message.merge complementary_message)
         definition.map{ |data_type, field_name|
           field_value = if message[field_name].instance_of? ::Proc then message[field_name].call else message[field_name] end
-          HrrRbSsh::Transport::DataType[data_type].encode( field_value )
+          HrrRbSsh::DataType[data_type].encode( field_value )
         }.join
       end
 
@@ -46,7 +46,7 @@ module HrrRbSsh
             decoded_message = definition.map{ |data_type, field_name|
               [
                 field_name,
-                HrrRbSsh::Transport::DataType[data_type].decode( payload_io )
+                HrrRbSsh::DataType[data_type].decode( payload_io )
               ]
             }
 
