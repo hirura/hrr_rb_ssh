@@ -12,7 +12,7 @@ module HrrRbSsh
             def encode definition, payload
               definition.map{ |data_type, field_name|
                 field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-                HrrRbSsh::DataType[data_type].encode(field_value)
+                data_type.encode(field_value)
               }.join
             end
 
@@ -21,7 +21,7 @@ module HrrRbSsh
               definition.map{ |data_type, field_name|
                 [
                   field_name,
-                  HrrRbSsh::DataType[data_type].decode(payload_io)
+                  data_type.decode(payload_io)
                 ]
               }.to_h
             end

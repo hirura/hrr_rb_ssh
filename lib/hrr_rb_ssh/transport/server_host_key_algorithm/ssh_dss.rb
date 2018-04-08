@@ -26,16 +26,16 @@ MRl/p42OrQzL/chRPvRf
         EOB
 
         KEY_FORMAT_DEFINITION = [
-          ['string', 'ssh-dss'],
-          ['mpint',  'p'],
-          ['mpint',  'q'],
-          ['mpint',  'g'],
-          ['mpint',  'y'],
+          [DataType::String, 'ssh-dss'],
+          [DataType::Mpint,  'p'],
+          [DataType::Mpint,  'q'],
+          [DataType::Mpint,  'g'],
+          [DataType::Mpint,  'y'],
         ]
 
         SIGN_DEFINITION = [
-          ['string', 'ssh-dss'],
-          ['string', 'dss_signature_blob'],
+          [DataType::String, 'ssh-dss'],
+          [DataType::String, 'dss_signature_blob'],
         ]
 
         def initialize
@@ -47,7 +47,7 @@ MRl/p42OrQzL/chRPvRf
         def encode definition, payload
           definition.map{ |data_type, field_name|
             field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-            HrrRbSsh::DataType[data_type].encode( field_value )
+            data_type.encode( field_value )
           }.join
         end
 
@@ -56,7 +56,7 @@ MRl/p42OrQzL/chRPvRf
           definition.map{ |data_type, field_name|
             [
               field_name,
-              HrrRbSsh::DataType[data_type].decode( payload_io )
+              data_type.decode( payload_io )
             ]
           }.to_h
         end

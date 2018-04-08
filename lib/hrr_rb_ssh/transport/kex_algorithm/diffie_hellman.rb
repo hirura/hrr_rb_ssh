@@ -9,14 +9,14 @@ module HrrRbSsh
     class KexAlgorithm
       module DiffieHellman
         H0_DEFINITION = [
-          ['string', 'V_C'],
-          ['string', 'V_S'],
-          ['string', 'I_C'],
-          ['string', 'I_S'],
-          ['string', 'K_S'],
-          ['mpint',  'e'],
-          ['mpint',  'f'],
-          ['mpint',  'k'],
+          [DataType::String, 'V_C'],
+          [DataType::String, 'V_S'],
+          [DataType::String, 'I_C'],
+          [DataType::String, 'I_S'],
+          [DataType::String, 'K_S'],
+          [DataType::Mpint,  'e'],
+          [DataType::Mpint,  'f'],
+          [DataType::Mpint,  'k'],
         ]
 
         def initialize
@@ -35,7 +35,7 @@ module HrrRbSsh
         def encode definition, payload
           definition.map{ |data_type, field_name|
             field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-            HrrRbSsh::DataType[data_type].encode(field_value)
+            data_type.encode(field_value)
           }.join
         end
 
@@ -81,8 +81,8 @@ module HrrRbSsh
         end
 
         def build_key(_k, h, _x, session_id, key_length)
-          k = HrrRbSsh::DataType::Mpint.encode _k
-          x = HrrRbSsh::DataType::Byte.encode _x
+          k = DataType::Mpint.encode _k
+          x = DataType::Byte.encode _x
 
           key = OpenSSL::Digest.digest(self.class::DIGEST, k + h + x + session_id)
 

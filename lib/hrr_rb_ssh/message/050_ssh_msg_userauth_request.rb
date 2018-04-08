@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/message/codable'
 
 module HrrRbSsh
@@ -15,32 +15,32 @@ module HrrRbSsh
       VALUE = 50
 
       DEFINITION = [
-        # [Data Type, Field Name]
-        ['byte',      'message number'],
-        ['string',    'user name'],
-        ['string',    'service name'],
-        ['string',    'method name'],
+        #[DataType, Field Name]
+        [DataType::Byte,      'message number'],
+        [DataType::String,    'user name'],
+        [DataType::String,    'service name'],
+        [DataType::String,    'method name'],
       ]
 
       PUBLICKEY_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'method name' : "publickey"],
-        ['boolean',   'with signature'],
-        ['string',    'public key algorithm name'],
-        ['string',    'public key blob'],
+        #[DataType, Field Name]
+        #[DataType::String,   'method name' : "publickey"],
+        [DataType::Boolean,   'with signature'],
+        [DataType::String,    'public key algorithm name'],
+        [DataType::String,    'public key blob'],
       ]
 
       PUBLICKEY_SIGNATURE_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'with signature' : "TRUE"],
-        ['string',    'signature'],
+        #[DataType, Field Name]
+        #[DataType::String,   'with signature' : "TRUE"],
+        [DataType::String,    'signature'],
       ]
 
       PASSWORD_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'method name' : "password"],
-        ['boolean',   'FALSE'],
-        ['string',    'plaintext password'],
+        #[DataType, Field Name]
+        #[DataType::String,   'method name' : "password"],
+        [DataType::Boolean,   'FALSE'],
+        [DataType::String,    'plaintext password'],
       ]
 
       CONDITIONAL_DEFINITION = {

@@ -4,22 +4,6 @@
 require 'stringio'
 
 RSpec.describe HrrRbSsh::DataType do
-  describe ".[]" do
-    [
-      ['byte',      HrrRbSsh::DataType::Byte    ],
-      ['boolean',   HrrRbSsh::DataType::Boolean ],
-      ['uint32',    HrrRbSsh::DataType::Uint32  ],
-      ['uint64',    HrrRbSsh::DataType::Uint64  ],
-      ['string',    HrrRbSsh::DataType::String  ],
-      ['mpint',     HrrRbSsh::DataType::Mpint   ],
-      ['name-list', HrrRbSsh::DataType::NameList],
-    ].each do |key, value|
-      it "has #{key.ljust(9, ' ')} key" do
-        expect(HrrRbSsh::DataType[key]).to eq value
-      end
-    end
-  end
-
   describe HrrRbSsh::DataType::Byte do
     describe ".encode" do
       context "when arg is within byte value" do

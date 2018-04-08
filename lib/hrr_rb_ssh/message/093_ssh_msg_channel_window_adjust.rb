@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/message/codable'
 
 module HrrRbSsh
@@ -15,10 +15,10 @@ module HrrRbSsh
       VALUE = 93
 
       DEFINITION = [
-        # [Data Type, Field Name]
-        ['byte',      'message number'],
-        ['uint32',    'recipient channel'],
-        ['uint32',    'bytes to add'],
+        #[DataType, Field Name]
+        [DataType::Byte,      'message number'],
+        [DataType::Uint32,    'recipient channel'],
+        [DataType::Uint32,    'bytes to add'],
       ]
     end
   end

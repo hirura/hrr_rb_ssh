@@ -41,14 +41,14 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
         EOB
 
         KEY_FORMAT_DEFINITION = [
-          ['string', 'ssh-rsa'],
-          ['mpint',  'e'],
-          ['mpint',  'n'],
+          [DataType::String, 'ssh-rsa'],
+          [DataType::Mpint,  'e'],
+          [DataType::Mpint,  'n'],
         ]
 
         SIGN_DEFINITION = [
-          ['string', 'ssh-rsa'],
-          ['string', 'rsa_signature_blob'],
+          [DataType::String, 'ssh-rsa'],
+          [DataType::String, 'rsa_signature_blob'],
         ]
 
         def initialize
@@ -60,7 +60,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
         def encode definition, payload
           definition.map{ |data_type, field_name|
             field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-            HrrRbSsh::DataType[data_type].encode( field_value )
+            data_type.encode( field_value )
           }.join
         end
 
@@ -69,7 +69,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
           definition.map{ |data_type, field_name|
             [
               field_name,
-              HrrRbSsh::DataType[data_type].decode( payload_io )
+              data_type.decode( payload_io )
             ]
           }.to_h
         end

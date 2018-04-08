@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/message/codable'
 
 module HrrRbSsh
@@ -15,10 +15,10 @@ module HrrRbSsh
       VALUE = 51
 
       DEFINITION = [
-        # [Data Type, Field Name]
-        ['byte',      'message number'],
-        ['name-list', 'authentications that can continue'],
-        ['boolean',   'partial success'],
+        #[DataType, Field Name]
+        [DataType::Byte,      'message number'],
+        [DataType::NameList, 'authentications that can continue'],
+        [DataType::Boolean,   'partial success'],
       ]
     end
   end

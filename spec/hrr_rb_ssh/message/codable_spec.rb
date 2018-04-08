@@ -10,8 +10,8 @@ RSpec.describe HrrRbSsh::Message::Codable do
         end
 
         DEFINITION = [
-          ['byte',   'message number'],
-          ['string', 'data'        ],
+          [HrrRbSsh::DataType::Byte,   'message number'],
+          [HrrRbSsh::DataType::String, 'data'        ],
         ]
       end
     end
@@ -49,12 +49,12 @@ RSpec.describe HrrRbSsh::Message::Codable do
         end
 
         DEFINITION = [
-          ['byte',   'message number'],
-          ['string', 'data'        ],
+          [HrrRbSsh::DataType::Byte,   'message number'],
+          [HrrRbSsh::DataType::String, 'data'        ],
         ]
 
         TESTING_DEFINITION = [
-          ['string', 'testing data'],
+          [HrrRbSsh::DataType::String, 'testing data'],
         ]
 
         CONDITIONAL_DEFINITION = {
@@ -98,16 +98,16 @@ RSpec.describe HrrRbSsh::Message::Codable do
         end
 
         DEFINITION = [
-          ['byte',   'message number'],
-          ['string', 'data'        ],
+          [HrrRbSsh::DataType::Byte,   'message number'],
+          [HrrRbSsh::DataType::String, 'data'        ],
         ]
 
         TESTING_DEFINITION = [
-          ['string', 'testing data'],
+          [HrrRbSsh::DataType::String, 'testing data'],
         ]
 
         CHAINED_DEFINITION = [
-          ['string', 'chained data'],
+          [HrrRbSsh::DataType::String, 'chained data'],
         ]
 
         CONDITIONAL_DEFINITION = {
@@ -154,12 +154,12 @@ RSpec.describe HrrRbSsh::Message::Codable do
         end
 
         DEFINITION = [
-          ['byte',   'message number'],
-          ['string', 'data'        ],
+          [HrrRbSsh::DataType::Byte,   'message number'],
+          [HrrRbSsh::DataType::String, 'data'        ],
         ]
 
         HIDDEN_DEFINITION = [
-          ['string', 'hidden data'],
+          [HrrRbSsh::DataType::String, 'hidden data'],
         ]
 
         CONDITIONAL_DEFINITION = {

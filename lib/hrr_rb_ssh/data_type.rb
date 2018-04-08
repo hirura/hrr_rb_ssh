@@ -5,25 +5,6 @@ require 'openssl'
 
 module HrrRbSsh
   module DataType
-    def self.[] key
-      case key
-      when 'byte'
-        Byte
-      when 'boolean'
-        Boolean
-      when 'uint32'
-        Uint32
-      when 'uint64'
-        Uint64
-      when 'string'
-        String
-      when 'mpint'
-        Mpint
-      when 'name-list'
-        NameList
-      end
-    end
-
     class Byte
       def self.encode arg
         case arg

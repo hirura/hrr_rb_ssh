@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/message/codable'
 
 module HrrRbSsh
@@ -15,36 +15,36 @@ module HrrRbSsh
       VALUE = 20
 
       DEFINITION = [
-        # [Data Type, Field Name]
-        ['byte',      'message number'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['byte',      'cookie (random byte)'],
-        ['name-list', 'kex_algorithms'],
-        ['name-list', 'server_host_key_algorithms'],
-        ['name-list', 'encryption_algorithms_client_to_server'],
-        ['name-list', 'encryption_algorithms_server_to_client'],
-        ['name-list', 'mac_algorithms_client_to_server'],
-        ['name-list', 'mac_algorithms_server_to_client'],
-        ['name-list', 'compression_algorithms_client_to_server'],
-        ['name-list', 'compression_algorithms_server_to_client'],
-        ['name-list', 'languages_client_to_server'],
-        ['name-list', 'languages_server_to_client'],
-        ['boolean',   'first_kex_packet_follows'],
-        ['uint32',    '0 (reserved for future extension)'],
+        #[DataType, Field Name]
+        [DataType::Byte,      'message number'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::Byte,      'cookie (random byte)'],
+        [DataType::NameList, 'kex_algorithms'],
+        [DataType::NameList, 'server_host_key_algorithms'],
+        [DataType::NameList, 'encryption_algorithms_client_to_server'],
+        [DataType::NameList, 'encryption_algorithms_server_to_client'],
+        [DataType::NameList, 'mac_algorithms_client_to_server'],
+        [DataType::NameList, 'mac_algorithms_server_to_client'],
+        [DataType::NameList, 'compression_algorithms_client_to_server'],
+        [DataType::NameList, 'compression_algorithms_server_to_client'],
+        [DataType::NameList, 'languages_client_to_server'],
+        [DataType::NameList, 'languages_server_to_client'],
+        [DataType::Boolean,   'first_kex_packet_follows'],
+        [DataType::Uint32,    '0 (reserved for future extension)'],
       ]
     end
   end

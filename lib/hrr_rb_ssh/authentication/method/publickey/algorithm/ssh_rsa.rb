@@ -1,6 +1,8 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/data_type'
+
 module HrrRbSsh
   class Authentication
     module Method
@@ -11,25 +13,25 @@ module HrrRbSsh
             DIGEST = 'sha1'
 
             PUBLIC_KEY_BLOB_DEFINITION = [
-              ['string', 'public key algorithm name'],
-              ['mpint',  'e'],
-              ['mpint',  'n'],
+              [DataType::String, 'public key algorithm name'],
+              [DataType::Mpint,  'e'],
+              [DataType::Mpint,  'n'],
             ]
 
             SIGNATURE_DEFINITION = [
-              ['string', 'public key algorithm name'],
-              ['string', 'signature blob'],
+              [DataType::String, 'public key algorithm name'],
+              [DataType::String, 'signature blob'],
             ]
 
             SIGNATURE_BLOB_DEFINITION = [
-              ['string',  'session identifier'],
-              ['byte',    'message number'],
-              ['string',  'user name'],
-              ['string',  'service name'],
-              ['string',  'method name'],
-              ['boolean', 'with signature'],
-              ['string',  'public key algorithm name'],
-              ['string',  'public key blob'],
+              [DataType::String,  'session identifier'],
+              [DataType::Byte,    'message number'],
+              [DataType::String,  'user name'],
+              [DataType::String,  'service name'],
+              [DataType::String,  'method name'],
+              [DataType::Boolean, 'with signature'],
+              [DataType::String,  'public key algorithm name'],
+              [DataType::String,  'public key blob'],
             ]
 
             def verify_public_key public_key_algorithm_name, public_key, public_key_blob

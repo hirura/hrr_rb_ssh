@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/message/codable'
 
 module HrrRbSsh
@@ -31,91 +31,91 @@ module HrrRbSsh
       VALUE = 98
 
       DEFINITION = [
-        # [Data Type, Field Name]
-        ['byte',      'message number'],
-        ['uint32',    'recipient channel'],
-        ['string',    'request type'],
-        ['boolean',   'want reply'],
+        #[DataType, Field Name]
+        [DataType::Byte,      'message number'],
+        [DataType::Uint32,    'recipient channel'],
+        [DataType::String,    'request type'],
+        [DataType::Boolean,   'want reply'],
       ]
 
       PTY_REQ_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "pty-req"],
-        ['string',    'TERM environment variable value'],
-        ['uint32',    'terminal width, characters'],
-        ['uint32',    'terminal height, rows'],
-        ['uint32',    'terminal width, pixels'],
-        ['uint32',    'terminal height, pixels'],
-        ['string',    'encoded terminal modes'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "pty-req"],
+        [DataType::String,    'TERM environment variable value'],
+        [DataType::Uint32,    'terminal width, characters'],
+        [DataType::Uint32,    'terminal height, rows'],
+        [DataType::Uint32,    'terminal width, pixels'],
+        [DataType::Uint32,    'terminal height, pixels'],
+        [DataType::String,    'encoded terminal modes'],
       ]
 
       X11_REQ_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "x11-req"],
-        ['boolean',   'single connection'],
-        ['string',    'x11 authentication protocol'],
-        ['string',    'x11 authentication cookie'],
-        ['uint32',    'x11 screen number'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "x11-req"],
+        [DataType::Boolean,   'single connection'],
+        [DataType::String,    'x11 authentication protocol'],
+        [DataType::String,    'x11 authentication cookie'],
+        [DataType::Uint32,    'x11 screen number'],
       ]
 
       ENV_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "env"],
-        ['string',    'variable name'],
-        ['string',    'variable value'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "env"],
+        [DataType::String,    'variable name'],
+        [DataType::String,    'variable value'],
       ]
 
       SHELL_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "shell"],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "shell"],
       ]
 
       EXEC_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "exec"],
-        ['string',    'command'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "exec"],
+        [DataType::String,    'command'],
       ]
 
       SUBSYSTEM_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "subsystem"],
-        ['string',    'subsystem name'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "subsystem"],
+        [DataType::String,    'subsystem name'],
       ]
 
       WINDOW_CHANGE_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "window-change"],
-        ['uint32',    'terminal width, columns'],
-        ['uint32',    'terminal height, rows'],
-        ['uint32',    'terminal width, pixels'],
-        ['uint32',    'terminal height, pixels'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "window-change"],
+        [DataType::Uint32,    'terminal width, columns'],
+        [DataType::Uint32,    'terminal height, rows'],
+        [DataType::Uint32,    'terminal width, pixels'],
+        [DataType::Uint32,    'terminal height, pixels'],
       ]
 
       XON_XOFF_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "xon-xoff"],
-        ['boolean',   'client can do'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "xon-xoff"],
+        [DataType::Boolean,   'client can do'],
       ]
 
       SIGNAL_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "signal"],
-        ['string',    'signal name'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "signal"],
+        [DataType::String,    'signal name'],
       ]
 
       EXIT_STATUS_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "exit-status"],
-        ['uint32',    'exit status'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "exit-status"],
+        [DataType::Uint32,    'exit status'],
       ]
 
       EXIT_SIGNAL_DEFINITION = [
-        # [Data Type, Field Name]
-        # ['string',  'request type' : "exit-signal"],
-        ['string',    'signal name'],
-        ['boolean',   'core dumped'],
-        ['string',    'error message'],
-        ['string',    'language tag'],
+        #[DataType, Field Name]
+        #[DataType::String,   'request type' : "exit-signal"],
+        [DataType::String,    'signal name'],
+        [DataType::Boolean,   'core dumped'],
+        [DataType::String,    'error message'],
+        [DataType::String,    'language tag'],
       ]
 
       CONDITIONAL_DEFINITION = {
