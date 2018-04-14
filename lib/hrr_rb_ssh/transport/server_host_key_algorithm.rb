@@ -1,19 +1,14 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/subclass_with_preference_listable'
+
 module HrrRbSsh
   class Transport
     class ServerHostKeyAlgorithm
-      def self.list
-        ServerHostKeyAlgorithm.list
-      end
-
-      def self.name_list
-        ServerHostKeyAlgorithm.name_list
-      end
-
-      def self.[] key
-        ServerHostKeyAlgorithm[key]
+      @subclass_list = Array.new
+      class << self
+        include SubclassWithPreferenceListable
       end
     end
   end

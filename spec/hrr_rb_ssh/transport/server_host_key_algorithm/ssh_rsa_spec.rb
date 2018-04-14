@@ -5,16 +5,16 @@ RSpec.describe HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa do
   let(:name){ 'ssh-rsa' }
   let(:server_host_key_algorithm){ described_class.new }
 
-  it "is registered in HrrRbSsh::Transport::ServerHostKeyAlgorithm.list" do
-    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.list ).to include described_class
-  end
-
-  it "can be looked up in in HrrRbSsh::Transport::ServerHostKeyAlgorithm dictionary" do
+  it "can be looked up in HrrRbSsh::Transport::ServerHostKeyAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm[name] ).to eq described_class
-  end
+  end       
 
-  it "appears in HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list ).to include name
+  it "is registered in HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported" do
+    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported ).to include name
+  end         
+
+  it "appears in HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred" do
+    expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred ).to include name
   end
 
   describe '#server_public_host_key' do

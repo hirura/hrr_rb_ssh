@@ -375,7 +375,7 @@ RSpec.describe HrrRbSsh::Transport do
           expect(i_s.read(1).unpack("C")[0]).to be_between(0x00, 0xff).inclusive
         end
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::KexAlgorithm.name_list
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
@@ -761,7 +761,7 @@ RSpec.describe HrrRbSsh::Transport do
           'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
           'cookie (random byte)'                    => lambda { rand(0x01_00) },
           "kex_algorithms"                          => HrrRbSsh::Transport::KexAlgorithm.name_list,
-          "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list,
+          "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred,
           "encryption_algorithms_client_to_server"  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
           "encryption_algorithms_server_to_client"  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
           "mac_algorithms_client_to_server"         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
@@ -791,7 +791,7 @@ RSpec.describe HrrRbSsh::Transport do
           expect(i_c.read(1).unpack("C")[0]).to be_between(0x00, 0xff).inclusive
         end
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::KexAlgorithm.name_list
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
@@ -811,7 +811,7 @@ RSpec.describe HrrRbSsh::Transport do
 
         transport.exchange_key
 
-        expect(transport.server_host_key_algorithm).to be_a_kind_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::ServerHostKeyAlgorithm
+        expect(transport.server_host_key_algorithm).to be_a_kind_of HrrRbSsh::Transport::ServerHostKeyAlgorithm
         expect(transport.instance_variable_get('@kex_algorithm')).to be_a_kind_of HrrRbSsh::Transport::KexAlgorithm::KexAlgorithm
       end
     end

@@ -1,14 +1,16 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/data_type'
-require 'hrr_rb_ssh/transport/server_host_key_algorithm/server_host_key_algorithm'
 
 module HrrRbSsh
   class Transport
     class ServerHostKeyAlgorithm
       class SshRsa < ServerHostKeyAlgorithm
         NAME = 'ssh-rsa'
+
+        PREFERENCE = 20
 
         SECRET_KEY = <<-EOB
 -----BEGIN RSA PRIVATE KEY-----
@@ -52,8 +54,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
         ]
 
         def initialize
-          super
-
+          @logger = HrrRbSsh::Logger.new(self.class.name)
           @rsa = OpenSSL::PKey::RSA.new SECRET_KEY
         end
 

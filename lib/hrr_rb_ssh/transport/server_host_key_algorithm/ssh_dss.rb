@@ -1,14 +1,16 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/data_type'
-require 'hrr_rb_ssh/transport/server_host_key_algorithm/server_host_key_algorithm'
 
 module HrrRbSsh
   class Transport
     class ServerHostKeyAlgorithm
       class SshDss < ServerHostKeyAlgorithm
         NAME = 'ssh-dss'
+
+        PREFERENCE = 10
 
         SECRET_KEY = <<-EOB
 -----BEGIN DSA PRIVATE KEY-----
@@ -39,8 +41,7 @@ MRl/p42OrQzL/chRPvRf
         ]
 
         def initialize
-          super
-
+          @logger = HrrRbSsh::Logger.new(self.class.name)
           @dss = OpenSSL::PKey::DSA.new SECRET_KEY
         end
 
