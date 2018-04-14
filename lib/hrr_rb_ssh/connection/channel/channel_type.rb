@@ -4,22 +4,27 @@
 module HrrRbSsh
   class Connection
     class Channel
-      module ChannelType
-        def self.list
-          ChannelType.list
-        end
+      class ChannelType
+        @subclass_list = Array.new
+        class << self
+          def inherited klass
+            @subclass_list.push klass if @subclass_list
+          end
 
-        def self.name_list
-          ChannelType.name_list
-        end
+          def [] key
+            __subclass_list__(__method__).find{ |klass| klass::NAME == key }
+          end
 
-        def self.[] key
-          ChannelType[key]
+          def __subclass_list__ method_name
+            send(:method_missing, method_name) unless @subclass_list
+            @subclass_list
+          end
+
+          private :__subclass_list__
         end
       end
     end
   end
 end
 
-require 'hrr_rb_ssh/connection/channel/channel_type/channel_type'
 require 'hrr_rb_ssh/connection/channel/channel_type/session'

@@ -541,7 +541,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       ]
     }
 
-    it "calls ChannelType['session']['shell'].run" do
+    it "calls ChannelType['session']::RequestType['shell'].run" do
       expect(HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Shell).to receive(:run).with(*arguments).once
       channel.request(channel_request_message, variables)
     end

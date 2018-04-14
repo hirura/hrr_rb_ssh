@@ -4,7 +4,7 @@
 module HrrRbSsh
   class Connection
     class Channel
-      module ChannelType
+      class ChannelType
         class Session
           module RequestType
             class RequestType

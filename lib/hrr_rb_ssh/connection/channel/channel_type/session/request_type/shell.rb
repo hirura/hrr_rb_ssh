@@ -8,7 +8,7 @@ require 'hrr_rb_ssh/connection/channel/channel_type/session/request_type/request
 module HrrRbSsh
   class Connection
     class Channel
-      module ChannelType
+      class ChannelType
         class Session
           module RequestType
             class Shell < RequestType
