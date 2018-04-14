@@ -230,6 +230,9 @@ module HrrRbSsh
             end
           rescue EOFError => e
             close
+          rescue Errno::ECONNRESET => e
+            @logger.warn("IO is RESET")
+            close
           rescue => e
             @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
             close
