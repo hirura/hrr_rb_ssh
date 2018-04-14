@@ -2,15 +2,21 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm do
-  describe 'self#[]' do
+  describe '[key]' do
     it "has none algorithm loaded" do
-      expect( HrrRbSsh::Transport::EncryptionAlgorithm['none'] ).to eq HrrRbSsh::Transport::EncryptionAlgorithm::None
+      expect( described_class['none'] ).to eq described_class::None
     end
   end
 
-  describe 'self#name_list' do
+  describe '.list_supported' do
     it "contains none algorithm loaded" do
-      expect( HrrRbSsh::Transport::EncryptionAlgorithm.name_list ).to include 'none'
+      expect( described_class.list_supported ).to include 'none'
+    end
+  end
+
+  describe '.list_preferred' do
+    it "contains none algorithm loaded" do
+      expect( described_class.list_preferred ).not_to include 'none'
     end
   end
 end

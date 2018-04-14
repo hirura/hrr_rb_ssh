@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/transport/encryption_algorithm/encryption_algorithm'
 require 'hrr_rb_ssh/transport/encryption_algorithm/functionable'
 
 module HrrRbSsh
@@ -9,9 +8,9 @@ module HrrRbSsh
     class EncryptionAlgorithm
       class Arcfour < EncryptionAlgorithm
         NAME        = 'arcfour'
+        PREFERENCE  = 100
         CIPHER_NAME = "RC4"
         BLOCK_SIZE  = 8
-
         include Functionable
       end
     end

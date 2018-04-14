@@ -1,6 +1,8 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/logger'
+
 module HrrRbSsh
   class Transport
     class EncryptionAlgorithm
@@ -8,6 +10,10 @@ module HrrRbSsh
         def self.included klass
           klass.const_set(:IV_LENGTH,  0)
           klass.const_set(:KEY_LENGTH, 0)
+        end
+
+        def initialize direction=nil, iv=nil, key=nil
+          @logger = HrrRbSsh::Logger.new(self.class.name)
         end
 
         def block_size

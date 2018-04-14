@@ -69,6 +69,10 @@ module HrrRbSsh
       initialize_algorithms
     end
 
+    def preferred_encryption_algorithms
+      EncryptionAlgorithm.preferred_names
+    end
+
     def register_acceptable_service service_name
       @acceptable_services.push service_name
     end
@@ -238,8 +242,8 @@ module HrrRbSsh
     def initialize_local_algorithms
       @local_kex_algorithms                          = HrrRbSsh::Transport::KexAlgorithm.name_list
       @local_server_host_key_algorithms              = HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
-      @local_encryption_algorithms_client_to_server  = HrrRbSsh::Transport::EncryptionAlgorithm.name_list
-      @local_encryption_algorithms_server_to_client  = HrrRbSsh::Transport::EncryptionAlgorithm.name_list
+      @local_encryption_algorithms_client_to_server  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
+      @local_encryption_algorithms_server_to_client  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
       @local_mac_algorithms_client_to_server         = HrrRbSsh::Transport::MacAlgorithm.name_list
       @local_mac_algorithms_server_to_client         = HrrRbSsh::Transport::MacAlgorithm.name_list
       @local_compression_algorithms_client_to_server = HrrRbSsh::Transport::CompressionAlgorithm.name_list

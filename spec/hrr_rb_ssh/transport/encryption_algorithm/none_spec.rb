@@ -2,19 +2,20 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::None do
-  let(:encryption_algorithm){ HrrRbSsh::Transport::EncryptionAlgorithm::None.new }
+  let(:name){ 'none' }
+  let(:encryption_algorithm){ described_class.new }
   let(:test_data){ "test data" }
 
-  it "is registered in HrrRbSsh::Transport::EncryptionAlgorithm.list" do
-    expect( HrrRbSsh::Transport::EncryptionAlgorithm.list ).to include described_class
+  it "can be looked up in HrrRbSsh::Transport::EncryptionAlgorithm dictionary" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm[name] ).to eq described_class
   end
 
-  it "can be looked up as none in HrrRbSsh::Transport::EncryptionAlgorithm dictionary" do
-    expect( HrrRbSsh::Transport::EncryptionAlgorithm['none'] ).to eq described_class
+  it "is registered in HrrRbSsh::Transport::EncryptionAlgorithm.list_supported" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm.list_supported ).to include name
   end
 
-  it "appears as none in HrrRbSsh::Transport::EncryptionAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::EncryptionAlgorithm.name_list ).to include 'none'
+  it "not appears in HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred ).not_to include name
   end
 
   describe '#block_size' do

@@ -12,16 +12,16 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes192Cbc do
   let(:encryption_algorithm){ described_class.new direction, iv, key }
   let(:data){ ('a'..'z').to_a.sample(block_size).join }
 
-  it "is registered in HrrRbSsh::Transport::EncryptionAlgorithm.list" do
-    expect( HrrRbSsh::Transport::EncryptionAlgorithm.list ).to include described_class
-  end
-
   it "can be looked up in HrrRbSsh::Transport::EncryptionAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::EncryptionAlgorithm[name] ).to eq described_class
-  end
+  end       
 
-  it "appears in HrrRbSsh::Transport::EncryptionAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::EncryptionAlgorithm.name_list ).to include name
+  it "is registered in HrrRbSsh::Transport::EncryptionAlgorithm.list_supported" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm.list_supported ).to include name
+  end         
+
+  it "appears in HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred" do
+    expect( HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred ).to include name
   end
 
   context "when direction is outgoing" do
