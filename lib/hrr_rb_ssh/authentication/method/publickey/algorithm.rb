@@ -3,7 +3,7 @@
 
 module HrrRbSsh
   class Authentication
-    module Method
+    class Method
       class Publickey
         module Algorithm
           def self.list

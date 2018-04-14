@@ -2,17 +2,21 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Authentication::Method do
-  describe '.[]' do
-    context "when arg is unregistered" do
-      it "returns nil" do
-        expect( HrrRbSsh::Authentication::Method['unregistered'] ).to be nil
-      end
+  describe '[key]' do
+    it "returns nil for dummy key" do
+      expect( described_class['dummy key'] ).to be nil
     end
   end
 
-  describe '.name_list' do
+  describe '.list_supported' do
     it "returns an instance of Array" do
-      expect( HrrRbSsh::Authentication::Method.name_list ).to be_an_instance_of Array
+      expect( described_class.list_supported ).to be_an_instance_of Array
+    end
+  end
+
+  describe '.list_preferred' do
+    it "returns an instance of Array" do
+      expect( described_class.list_preferred ).to be_an_instance_of Array
     end
   end
 end

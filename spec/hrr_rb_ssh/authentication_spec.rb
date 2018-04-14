@@ -149,7 +149,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:userauth_failure_message){
       {
         'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
-        'authentications that can continue' => HrrRbSsh::Authentication::Method.name_list,
+        'authentications that can continue' => HrrRbSsh::Authentication::Method.list_preferred,
         'partial success'                   => false,
       }
     }

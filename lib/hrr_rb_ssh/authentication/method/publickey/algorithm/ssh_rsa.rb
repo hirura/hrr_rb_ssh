@@ -5,7 +5,7 @@ require 'hrr_rb_ssh/data_type'
 
 module HrrRbSsh
   class Authentication
-    module Method
+    class Method
       class Publickey
         module Algorithm
           class SshRsa < Algorithm

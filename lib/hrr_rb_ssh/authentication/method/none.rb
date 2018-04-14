@@ -1,17 +1,17 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/authentication/method/method'
+require 'hrr_rb_ssh/logger'
 
 module HrrRbSsh
   class Authentication
-    module Method
+    class Method
       class None < Method
         NAME = 'none'
+        PREFERENCE = 0
 
         def initialize options
-          super
-
+          @logger = HrrRbSsh::Logger.new(self.class.name)
           @authenticator = options.fetch( 'authentication_none_authenticator', Authenticator.new { false } )
         end
 

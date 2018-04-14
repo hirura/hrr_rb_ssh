@@ -5,7 +5,7 @@ require 'hrr_rb_ssh/logger'
 
 module HrrRbSsh
   class Authentication
-    module Method
+    class Method
       class None
         class Context
           attr_reader :username

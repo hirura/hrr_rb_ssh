@@ -4,17 +4,17 @@
 RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
   let(:name){ 'publickey' }
 
-  it "is registered in HrrRbSsh::Authentication::Method.list" do
-    expect( HrrRbSsh::Authentication::Method.list ).to include described_class
-  end         
-
   it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
     expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
-  end           
+  end                              
 
-  it "appears in HrrRbSsh::Authentication::Method.name_list" do
-    expect( HrrRbSsh::Authentication::Method.name_list ).to include name
-  end             
+  it "is registered in HrrRbSsh::Authentication::Method.list_supported" do
+    expect( HrrRbSsh::Authentication::Method.list_supported ).to include name
+  end         
+
+  it "appears in HrrRbSsh::Authentication::Method.list_preferred" do
+    expect( HrrRbSsh::Authentication::Method.list_preferred ).to include name
+  end           
 
   let(:session_id){ 'session id' }
   let(:authentication_publickey_authenticator){ 'authentication_publickey_authenticator' }

@@ -6,7 +6,7 @@ require 'hrr_rb_ssh/authentication/method/publickey/algorithm/codable'
 
 module HrrRbSsh
   class Authentication
-    module Method
+    class Method
       class Publickey
         module Algorithm
           class Algorithm
