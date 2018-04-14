@@ -1,15 +1,18 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/data_type'
+require 'hrr_rb_ssh/authentication/method/publickey/algorithm/codable'
 
 module HrrRbSsh
   class Authentication
     class Method
       class Publickey
-        module Algorithm
+        class Algorithm
           class SshDss < Algorithm
-            NAME   = 'ssh-dss'
+            NAME = 'ssh-dss'
+            PREFERENCE = 10
             DIGEST = 'sha1'
 
             PUBLIC_KEY_BLOB_DEFINITION = [
@@ -35,6 +38,12 @@ module HrrRbSsh
               [DataType::String,  'public key algorithm name'],
               [DataType::String,  'public key blob'],
             ]
+
+            include Codable
+
+            def initialize
+              @logger = HrrRbSsh::Logger.new(self.class.name)
+            end
 
             def verify_public_key public_key_algorithm_name, public_key, public_key_blob
               public_key = case public_key

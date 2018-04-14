@@ -6,17 +6,17 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Algorithm::SshDss do
   let(:digest){ 'sha1' }
   let(:algorithm){ described_class.new }
 
-  it "is registered in HrrRbSsh::Authentication::Method::Publickey::Algorithm.list" do
-    expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm.list ).to include described_class
-  end         
-
   it "can be looked up in HrrRbSsh::Authentication::Method::Publickey::Algorithm dictionary" do
     expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm[name] ).to eq described_class
-  end           
+  end       
 
-  it "appears in HrrRbSsh::Authentication::Method::Publickey::Algorithm.name_list" do
-    expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm.name_list ).to include name
-  end             
+  it "is registered in HrrRbSsh::Authentication::Method::Publickey::Algorithm.list_supported" do
+    expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm.list_supported ).to include name
+  end         
+
+  it "appears in HrrRbSsh::Authentication::Method::Publickey::Algorithm.list_preferred" do
+    expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm.list_preferred ).to include name
+  end
 
   describe "::NAME" do
     it "is available" do

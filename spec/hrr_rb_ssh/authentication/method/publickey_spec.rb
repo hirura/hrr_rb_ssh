@@ -55,17 +55,17 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
 
     context "when 'public key algorithm name' is supported" do
       let(:algorithm_class){
-        class AlgorithmClass
-          NAME = 'supported'
+        Class.new do
+          const_set(:NAME, 'supported')
+          const_set(:PREFERENCE, 100)
         end
-        AlgorithmClass
       }
       before :example do
-        HrrRbSsh::Authentication::Method::Publickey::Algorithm.list.push algorithm_class
+        HrrRbSsh::Authentication::Method::Publickey::Algorithm.instance_variable_get('@subclass_list').push algorithm_class
       end
 
       after :example do
-        HrrRbSsh::Authentication::Method::Publickey::Algorithm.list.delete algorithm_class
+        HrrRbSsh::Authentication::Method::Publickey::Algorithm.instance_variable_get('@subclass_list').delete algorithm_class
       end
 
       context "when 'with signature' is false" do

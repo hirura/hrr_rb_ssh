@@ -7,7 +7,7 @@ module HrrRbSsh
   class Authentication
     class Method
       class Publickey
-        module Algorithm
+        class Algorithm
           module Codable
             def encode definition, payload
               definition.map{ |data_type, field_name|

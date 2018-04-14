@@ -18,7 +18,7 @@ module HrrRbSsh
 
         def authenticate userauth_request_message
           public_key_algorithm_name = userauth_request_message['public key algorithm name']
-          unless Algorithm.name_list.include?(public_key_algorithm_name)
+          unless Algorithm.list_preferred.include?(public_key_algorithm_name)
             @logger.info("unsupported public key algorithm: #{public_key_algorithm_name}")
             return false
           end
