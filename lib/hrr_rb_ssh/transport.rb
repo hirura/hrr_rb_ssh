@@ -233,6 +233,9 @@ module HrrRbSsh
             end
           rescue EOFError => e
             close
+          rescue IOError => e
+            @logger.warn("IO is closed")
+            close
           rescue Errno::ECONNRESET => e
             @logger.warn("IO is RESET")
             close
