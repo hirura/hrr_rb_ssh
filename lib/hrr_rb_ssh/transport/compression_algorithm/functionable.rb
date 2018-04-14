@@ -2,18 +2,18 @@
 # vim: et ts=2 sw=2
 
 require 'zlib'
+require 'hrr_rb_ssh/logger'
 
 module HrrRbSsh
   class Transport
     class CompressionAlgorithm
       module Functionable
         def initialize direction
-          super
-
+          @logger = HrrRbSsh::Logger.new(self.class.name)
           case direction
-          when HrrRbSsh::Transport::Direction::OUTGOING
+          when Direction::OUTGOING
             @deflator = ::Zlib::Deflate.new
-          when HrrRbSsh::Transport::Direction::INCOMING
+          when Direction::INCOMING
             @inflator = ::Zlib::Inflate.new
           end
         end

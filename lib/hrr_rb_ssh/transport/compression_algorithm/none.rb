@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/transport/compression_algorithm/compression_algorithm'
 require 'hrr_rb_ssh/transport/compression_algorithm/unfunctionable'
 
 module HrrRbSsh
@@ -9,11 +8,7 @@ module HrrRbSsh
     class CompressionAlgorithm
       class None < CompressionAlgorithm
         NAME = 'none'
-
-        def initialize direction=nil
-          super
-        end
-
+        PREFERENCE = 20
         include Unfunctionable
       end
     end

@@ -2,15 +2,20 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::None do
-  let(:compression_algorithm){ HrrRbSsh::Transport::CompressionAlgorithm::None.new }
+  let(:name){ 'none' }
+  let(:compression_algorithm){ described_class.new }
   let(:test_data){ "test data" }
 
-  it "is registered as none in HrrRbSsh::Transport::CompressionAlgorithm.list" do
-    expect( HrrRbSsh::Transport::CompressionAlgorithm['none'] ).to eq HrrRbSsh::Transport::CompressionAlgorithm::None
+  it "can be looked up in HrrRbSsh::Transport::CompressionAlgorithm dictionary" do
+    expect( HrrRbSsh::Transport::CompressionAlgorithm[name] ).to eq described_class
   end
 
-  it "appears as none in HrrRbSsh::Transport::CompressionAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::CompressionAlgorithm.name_list ).to include 'none'
+  it "is registered in HrrRbSsh::Transport::CompressionAlgorithm.list_supported" do
+    expect( HrrRbSsh::Transport::CompressionAlgorithm.list_supported ).to include name
+  end
+
+  it "not appears in HrrRbSsh::Transport::CompressionAlgorithm.list_preferred" do
+    expect( HrrRbSsh::Transport::CompressionAlgorithm.list_preferred ).to include name
   end
 
   describe '#deflate' do

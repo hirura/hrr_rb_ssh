@@ -23,8 +23,8 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXINIT do
   let(:encryption_algorithms){ HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred }
   let(:mac_algorithms){ HrrRbSsh::Transport::MacAlgorithm.name_list }
   let(:mac_algorithms){ HrrRbSsh::Transport::MacAlgorithm.name_list }
-  let(:compression_algorithms){ HrrRbSsh::Transport::CompressionAlgorithm.name_list }
-  let(:compression_algorithms){ HrrRbSsh::Transport::CompressionAlgorithm.name_list }
+  let(:compression_algorithms){ HrrRbSsh::Transport::CompressionAlgorithm.list_preferred }
+  let(:compression_algorithms){ HrrRbSsh::Transport::CompressionAlgorithm.list_preferred }
   let(:message){
     {
       'message number'                          => value,

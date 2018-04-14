@@ -246,8 +246,8 @@ module HrrRbSsh
       @local_encryption_algorithms_server_to_client  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
       @local_mac_algorithms_client_to_server         = HrrRbSsh::Transport::MacAlgorithm.name_list
       @local_mac_algorithms_server_to_client         = HrrRbSsh::Transport::MacAlgorithm.name_list
-      @local_compression_algorithms_client_to_server = HrrRbSsh::Transport::CompressionAlgorithm.name_list
-      @local_compression_algorithms_server_to_client = HrrRbSsh::Transport::CompressionAlgorithm.name_list
+      @local_compression_algorithms_client_to_server = HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+      @local_compression_algorithms_server_to_client = HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
     end
 
     def initialize_algorithms

@@ -5,17 +5,17 @@ RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::Zlib do
   let(:name){ 'zlib' }
   let(:compression_algorithm){ described_class.new direction }
 
-  it "is registered in HrrRbSsh::Transport::CompressionAlgorithm.list" do
-    expect( HrrRbSsh::Transport::CompressionAlgorithm.list ).to include described_class
-  end
-
   it "can be looked up in HrrRbSsh::Transport::CompressionAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::CompressionAlgorithm[name] ).to eq described_class
-  end
+  end       
 
-  it "appears in HrrRbSsh::Transport::CompressionAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::CompressionAlgorithm.name_list ).to include name
-  end
+  it "is registered in HrrRbSsh::Transport::CompressionAlgorithm.list_supported" do
+    expect( HrrRbSsh::Transport::CompressionAlgorithm.list_supported ).to include name
+  end         
+
+  it "not appears in HrrRbSsh::Transport::CompressionAlgorithm.list_preferred" do
+    expect( HrrRbSsh::Transport::CompressionAlgorithm.list_preferred ).to include name
+  end           
 
   context "when direction is outgoing" do
     let(:direction){ HrrRbSsh::Transport::Direction::OUTGOING }
