@@ -191,6 +191,9 @@ module HrrRbSsh
               break
             end
             @sender.send self, payload
+          rescue Errno::EPIPE => e
+            @logger.warn("IO is Broken PIPE")
+            close
           rescue => e
             @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
             close
