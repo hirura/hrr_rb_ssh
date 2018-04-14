@@ -240,7 +240,7 @@ module HrrRbSsh
     end
 
     def initialize_local_algorithms
-      @local_kex_algorithms                          = HrrRbSsh::Transport::KexAlgorithm.name_list
+      @local_kex_algorithms                          = HrrRbSsh::Transport::KexAlgorithm.list_preferred
       @local_server_host_key_algorithms              = HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
       @local_encryption_algorithms_client_to_server  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
       @local_encryption_algorithms_server_to_client  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred

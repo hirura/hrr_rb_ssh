@@ -1,19 +1,14 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/subclass_with_preference_listable'
+
 module HrrRbSsh
   class Transport
     class KexAlgorithm
-      def self.list
-        KexAlgorithm.list
-      end
-
-      def self.name_list
-        KexAlgorithm.name_list
-      end
-
-      def self.[] key
-        KexAlgorithm[key]
+      @subclass_list = Array.new
+      class << self
+        include SubclassWithPreferenceListable
       end
     end
   end

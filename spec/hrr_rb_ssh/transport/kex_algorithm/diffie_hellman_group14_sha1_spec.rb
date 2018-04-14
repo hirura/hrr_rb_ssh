@@ -40,17 +40,17 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
     remote_dh.pub_key.to_i
   }
 
-  it "is registered in HrrRbSsh::Transport::KexAlgorithm.list" do
-    expect( HrrRbSsh::Transport::KexAlgorithm.list ).to include described_class
-  end
-
   it "can be looked up in HrrRbSsh::Transport::KexAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::KexAlgorithm[name] ).to eq described_class
-  end
+  end       
 
-  it "appears in HrrRbSsh::Transport::KexAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::KexAlgorithm.name_list ).to include name
-  end
+  it "is registered in HrrRbSsh::Transport::KexAlgorithm.list_supported" do
+    expect( HrrRbSsh::Transport::KexAlgorithm.list_supported ).to include name
+  end         
+
+  it "appears in HrrRbSsh::Transport::KexAlgorithm.list_preferred" do
+    expect( HrrRbSsh::Transport::KexAlgorithm.list_preferred ).to include name
+  end           
 
   describe '::P' do
     it "has diffie hellman group 14's p" do

@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/transport/kex_algorithm/kex_algorithm'
 require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman'
 
 module HrrRbSsh
@@ -9,7 +8,8 @@ module HrrRbSsh
     class KexAlgorithm
       class DiffieHellmanGroup14Sha1 < KexAlgorithm
         NAME = 'diffie-hellman-group14-sha1'
-
+        PREFERENCE = 20
+        DIGEST = 'sha1'
         P = \
           "FFFFFFFF" "FFFFFFFF" "C90FDAA2" "2168C234" \
           "C4C6628B" "80DC1CD1" "29024E08" "8A67CC74" \
@@ -28,9 +28,6 @@ module HrrRbSsh
           "3995497C" "EA956AE5" "15D22618" "98FA0510" \
           "15728E5A" "8AACAA68" "FFFFFFFF" "FFFFFFFF"
         G = 2
-
-        DIGEST = 'sha1'
-
         include DiffieHellman
       end
     end

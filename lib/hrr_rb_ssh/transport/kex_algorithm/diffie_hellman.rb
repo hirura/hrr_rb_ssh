@@ -2,6 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'openssl'
+require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/data_type'
 
 module HrrRbSsh
@@ -20,8 +21,7 @@ module HrrRbSsh
         ]
 
         def initialize
-          super
-
+          @logger = HrrRbSsh::Logger.new(self.class.name)
           @dh = OpenSSL::PKey::DH.new
           if @dh.respond_to?(:set_pqg)
             @dh.set_pqg OpenSSL::BN.new(self.class::P, 16), nil, OpenSSL::BN.new(self.class::G)
