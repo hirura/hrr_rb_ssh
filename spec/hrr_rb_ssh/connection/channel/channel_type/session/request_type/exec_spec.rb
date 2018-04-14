@@ -4,16 +4,8 @@
 RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Exec do
   let(:name){ 'exec' }
 
-  it "is registered in HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType.list" do
-    expect( HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType.list ).to include described_class
-  end
-
   it "can be looked up in HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType dictionary" do
-    expect( HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType[name] ).to eq described_class
-  end
-
-  it "appears in HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType.name_list" do
-    expect( HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType.name_list ).to include name
+    expect( HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType[name] ).to be described_class
   end
 
   describe ".run" do

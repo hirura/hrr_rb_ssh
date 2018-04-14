@@ -3,14 +3,13 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/request_handler'
-require 'hrr_rb_ssh/connection/channel/channel_type/session/request_type/request_type'
 
 module HrrRbSsh
   class Connection
     class Channel
       class ChannelType
         class Session
-          module RequestType
+          class RequestType
             class Env < RequestType
               NAME = 'env'
 

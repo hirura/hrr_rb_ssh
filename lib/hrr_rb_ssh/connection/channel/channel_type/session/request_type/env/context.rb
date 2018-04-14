@@ -8,7 +8,7 @@ module HrrRbSsh
     class Channel
       class ChannelType
         class Session
-          module RequestType
+          class RequestType
             class Env
               class Context
                 attr_reader \
