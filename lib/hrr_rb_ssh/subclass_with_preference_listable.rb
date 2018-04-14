@@ -16,7 +16,7 @@ module HrrRbSsh
     end
 
     def list_preferred
-      __subclass_list__(__method__).select{ |klass| klass::PREFERENCE.positive? }.sort_by{ |klass| klass::PREFERENCE }.reverse.map{ |klass| klass::NAME }
+      __subclass_list__(__method__).select{ |klass| klass::PREFERENCE > 0 }.sort_by{ |klass| klass::PREFERENCE }.reverse.map{ |klass| klass::NAME }
     end
 
     def __subclass_list__ method_name
