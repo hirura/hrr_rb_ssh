@@ -378,8 +378,8 @@ RSpec.describe HrrRbSsh::Transport do
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
+        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_s).to eq []
@@ -764,8 +764,8 @@ RSpec.describe HrrRbSsh::Transport do
           "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list,
           "encryption_algorithms_client_to_server"  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
           "encryption_algorithms_server_to_client"  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
-          "mac_algorithms_client_to_server"         => HrrRbSsh::Transport::MacAlgorithm.name_list,
-          "mac_algorithms_server_to_client"         => HrrRbSsh::Transport::MacAlgorithm.name_list,
+          "mac_algorithms_client_to_server"         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
+          "mac_algorithms_server_to_client"         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
           "compression_algorithms_client_to_server" => HrrRbSsh::Transport::CompressionAlgorithm.list_preferred,
           "compression_algorithms_server_to_client" => HrrRbSsh::Transport::CompressionAlgorithm.list_preferred,
           "languages_client_to_server"              => [],
@@ -794,8 +794,8 @@ RSpec.describe HrrRbSsh::Transport do
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.name_list
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
+        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
         expect(HrrRbSsh::DataType::NameList.decode i_c).to eq []

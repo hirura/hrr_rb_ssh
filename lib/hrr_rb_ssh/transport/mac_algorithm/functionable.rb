@@ -8,8 +8,7 @@ module HrrRbSsh
     class MacAlgorithm
       module Functionable
         def initialize key
-          super
-
+          @logger = HrrRbSsh::Logger.new(self.class.name)
           @key = key
         end
 

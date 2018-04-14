@@ -244,8 +244,8 @@ module HrrRbSsh
       @local_server_host_key_algorithms              = HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list
       @local_encryption_algorithms_client_to_server  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
       @local_encryption_algorithms_server_to_client  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-      @local_mac_algorithms_client_to_server         = HrrRbSsh::Transport::MacAlgorithm.name_list
-      @local_mac_algorithms_server_to_client         = HrrRbSsh::Transport::MacAlgorithm.name_list
+      @local_mac_algorithms_client_to_server         = HrrRbSsh::Transport::MacAlgorithm.list_preferred
+      @local_mac_algorithms_server_to_client         = HrrRbSsh::Transport::MacAlgorithm.list_preferred
       @local_compression_algorithms_client_to_server = HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
       @local_compression_algorithms_server_to_client = HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
     end

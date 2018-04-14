@@ -7,6 +7,10 @@ module HrrRbSsh
   class Transport
     class MacAlgorithm
       module Unfunctionable
+        def initialize key=nil
+          @logger = HrrRbSsh::Logger.new(self.class.name)
+        end
+
         def digest_length
           self.class::DIGEST_LENGTH
         end

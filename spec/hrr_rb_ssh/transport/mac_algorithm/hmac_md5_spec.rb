@@ -11,17 +11,17 @@ RSpec.describe HrrRbSsh::Transport::MacAlgorithm::HmacMd5 do
   let(:sequence_number){ 0 }
   let(:unencrypted_packet){ "testing" }
 
-  it "is registered in HrrRbSsh::Transport::MacAlgorithm.list" do
-    expect( HrrRbSsh::Transport::MacAlgorithm.list ).to include described_class
-  end
-
   it "can be looked up in HrrRbSsh::Transport::MacAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::MacAlgorithm[name] ).to eq described_class
-  end
+  end       
 
-  it "appears in HrrRbSsh::Transport::MacAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::MacAlgorithm.name_list ).to include name
-  end
+  it "is registered in HrrRbSsh::Transport::MacAlgorithm.list_supported" do
+    expect( HrrRbSsh::Transport::MacAlgorithm.list_supported ).to include name
+  end         
+
+  it "appears in HrrRbSsh::Transport::MacAlgorithm.list_preferred" do
+    expect( HrrRbSsh::Transport::MacAlgorithm.list_preferred ).to include name
+  end           
 
   describe '#digest_length' do
     it "returns expected digest length" do

@@ -21,8 +21,8 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXINIT do
   let(:server_host_key_algorithms){ HrrRbSsh::Transport::ServerHostKeyAlgorithm.name_list }
   let(:encryption_algorithms){ HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred }
   let(:encryption_algorithms){ HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred }
-  let(:mac_algorithms){ HrrRbSsh::Transport::MacAlgorithm.name_list }
-  let(:mac_algorithms){ HrrRbSsh::Transport::MacAlgorithm.name_list }
+  let(:mac_algorithms){ HrrRbSsh::Transport::MacAlgorithm.list_preferred }
+  let(:mac_algorithms){ HrrRbSsh::Transport::MacAlgorithm.list_preferred }
   let(:compression_algorithms){ HrrRbSsh::Transport::CompressionAlgorithm.list_preferred }
   let(:compression_algorithms){ HrrRbSsh::Transport::CompressionAlgorithm.list_preferred }
   let(:message){

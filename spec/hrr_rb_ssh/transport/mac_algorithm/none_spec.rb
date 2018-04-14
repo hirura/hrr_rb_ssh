@@ -2,16 +2,21 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Transport::MacAlgorithm::None do
+  let(:name){ 'none' }
   let(:mac_algorithm){ described_class.new }
   let(:sequence_number){ 0 }
   let(:unencrypted_packet){ "dummy unencrypted_packet" }
 
-  it "is registered as none in list of HrrRbSsh::Transport::MacAlgorithm" do
-    expect( HrrRbSsh::Transport::MacAlgorithm['none'] ).to eq HrrRbSsh::Transport::MacAlgorithm::None
+  it "can be looked up in HrrRbSsh::Transport::MacAlgorithm dictionary" do
+    expect( HrrRbSsh::Transport::MacAlgorithm[name] ).to eq described_class
   end
 
-  it "appears as none in HrrRbSsh::Transport::MacAlgorithm.name_list" do
-    expect( HrrRbSsh::Transport::MacAlgorithm.name_list ).to include 'none'
+  it "is registered in HrrRbSsh::Transport::MacAlgorithm.list_supported" do
+    expect( HrrRbSsh::Transport::MacAlgorithm.list_supported ).to include name
+  end
+
+  it "not appears in HrrRbSsh::Transport::MacAlgorithm.list_preferred" do
+    expect( HrrRbSsh::Transport::MacAlgorithm.list_preferred ).not_to include name
   end
 
   describe '#compute' do
