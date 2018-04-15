@@ -1,6 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'monitor'
 require 'hrr_rb_ssh/version'
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/data_type'
@@ -48,14 +49,13 @@ module HrrRbSsh
       @closed = nil
       @disconnected = nil
 
+      @in_kex = false
+
       @sender   = HrrRbSsh::Transport::Sender.new
       @receiver = HrrRbSsh::Transport::Receiver.new
 
-      @send_queue    = Queue.new
-      @receive_queue = Queue.new
-
-      @sender_thread   = nil
-      @receiver_thread = nil
+      @sender_monitor   = Monitor.new
+      @receiver_monitor = Monitor.new
 
       @local_version  = "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}".force_encoding(Encoding::ASCII_8BIT)
       @remote_version = "".force_encoding(Encoding::ASCII_8BIT)
@@ -78,19 +78,75 @@ module HrrRbSsh
     end
 
     def send payload
-      begin
-        @send_queue.enq payload
-      rescue ClosedQueueError => e
-        raise HrrRbSsh::ClosedTransportError
+      @sender_monitor.synchronize do
+        begin
+          @sender.send self, payload
+        rescue Errno::EPIPE => e
+          @logger.warn("IO is Broken PIPE")
+          close
+          raise HrrRbSsh::ClosedTransportError
+        rescue => e
+          @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+          close
+          raise HrrRbSsh::ClosedTransportError
+        end
       end
     end
 
     def receive
-      payload = @receive_queue.deq
-      if @receive_queue.closed?
-        raise HrrRbSsh::ClosedTransportError
+      raise ClosedTransportError if @closed
+      @receiver_monitor.synchronize do
+        begin
+          payload = @receiver.receive self
+          case payload[0,1].unpack("C")[0]
+          when HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE
+            message = HrrRbSsh::Message::SSH_MSG_DISCONNECT.decode payload
+            @logger.debug("received disconnect message: #{message.inspect}")
+            @disconnected = true
+            close
+            raise ClosedTransportError
+          when HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE
+            message = HrrRbSsh::Message::SSH_MSG_IGNORE.decode payload
+            @logger.debug("received ignore message: #{message.inspect}")
+            receive
+          when HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE
+            message = HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.decode payload
+            @logger.debug("received unimplemented message: #{message.inspect}")
+            receive
+          when HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE
+            message = HrrRbSsh::Message::SSH_MSG_DEBUG.decode payload
+            @logger.debug("received debug message: #{message.inspect}")
+            receive
+          when HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE
+            @logger.debug("received kexinit message")
+            if @in_kex
+              payload
+            else
+              exchange_key payload
+              receive
+            end
+          else
+            payload
+          end
+        rescue ClosedTransportError
+          raise ClosedTransportError
+        rescue EOFError => e
+          close
+          raise ClosedTransportError
+        rescue IOError => e
+          @logger.warn("IO is closed")
+          close
+          raise ClosedTransportError
+        rescue Errno::ECONNRESET => e
+          @logger.warn("IO is RESET")
+          close
+          raise ClosedTransportError
+        rescue => e
+          @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+          close
+          raise ClosedTransportError
+        end
       end
-      payload
     end
 
     def start
@@ -112,9 +168,6 @@ module HrrRbSsh
         @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
         close
       else
-        @sender_thread   = sender_thread
-        @receiver_thread = receiver_thread
-
         @logger.info("transport started")
       end
     end
@@ -123,8 +176,6 @@ module HrrRbSsh
       return if @closed
       @logger.info("close transport")
       @closed = true
-      @send_queue.close
-      @receive_queue.close
       disconnect
       @logger.info("transport closed")
     end
@@ -154,20 +205,29 @@ module HrrRbSsh
       update_version_strings
     end
 
-    def exchange_key
-      send_kexinit
-      receive_kexinit
+    def exchange_key payload=nil
+      @in_kex = true
+      @sender_monitor.synchronize do
+        @receiver_monitor.synchronize do
+          send_kexinit
+          if payload
+            receive_kexinit payload
+          else
+            receive_kexinit receive
+          end
+          update_kex_and_server_host_key_algorithms
 
-      update_kex_and_server_host_key_algorithms
+          case @mode
+          when HrrRbSsh::Transport::Mode::SERVER
+            receive_kexdh_init receive
+            send_kexdh_reply
 
-      case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
-        receive_kexdh_init
-        send_kexdh_reply
-
-        send_newkeys
-        receive_newkeys
+            send_newkeys
+            receive_newkeys receive
+          end
+        end
       end
+      @in_kex = false
     end
 
     def verify_service_request
@@ -178,74 +238,6 @@ module HrrRbSsh
       else
         close
       end
-    end
-
-    def sender_thread
-      Thread.start {
-        @logger.info("start sender thread")
-        loop do
-          begin
-            payload = @send_queue.deq
-            if @send_queue.closed?
-              @logger.info("closing sender thread")
-              break
-            end
-            @sender.send self, payload
-          rescue Errno::EPIPE => e
-            @logger.warn("IO is Broken PIPE")
-            close
-          rescue => e
-            @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
-            close
-          end
-        end
-        @logger.info("sender thread closed")
-      }
-    end
-
-    def receiver_thread
-      Thread.start {
-        @logger.info("start receiver thread")
-        loop do
-          if @receive_queue.closed?
-            @logger.info("closing receiver thread")
-            break
-          end
-          begin
-            payload = @receiver.receive self
-            case payload[0,1].unpack("C")[0]
-            when HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE
-              message = HrrRbSsh::Message::SSH_MSG_DISCONNECT.decode payload
-              @logger.debug("received disconnect message: #{message.inspect}")
-              @disconnected = true
-              close
-            when HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE
-              message = HrrRbSsh::Message::SSH_MSG_IGNORE.decode payload
-              @logger.debug("received ignore message: #{message.inspect}")
-            when HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE
-              message = HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.decode payload
-              @logger.debug("received unimplemented message: #{message.inspect}")
-            when HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE
-              message = HrrRbSsh::Message::SSH_MSG_DEBUG.decode payload
-              @logger.debug("received debug message: #{message.inspect}")
-            else
-              @receive_queue.enq payload
-            end
-          rescue EOFError => e
-            close
-          rescue IOError => e
-            @logger.warn("IO is closed")
-            close
-          rescue Errno::ECONNRESET => e
-            @logger.warn("IO is RESET")
-            close
-          rescue => e
-            @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
-            close
-          end
-        end
-        @logger.info("receiver thread closed")
-      }
     end
 
     def initialize_local_algorithms
@@ -307,7 +299,7 @@ module HrrRbSsh
         "language tag"   => ""
       }
       payload = HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode message
-      @sender.send self, payload
+      send payload
     end
 
     def send_kexinit
@@ -328,7 +320,7 @@ module HrrRbSsh
         '0 (reserved for future extension)'       => 0,
       }
       payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode message
-      @sender.send self, payload
+      send payload
 
       case @mode
       when HrrRbSsh::Transport::Mode::SERVER
@@ -338,27 +330,20 @@ module HrrRbSsh
       end
     end
 
-    def receive_kexinit
-      payload = @receiver.receive self
-
+    def receive_kexinit payload
       case @mode
       when HrrRbSsh::Transport::Mode::SERVER
         @i_c = payload
       when HrrRbSsh::Transport::Mode::CLIENT
         @i_s = payload
       end
-
       message = HrrRbSsh::Message::SSH_MSG_KEXINIT.decode payload
-
       update_remote_algorithms message
     end
 
-    def receive_kexdh_init
-      payload = @receiver.receive self
+    def receive_kexdh_init payload
       message = HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.decode payload
-
       @kex_algorithm.set_e message['e']
-
       @session_id ||= @kex_algorithm.hash self
     end
 
@@ -370,7 +355,7 @@ module HrrRbSsh
           'signature of H'                                => @kex_algorithm.sign(self),
         }
         payload = HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.encode message
-        @sender.send self, payload
+        send payload
     end
 
     def send_newkeys
@@ -378,11 +363,10 @@ module HrrRbSsh
           'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
         }
         payload = HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode message
-        @sender.send self, payload
+        send payload
     end
 
-    def receive_newkeys
-      payload = @receiver.receive self
+    def receive_newkeys payload
       message = HrrRbSsh::Message::SSH_MSG_NEWKEYS.decode payload
 
       update_encryption_mac_compression_algorithms
@@ -401,7 +385,7 @@ module HrrRbSsh
           'service name'   => service_name,
         }
         payload = HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode message
-        @sender.send self, payload
+        send payload
     end
 
     def update_remote_algorithms message

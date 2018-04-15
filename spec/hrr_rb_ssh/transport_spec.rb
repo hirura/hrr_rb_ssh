@@ -88,19 +88,29 @@ RSpec.describe HrrRbSsh::Transport do
     let(:mock_sender){ double("mock sender") }
     let(:payload){ "testing" }
 
-    context "when send_queue is not closed" do
+    before :example do
+      transport.instance_variable_set('@sender', mock_sender)
+    end
+
+    context "when sender can send payload" do
       it "sends payload" do
-        transport.send payload
-        expect(transport.instance_variable_get('@send_queue').deq).to eq payload
+        expect(mock_sender).to receive(:send).with(transport, payload)
+        expect(transport.send payload).to be nil
       end
     end
 
-    context "when send_queue is closed" do
-      before :example do
-        transport.instance_variable_get('@send_queue').close
+    context "when sender raises Errno::EPIPE error" do
+      it "closes transport and raises HrrRbSsh::ClosedTransportError" do
+        expect(mock_sender).to receive(:send).with(transport, payload).and_raise(Errno::EPIPE)
+        expect(transport).to receive(:close).with(no_args)
+        expect { transport.send payload }.to raise_error HrrRbSsh::ClosedTransportError
       end
+    end
 
-      it "raises HrrRbSsh::ClosedTransportError" do
+    context "when sender raises unexpected error" do
+      it "closes transport and raises HrrRbSsh::ClosedTransportError" do
+        expect(mock_sender).to receive(:send).with(transport, payload).and_raise(RuntimeError)
+        expect(transport).to receive(:close).with(no_args)
         expect { transport.send payload }.to raise_error HrrRbSsh::ClosedTransportError
       end
     end
@@ -113,23 +123,148 @@ RSpec.describe HrrRbSsh::Transport do
     let(:mock_receiver){ double("mock receiver") }
     let(:payload){ "testing" }
 
-    context "when receive_queue is not closed" do
-      before :example do
-        transport.instance_variable_get('@receive_queue').enq payload
-      end
-
-      it "receives payload" do
-        expect(transport.receive).to eq payload
-      end
+    before :example do
+      transport.instance_variable_set('@receiver', mock_receiver)
     end
 
-    context "when receive_queue is closed" do
+    context "when transport is closed" do
       before :example do
-        transport.instance_variable_get('@receive_queue').close
+        transport.instance_variable_set('@closed', true)
       end
 
       it "raises HrrRbSsh::ClosedTransportError" do
         expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+      end
+    end
+
+    context "when transport is not closed" do
+      before :example do
+        transport.instance_variable_set('@closed', false)
+      end
+
+      context "when receives disconnect message" do
+        let(:disconnect_message){
+          {
+            'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+            'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+            'description'    => 'disconnected by user',
+            'language tag'   => '',
+          }
+        }
+        let(:disconnect_payload){
+          HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+        }
+
+        it "closes transport and raises ClosedTransportError" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
+          expect(transport).to receive(:close).with(no_args)
+          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+        end
+      end
+
+      context "when receives ignore message and then some message" do
+        let(:ignore_message){
+          {
+            'message number' => HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE,
+            'data'           => 'ignored',
+          }
+        }
+        let(:ignore_payload){
+          HrrRbSsh::Message::SSH_MSG_IGNORE.encode ignore_message
+        }
+
+        it "ignores message" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(ignore_payload).once
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(payload).once
+          expect(transport.receive).to eq payload
+        end
+      end
+
+      context "when receives unimplemented message and then some message" do
+        let(:unimplemented_message){
+          {
+            'message number'                             => HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE,
+            'packet sequence number of rejected message' => 123,
+          }
+        }
+        let(:unimplemented_payload){
+          HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.encode unimplemented_message
+        }
+
+        it "receives unimplemented message and is finished" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(unimplemented_payload).once
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(payload).once
+          expect(transport.receive).to eq payload
+        end
+      end
+
+      context "when receives debug message and then some message" do
+        let(:debug_message){
+          {
+            'message number' => HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE,
+            'always_display' => true,
+            'message'        => 'message',
+            'language tag'   => 'language tag',
+          }
+        }
+        let(:debug_payload){
+          HrrRbSsh::Message::SSH_MSG_DEBUG.encode debug_message
+        }
+
+        it "receive debug message and is finished" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(debug_payload).once
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(payload).once
+          expect(transport.receive).to eq payload
+        end
+      end
+
+      context "when receives other message" do
+        let(:service_request_message){
+          {
+            'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
+            'service name'   => 'service name',
+          }
+        }
+        let(:service_request_payload){
+          HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.encode service_request_message
+        }
+
+        it "receive service_request message and is finished" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(service_request_payload).once
+          expect(transport.receive).to eq service_request_payload
+        end
+      end
+
+      context "when @receiver.receive returns EOFError" do
+        it "closes transport" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_raise(EOFError).once
+          expect(transport).to receive(:close).with(no_args)
+          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+        end
+      end
+
+      context "when @receiver.receive returns IOError" do
+        it "closes transport" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_raise(IOError).once
+          expect(transport).to receive(:close).with(no_args)
+          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+        end
+      end
+
+      context "when @receiver.receive returns Errno::ECONNRESET" do
+        it "closes transport" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_raise(Errno::ECONNRESET).once
+          expect(transport).to receive(:close).with(no_args)
+          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+        end
+      end
+
+      context "when @receiver.receive returns RuntimeError" do
+        it "closes transport" do
+          expect(mock_receiver).to receive(:receive).with(transport).and_raise(RuntimeError).once
+          expect(transport).to receive(:close).with(no_args)
+          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+        end
       end
     end
   end
@@ -141,13 +276,10 @@ RSpec.describe HrrRbSsh::Transport do
     describe "#start" do
       let(:transport){ described_class.new io, mode }
 
-      it "calls #exchange_version, #exchange_key, #verify_service_request, #sender_thread, and #receiver_thread" do
+      it "calls #exchange_version, #exchange_key, #verify_service_request" do
         expect(transport).to receive(:exchange_version).with(no_args).once
         expect(transport).to receive(:exchange_key).with(no_args).once
         expect(transport).to receive(:verify_service_request).with(no_args).once
-        expect(transport).to receive(:sender_thread).with(no_args).once
-        expect(transport).to receive(:receiver_thread).with(no_args).once
-
         transport.start
       end
     end
@@ -159,14 +291,10 @@ RSpec.describe HrrRbSsh::Transport do
         transport.instance_variable_set('@closed', false)
       end
 
-      it "closes @send_queue and @receive_queue, and calls disconnect" do
+      it "updates @closed with true, and calls disconnect" do
         expect(transport).to receive(:disconnect).with(no_args).once
-
-        expect(transport.instance_variable_get('@send_queue').closed?).to be false
-        expect(transport.instance_variable_get('@receive_queue').closed?).to be false
         transport.close
-        expect(transport.instance_variable_get('@send_queue').closed?).to be true
-        expect(transport.instance_variable_get('@receive_queue').closed?).to be true
+        expect(transport.instance_variable_get('@closed')).to be true
       end
     end
 
@@ -493,189 +621,6 @@ RSpec.describe HrrRbSsh::Transport do
           expect(mock_sender).to   receive(:send).with(transport, disconnect_payload).once
 
           transport.verify_service_request
-        end
-      end
-    end
-
-    describe "#sender_thread" do
-      let(:transport){ described_class.new io, mode }
-
-      let(:payload){ "testing" }
-
-      let(:mock_sender){ double("mock sender") }
-
-      before :example do
-        transport.instance_variable_set('@sender', mock_sender)
-      end
-
-      context "with no error" do
-        let(:mock_send_queue){ double("mock send_queue") }
-
-        before :example do
-          transport.instance_variable_set('@send_queue', mock_send_queue)
-        end
-
-        it "dequeues a payload and sends the payload, and exit when send_queue is closed" do
-          expect(mock_send_queue).to receive(:deq).with(no_args).and_return(payload).once
-          expect(mock_send_queue).to receive(:closed?).with(no_args).and_return(false).once
-          expect(mock_send_queue).to receive(:deq).with(no_args).and_return(nil).once
-          expect(mock_send_queue).to receive(:closed?).with(no_args).and_return(true).once
-
-          expect(mock_sender).to receive(:send).with(transport, payload).once
-          t = transport.sender_thread
-          expect { t.join }.not_to raise_error
-        end
-      end
-
-      context "with error" do
-        let(:send_queue){ transport.instance_variable_get('@send_queue') }
-
-        before :example do
-          transport.instance_variable_set('@closed', false)
-          transport.instance_variable_set('@disconnected', true)
-          send_queue.enq payload
-        end
-
-        it "dequeues a payload and sends the payload, and exit when send_queue is closed" do
-          expect(mock_sender).to receive(:send).with(transport, payload).and_raise(RuntimeError).once
-
-          t = transport.sender_thread
-          expect { t.join }.not_to raise_error
-        end
-      end
-    end
-
-    describe "#receiver_thread" do
-      let(:transport){ described_class.new io, mode }
-
-      let(:disconnect_message){
-        {
-          'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
-          'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-          'description'    => 'disconnected by user',
-          'language tag'   => '',
-        }
-      }
-      let(:disconnect_payload){
-        HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
-      }
-
-      let(:mock_receiver){ double("mock receiver") }
-      let(:receive_queue){ Queue.new }
-
-      before :example do
-        transport.instance_variable_set('@receiver', mock_receiver)
-        transport.instance_variable_set('@receive_queue', receive_queue)
-      end
-
-      context "when receives disconnect message" do
-        it "is finished" do
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.receiver_thread
-          t.join
-          expect(receive_queue.size).to eq 0
-        end
-      end
-
-      context "when receives ignore message and then disconnect message" do
-        let(:ignore_message){
-          {
-            'message number' => HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE,
-            'data'           => 'ignored',
-          }
-        }
-        let(:ignore_payload){
-          HrrRbSsh::Message::SSH_MSG_IGNORE.encode ignore_message
-        }
-
-        it "ignores message and is finished" do
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(ignore_payload).once
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.receiver_thread
-          t.join
-          expect(receive_queue.size).to eq 0
-        end
-      end
-
-      context "when receives unimplemented message and then disconnect message" do
-        let(:unimplemented_message){
-          {
-            'message number'                             => HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE,
-            'packet sequence number of rejected message' => 123,
-          }
-        }
-        let(:unimplemented_payload){
-          HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.encode unimplemented_message
-        }
-
-        it "receives unimplemented message and is finished" do
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(unimplemented_payload).once
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.receiver_thread
-          t.join
-          expect(receive_queue.size).to eq 0
-        end
-      end
-
-      context "when receives debug message and then disconnect message" do
-        let(:debug_message){
-          {
-            'message number' => HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE,
-            'always_display' => true,
-            'message'        => 'message',
-            'language tag'   => 'language tag',
-          }
-        }
-        let(:debug_payload){
-          HrrRbSsh::Message::SSH_MSG_DEBUG.encode debug_message
-        }
-
-        it "receive debug message and is finished" do
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(debug_payload).once
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.receiver_thread
-          t.join
-          expect(receive_queue.size).to eq 0
-        end
-      end
-
-      context "when receives other message and then disconnect message" do
-        let(:service_request_message){
-          {
-            'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
-            'service name'   => 'service name',
-          }
-        }
-        let(:service_request_payload){
-          HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.encode service_request_message
-        }
-
-        it "receive service_request message and is finished" do
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(service_request_payload).once
-          expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
-          t = transport.receiver_thread
-          t.join
-          expect(receive_queue.size).to eq 1
-          expect(receive_queue.pop).to eq service_request_payload
-          expect(receive_queue.size).to eq 0
-        end
-      end
-
-      context "when @receiver.receive returns EOFError" do
-        it "is finished" do
-          expect(mock_receiver).to receive(:receive).with(transport).and_raise(EOFError).once
-          t = transport.receiver_thread
-          t.join
-          expect(receive_queue.size).to eq 0
-        end
-      end
-
-      context "when @receiver.receive returns RuntimeError" do
-        it "is finished" do
-          expect(mock_receiver).to receive(:receive).with(transport).and_raise(RuntimeError).once
-          t = transport.receiver_thread
-          t.join
-          expect(receive_queue.size).to eq 0
         end
       end
     end
