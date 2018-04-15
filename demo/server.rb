@@ -18,6 +18,12 @@ logger.level = Logger::INFO
 HrrRbSsh::Logger.initialize logger
 
 
+tran_preferred_encryption_algorithms      = %w(aes128-ctr aes192-ctr aes256-ctr aes128-cbc 3des-cbc blowfish-cbc cast128-cbc aes192-cbc aes256-cbc arcfour)
+tran_preferred_server_host_key_algorithms = %w(ssh-rsa ssh-dss)
+tran_preferred_kex_algorithms             = %w(diffie-hellman-group14-sha1 diffie-hellman-group1-sha1)
+tran_preferred_mac_algorithms             = %w(hmac-sha1 hmac-md5 hmac-sha1-96 hmac-md5-96)
+tran_preferred_compression_algorithms     = %w(none zlib)
+
 auth_none = HrrRbSsh::Authentication::Authenticator.new { |context|
   false
 }
@@ -163,6 +169,12 @@ conn_exec = HrrRbSsh::Connection::RequestHandler.new { |context|
 
 options = {}
 
+options['transport_preferred_encryption_algorithms']      = tran_preferred_encryption_algorithms
+options['transport_preferred_server_host_key_algorithms'] = tran_preferred_server_host_key_algorithms
+options['transport_preferred_kex_algorithms']             = tran_preferred_kex_algorithms
+options['transport_preferred_mac_algorithms']             = tran_preferred_mac_algorithms
+options['transport_preferred_compression_algorithms']     = tran_preferred_compression_algorithms
+
 options['authentication_none_authenticator']      = auth_none
 options['authentication_publickey_authenticator'] = auth_publickey
 options['authentication_password_authenticator']  = auth_password
@@ -176,7 +188,7 @@ options['connection_channel_request_exec']    = conn_exec
 server = TCPServer.new 10022
 while true
   t = Thread.new(server.accept) do |io|
-    tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Transport::Mode::SERVER
+    tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Transport::Mode::SERVER, options
     auth = HrrRbSsh::Authentication.new tran, options
     conn = HrrRbSsh::Connection.new     auth, options
     conn.start
