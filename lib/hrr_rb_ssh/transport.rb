@@ -69,8 +69,44 @@ module HrrRbSsh
       initialize_algorithms
     end
 
+    def supported_encryption_algorithms
+      EncryptionAlgorithm.list_supported
+    end
+
+    def supported_server_host_key_algorithms
+      ServerHostKeyAlgorithm.list_supported
+    end
+
+    def supported_kex_algorithms
+      KexAlgorithm.list_supported
+    end
+
+    def supported_mac_algorithms
+      MacAlgorithm.list_supported
+    end
+
+    def supported_compression_algorithms
+      CompressionAlgorithm.list_supported
+    end
+
     def preferred_encryption_algorithms
-      EncryptionAlgorithm.preferred_names
+      EncryptionAlgorithm.list_preferred
+    end
+
+    def preferred_server_host_key_algorithms
+      ServerHostKeyAlgorithm.list_preferred
+    end
+
+    def preferred_kex_algorithms
+      KexAlgorithm.list_preferred
+    end
+
+    def preferred_mac_algorithms
+      MacAlgorithm.list_preferred
+    end
+
+    def preferred_compression_algorithms
+      CompressionAlgorithm.list_preferred
     end
 
     def register_acceptable_service service_name

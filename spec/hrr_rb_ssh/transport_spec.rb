@@ -81,6 +81,106 @@ RSpec.describe HrrRbSsh::Transport do
     end
   end
 
+  describe "supported_encryption_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::EncryptionAlgorithm.list_supported" do
+      expect(transport.supported_encryption_algorithms).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_supported
+    end
+  end
+
+  describe "supported_server_host_key_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported" do
+      expect(transport.supported_server_host_key_algorithms).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported
+    end
+  end
+
+  describe "supported_kex_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::KexAlgorithm.list_supported" do
+      expect(transport.supported_kex_algorithms).to eq HrrRbSsh::Transport::KexAlgorithm.list_supported
+    end
+  end
+
+  describe "supported_mac_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::MacAlgorithm.list_supported" do
+      expect(transport.supported_mac_algorithms).to eq HrrRbSsh::Transport::MacAlgorithm.list_supported
+    end
+  end
+
+  describe "supported_compression_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::CompressionAlgorithm.list_supported" do
+      expect(transport.supported_compression_algorithms).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_supported
+    end
+  end
+
+  describe "preferred_encryption_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred" do
+      expect(transport.preferred_encryption_algorithms).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
+    end
+  end
+
+  describe "preferred_server_host_key_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred" do
+      expect(transport.preferred_server_host_key_algorithms).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
+    end
+  end
+
+  describe "preferred_kex_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::KexAlgorithm.list_preferred" do
+      expect(transport.preferred_kex_algorithms).to eq HrrRbSsh::Transport::KexAlgorithm.list_preferred
+    end
+  end
+
+  describe "preferred_mac_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::MacAlgorithm.list_preferred" do
+      expect(transport.preferred_mac_algorithms).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
+    end
+  end
+
+  describe "preferred_compression_algorithms" do
+    let(:io){ 'dummy' }
+    let(:mode){ 'dummy' }
+    let(:transport){ described_class.new io, mode }
+
+    it "returns HrrRbSsh::Transport::CompressionAlgorithm.list_preferred" do
+      expect(transport.preferred_compression_algorithms).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+    end
+  end
+
   describe "#send" do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
