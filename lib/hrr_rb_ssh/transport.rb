@@ -25,6 +25,16 @@ module HrrRbSsh
 
     attr_reader \
       :io,
+      :supported_encryption_algorithms,
+      :supported_server_host_key_algorithms,
+      :supported_kex_algorithms,
+      :supported_mac_algorithms,
+      :supported_compression_algorithms,
+      :preferred_encryption_algorithms,
+      :preferred_server_host_key_algorithms,
+      :preferred_kex_algorithms,
+      :preferred_mac_algorithms,
+      :preferred_compression_algorithms,
       :incoming_sequence_number,
       :outgoing_sequence_number,
       :server_host_key_algorithm,
@@ -40,7 +50,7 @@ module HrrRbSsh
       :i_s,
       :session_id
 
-    def initialize io, mode
+    def initialize io, mode, options={}
       @io = io
       @mode = mode
 
@@ -65,48 +75,10 @@ module HrrRbSsh
 
       @acceptable_services = Array.new
 
+      update_supported_algorithms
+      update_preferred_algorithms options
       initialize_local_algorithms
       initialize_algorithms
-    end
-
-    def supported_encryption_algorithms
-      EncryptionAlgorithm.list_supported
-    end
-
-    def supported_server_host_key_algorithms
-      ServerHostKeyAlgorithm.list_supported
-    end
-
-    def supported_kex_algorithms
-      KexAlgorithm.list_supported
-    end
-
-    def supported_mac_algorithms
-      MacAlgorithm.list_supported
-    end
-
-    def supported_compression_algorithms
-      CompressionAlgorithm.list_supported
-    end
-
-    def preferred_encryption_algorithms
-      EncryptionAlgorithm.list_preferred
-    end
-
-    def preferred_server_host_key_algorithms
-      ServerHostKeyAlgorithm.list_preferred
-    end
-
-    def preferred_kex_algorithms
-      KexAlgorithm.list_preferred
-    end
-
-    def preferred_mac_algorithms
-      MacAlgorithm.list_preferred
-    end
-
-    def preferred_compression_algorithms
-      CompressionAlgorithm.list_preferred
     end
 
     def register_acceptable_service service_name
@@ -276,15 +248,49 @@ module HrrRbSsh
       end
     end
 
+    def update_supported_algorithms
+      @supported_kex_algorithms             = HrrRbSsh::Transport::KexAlgorithm.list_supported
+      @supported_server_host_key_algorithms = HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported
+      @supported_encryption_algorithms      = HrrRbSsh::Transport::EncryptionAlgorithm.list_supported
+      @supported_mac_algorithms             = HrrRbSsh::Transport::MacAlgorithm.list_supported
+      @supported_compression_algorithms     = HrrRbSsh::Transport::CompressionAlgorithm.list_supported
+    end
+
+    def update_preferred_algorithms options
+      @preferred_kex_algorithms             = options['transport_preferred_kex_algorithms']             || HrrRbSsh::Transport::KexAlgorithm.list_preferred
+      @preferred_server_host_key_algorithms = options['transport_preferred_server_host_key_algorithms'] || HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
+      @preferred_encryption_algorithms      = options['transport_preferred_encryption_algorithms']      || HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
+      @preferred_mac_algorithms             = options['transport_preferred_mac_algorithms']             || HrrRbSsh::Transport::MacAlgorithm.list_preferred
+      @preferred_compression_algorithms     = options['transport_preferred_compression_algorithms']     || HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+
+      check_if_preferred_algorithms_are_supported
+    end
+
+    def check_if_preferred_algorithms_are_supported
+      [
+        ['kex',             @preferred_kex_algorithms,             @supported_kex_algorithms            ],
+        ['server host key', @preferred_server_host_key_algorithms, @supported_server_host_key_algorithms],
+        ['encryption',      @preferred_encryption_algorithms,      @supported_encryption_algorithms     ],
+        ['mac',             @preferred_mac_algorithms,             @supported_mac_algorithms            ],
+        ['compression',     @preferred_compression_algorithms,     @supported_compression_algorithms    ],
+      ].each{ |algorithm_name, list_preferred, list_supported|
+        list_preferred.each{ |a|
+          unless list_supported.include? a
+            raise ArgumentError, "#{algorithm_name} algorithm #{a} is not supported"
+          end
+        }
+      }
+    end
+
     def initialize_local_algorithms
-      @local_kex_algorithms                          = HrrRbSsh::Transport::KexAlgorithm.list_preferred
-      @local_server_host_key_algorithms              = HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
-      @local_encryption_algorithms_client_to_server  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-      @local_encryption_algorithms_server_to_client  = HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-      @local_mac_algorithms_client_to_server         = HrrRbSsh::Transport::MacAlgorithm.list_preferred
-      @local_mac_algorithms_server_to_client         = HrrRbSsh::Transport::MacAlgorithm.list_preferred
-      @local_compression_algorithms_client_to_server = HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
-      @local_compression_algorithms_server_to_client = HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+      @local_kex_algorithms                          = @preferred_kex_algorithms
+      @local_server_host_key_algorithms              = @preferred_server_host_key_algorithms
+      @local_encryption_algorithms_client_to_server  = @preferred_encryption_algorithms
+      @local_encryption_algorithms_server_to_client  = @preferred_encryption_algorithms
+      @local_mac_algorithms_client_to_server         = @preferred_mac_algorithms
+      @local_mac_algorithms_server_to_client         = @preferred_mac_algorithms
+      @local_compression_algorithms_client_to_server = @preferred_compression_algorithms
+      @local_compression_algorithms_server_to_client = @preferred_compression_algorithms
     end
 
     def initialize_algorithms

@@ -22,8 +22,22 @@ RSpec.describe HrrRbSsh::Transport do
     let(:mode){ 'dummy' }
     let(:transport){ described_class.new io, mode }
 
-    it "takes two arguments: io and mode" do
+    it "can take two arguments: io and mode" do
       expect { transport }.not_to raise_error
+    end
+
+    context "when options is specified" do
+      context "when options has valid algorithm list" do
+        it "can take three arguments: io, mode, and options" do
+          expect { described_class.new io, mode, {} }.not_to raise_error
+        end
+      end
+
+      context "when options has invalid algorithm list" do
+        it "raises ArgumentError" do
+          expect { described_class.new io, mode, {'transport_preferred_mac_algorithms' => ['invalid algorithm']} }.to raise_error ArgumentError
+        end
+      end
     end
 
     it "initializes incoming_sequence_number readable" do
