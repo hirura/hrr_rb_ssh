@@ -9,17 +9,6 @@ module HrrRbSsh
   class Transport
     class KexAlgorithm
       module DiffieHellman
-        H0_DEFINITION = [
-          [DataType::String, 'V_C'],
-          [DataType::String, 'V_S'],
-          [DataType::String, 'I_C'],
-          [DataType::String, 'I_S'],
-          [DataType::String, 'K_S'],
-          [DataType::Mpint,  'e'],
-          [DataType::Mpint,  'f'],
-          [DataType::Mpint,  'k'],
-        ]
-
         def initialize
           @logger = HrrRbSsh::Logger.new(self.class.name)
           @dh = OpenSSL::PKey::DH.new
@@ -30,13 +19,6 @@ module HrrRbSsh
             @dh.g = OpenSSL::BN.new(self.class::G)
           end
           @dh.generate_key!
-        end
-
-        def encode definition, payload
-          definition.map{ |data_type, field_name|
-            field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-            data_type.encode(field_value)
-          }.join
         end
 
         def set_e e
@@ -66,7 +48,7 @@ module HrrRbSsh
             'f'   => f,
             'k'   => k,
           }
-          h0 = encode H0_DEFINITION, h0_payload
+          h0 = H0.encode h0_payload
 
           h = OpenSSL::Digest.digest self.class::DIGEST, h0
 
@@ -126,3 +108,5 @@ module HrrRbSsh
     end
   end
 end
+
+require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman/h0'
