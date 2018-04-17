@@ -25,28 +25,30 @@ module HrrRbSsh
       end
 
       def receive_packet transport
-        packet_length_field_length  = 4
-        minimum_block_size          = 8
+        packet_length_field_length = 4
+        minimum_block_size         = 8
 
-        block_size                 = [transport.incoming_encryption_algorithm.block_size, minimum_block_size].max
-        initial_encrypted_packet   = transport.io.read block_size
-        if (initial_encrypted_packet == nil) || (initial_encrypted_packet.length != block_size)
+        encrypted_packet   = Array.new
+        unencrypted_packet = Array.new
+
+        block_size = [transport.incoming_encryption_algorithm.block_size, minimum_block_size].max
+        encrypted_packet.push transport.io.read(block_size)
+        if (encrypted_packet.last == nil) || (encrypted_packet.last.length != block_size)
           @logger.warn("IO is EOF")
           raise EOFError
         end
-        initial_unencrypted_packet = transport.incoming_encryption_algorithm.decrypt initial_encrypted_packet
-        packet_length              = initial_unencrypted_packet[0,4].unpack("N")[0]
-        last_packet_length         = packet_length_field_length + packet_length - block_size
-        last_encrypted_packet      = transport.io.read last_packet_length
-        if (last_encrypted_packet == nil) || (last_encrypted_packet.length != last_packet_length)
+        unencrypted_packet.push transport.incoming_encryption_algorithm.decrypt(encrypted_packet.last)
+
+        packet_length           = unencrypted_packet.last[0,4].unpack("N")[0]
+        following_packet_length = packet_length_field_length + packet_length - block_size
+        encrypted_packet.push transport.io.read(following_packet_length)
+        if (encrypted_packet.last == nil) || (encrypted_packet.last.length != following_packet_length)
           @logger.warn("IO is EOF")
           raise EOFError
         end
-        last_unencrypted_packet    = transport.incoming_encryption_algorithm.decrypt last_encrypted_packet
-        encrypted_packet           = initial_encrypted_packet + last_encrypted_packet
-        unencrypted_packet         = initial_unencrypted_packet + last_unencrypted_packet
+        unencrypted_packet.push transport.incoming_encryption_algorithm.decrypt(encrypted_packet.last)
 
-        unencrypted_packet
+        unencrypted_packet.join
       end
 
       def receive_mac transport
