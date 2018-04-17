@@ -2,7 +2,6 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/logger'
-require 'hrr_rb_ssh/data_type'
 
 module HrrRbSsh
   class Transport
@@ -42,37 +41,9 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
 -----END RSA PRIVATE KEY-----
         EOB
 
-        KEY_FORMAT_DEFINITION = [
-          [DataType::String, 'ssh-rsa'],
-          [DataType::Mpint,  'e'],
-          [DataType::Mpint,  'n'],
-        ]
-
-        SIGN_DEFINITION = [
-          [DataType::String, 'ssh-rsa'],
-          [DataType::String, 'rsa_signature_blob'],
-        ]
-
         def initialize
           @logger = HrrRbSsh::Logger.new(self.class.name)
           @rsa = OpenSSL::PKey::RSA.new SECRET_KEY
-        end
-
-        def encode definition, payload
-          definition.map{ |data_type, field_name|
-            field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-            data_type.encode( field_value )
-          }.join
-        end
-
-        def decode definition, payload
-          payload_io = StringIO.new payload, 'r'
-          definition.map{ |data_type, field_name|
-            [
-              field_name,
-              data_type.decode( payload_io )
-            ]
-          }.to_h
         end
 
         def server_public_host_key
@@ -81,7 +52,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
             'e'       => @rsa.e.to_i,
             'n'       => @rsa.n.to_i,
           }
-          encode KEY_FORMAT_DEFINITION, payload
+          PublicKeyBlob.encode payload
         end
 
         def sign digest, data
@@ -89,14 +60,17 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
             'ssh-rsa'            => 'ssh-rsa',
             'rsa_signature_blob' => @rsa.sign(digest, data),
           }
-          encode SIGN_DEFINITION, payload
+          Signature.encode payload
         end
 
         def verify digest, sign, data
-          payload = decode SIGN_DEFINITION, sign
+          payload = Signature.decode sign
           payload['ssh-rsa'] == 'ssh-rsa' && @rsa.verify(digest, payload['rsa_signature_blob'], data)
         end
       end
     end
   end
 end
+
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_rsa/public_key_blob'
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_rsa/signature'

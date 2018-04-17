@@ -27,39 +27,9 @@ MRl/p42OrQzL/chRPvRf
 -----END DSA PRIVATE KEY-----
         EOB
 
-        KEY_FORMAT_DEFINITION = [
-          [DataType::String, 'ssh-dss'],
-          [DataType::Mpint,  'p'],
-          [DataType::Mpint,  'q'],
-          [DataType::Mpint,  'g'],
-          [DataType::Mpint,  'y'],
-        ]
-
-        SIGN_DEFINITION = [
-          [DataType::String, 'ssh-dss'],
-          [DataType::String, 'dss_signature_blob'],
-        ]
-
         def initialize
           @logger = HrrRbSsh::Logger.new(self.class.name)
           @dss = OpenSSL::PKey::DSA.new SECRET_KEY
-        end
-
-        def encode definition, payload
-          definition.map{ |data_type, field_name|
-            field_value = if payload[field_name].instance_of? ::Proc then payload[field_name].call else payload[field_name] end
-            data_type.encode( field_value )
-          }.join
-        end
-
-        def decode definition, payload
-          payload_io = StringIO.new payload, 'r'
-          definition.map{ |data_type, field_name|
-            [
-              field_name,
-              data_type.decode( payload_io )
-            ]
-          }.to_h
         end
 
         def server_public_host_key
@@ -70,7 +40,7 @@ MRl/p42OrQzL/chRPvRf
             'g'       => @dss.g.to_i,
             'y'       => @dss.pub_key.to_i,
           }
-          encode KEY_FORMAT_DEFINITION, payload
+          PublicKeyBlob.encode payload
         end
 
         def sign digest, data
@@ -83,11 +53,11 @@ MRl/p42OrQzL/chRPvRf
             'ssh-dss'            => 'ssh-dss',
             'dss_signature_blob' => (sign_r + sign_s),
           }
-          encode SIGN_DEFINITION, payload
+          Signature.encode payload
         end
 
         def verify digest, sign, data
-          payload = decode SIGN_DEFINITION, sign
+          payload = Signature.decode sign
           dss_signature_blob = payload['dss_signature_blob']
           sign_r = dss_signature_blob[ 0, 20]
           sign_s = dss_signature_blob[20, 20]
@@ -105,3 +75,6 @@ MRl/p42OrQzL/chRPvRf
     end
   end
 end
+
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_dss/public_key_blob'
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_dss/signature'
