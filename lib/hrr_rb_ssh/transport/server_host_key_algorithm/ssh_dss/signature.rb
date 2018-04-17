@@ -2,7 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/data_type'
-require 'hrr_rb_ssh/message/codable'
+require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   class Transport
@@ -10,7 +10,7 @@ module HrrRbSsh
       class SshDss
         module Signature
           class << self
-            include Message::Codable
+            include Codable
           end
           DEFINITION = [
             [DataType::String, 'ssh-dss'],

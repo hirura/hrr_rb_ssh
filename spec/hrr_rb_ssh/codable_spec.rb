@@ -1,12 +1,12 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-RSpec.describe HrrRbSsh::Message::Codable do
+RSpec.describe HrrRbSsh::Codable do
   context "when module does not have CONDITIONAL_DEFINITION" do
     before :context do
       module SSH_MSG_MOCK_WITH_NO_CONDITIONAL_DEFINITION
         class << self
-          include HrrRbSsh::Message::Codable
+          include HrrRbSsh::Codable
         end
 
         DEFINITION = [
@@ -45,7 +45,7 @@ RSpec.describe HrrRbSsh::Message::Codable do
     before :context do
       module SSH_MSG_MOCK_WITH_CONDITIONAL_DEFINITION
         class << self
-          include HrrRbSsh::Message::Codable
+          include HrrRbSsh::Codable
         end
 
         DEFINITION = [
@@ -94,7 +94,7 @@ RSpec.describe HrrRbSsh::Message::Codable do
     before :context do
       module SSH_MSG_MOCK_WITH_CHAINED_CONDITIONAL_DEFINITION
         class << self
-          include HrrRbSsh::Message::Codable
+          include HrrRbSsh::Codable
         end
 
         DEFINITION = [
@@ -150,7 +150,7 @@ RSpec.describe HrrRbSsh::Message::Codable do
     before :context do
       module SSH_MSG_MOCK_WITH_HIDDEN_CONDITIONAL_DEFINITION
         class << self
-          include HrrRbSsh::Message::Codable
+          include HrrRbSsh::Codable
         end
 
         DEFINITION = [
