@@ -3,7 +3,6 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/data_type'
-require 'hrr_rb_ssh/authentication/method/publickey/algorithm/codable'
 
 module HrrRbSsh
   class Authentication
@@ -14,32 +13,6 @@ module HrrRbSsh
             NAME = 'ssh-dss'
             PREFERENCE = 10
             DIGEST = 'sha1'
-
-            PUBLIC_KEY_BLOB_DEFINITION = [
-              [DataType::String, 'public key algorithm name'],
-              [DataType::Mpint,  'p'],
-              [DataType::Mpint,  'q'],
-              [DataType::Mpint,  'g'],
-              [DataType::Mpint,  'y'],
-            ]
-
-            SIGNATURE_DEFINITION = [
-              [DataType::String, 'public key algorithm name'],
-              [DataType::String, 'signature blob'],
-            ]
-
-            SIGNATURE_BLOB_DEFINITION = [
-              [DataType::String,  'session identifier'],
-              [DataType::Byte,    'message number'],
-              [DataType::String,  'user name'],
-              [DataType::String,  'service name'],
-              [DataType::String,  'method name'],
-              [DataType::Boolean, 'with signature'],
-              [DataType::String,  'public key algorithm name'],
-              [DataType::String,  'public key blob'],
-            ]
-
-            include Codable
 
             def initialize
               @logger = HrrRbSsh::Logger.new(self.class.name)
@@ -61,15 +34,15 @@ module HrrRbSsh
                 'q'                         => public_key.q.to_i,
                 'y'                         => public_key.pub_key.to_i,
               }
-              public_key_blob == encode(PUBLIC_KEY_BLOB_DEFINITION, public_key_message)
+              public_key_blob == PublicKeyBlob.encode(public_key_message)
             end
 
             def verify_signature session_id, message
-              signature_message   = decode SIGNATURE_DEFINITION, message['signature']
+              signature_message   = Signature.decode message['signature']
               signature_algorithm = signature_message['public key algorithm name']
               signature_blob      = signature_message['signature blob']
 
-              public_key = decode PUBLIC_KEY_BLOB_DEFINITION, message['public key blob']
+              public_key = PublicKeyBlob.decode message['public key blob']
               algorithm = OpenSSL::PKey::DSA.new
               if algorithm.respond_to?(:set_pqg)
                 algorithm.set_pqg public_key['p'], public_key['q'], public_key['g']
@@ -94,7 +67,7 @@ module HrrRbSsh
                 'public key algorithm name' => message['public key algorithm name'],
                 'public key blob'           => message['public key blob'],
               }
-              data_blob = encode SIGNATURE_BLOB_DEFINITION, data_message
+              data_blob = SignatureBlob.encode data_message
 
               hash = OpenSSL::Digest.digest(DIGEST, data_blob)
               sign_r = signature_blob[ 0, 20]
@@ -114,3 +87,7 @@ module HrrRbSsh
     end
   end
 end
+
+require 'hrr_rb_ssh/authentication/method/publickey/algorithm/ssh_dss/public_key_blob'
+require 'hrr_rb_ssh/authentication/method/publickey/algorithm/ssh_dss/signature_blob'
+require 'hrr_rb_ssh/authentication/method/publickey/algorithm/ssh_dss/signature'
