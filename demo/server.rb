@@ -73,98 +73,10 @@ auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
   }
 }
 
-conn_pty = HrrRbSsh::Connection::RequestHandler.new { |context|
-  ptm, pts = PTY.open
-  context.vars[:ptm] = ptm
-  context.vars[:pts] = pts
-  context.chain_proc { |chain|
-    begin
-      chain.call_next
-    ensure
-      context.vars[:ptm].close
-      context.vars[:pts].close
-    end
-  }
-}
-conn_env = HrrRbSsh::Connection::RequestHandler.new { |context|
-  context.vars[:env] ||= Hash.new
-  context.vars[:env][context.variable_name] = context.variable_value
-}
-conn_shell = HrrRbSsh::Connection::RequestHandler.new { |context|
-  ptm = context.vars[:ptm]
-  pts = context.vars[:pts]
-
-  context.chain_proc { |chain|
-    pid = fork do
-      ptm.close
-      Process.setsid
-      STDIN.reopen  pts, 'r'
-      STDOUT.reopen pts, 'w'
-      STDERR.reopen pts, 'w'
-      pts.close
-      context.vars[:env] ||= Hash.new
-      exec context.vars[:env], 'login', '-f', context.username
-    end
-
-    pts.close
-
-    threads = []
-    threads.push Thread.start {
-      loop do
-        begin
-          context.io.write ptm.readpartial(1024)
-        rescue EOFError => e
-          context.logger.info("ptm is EOF")
-          break
-        rescue IOError => e
-          context.logger.warn("IO is closed")
-          break
-        rescue => e
-          context.logger.error(e.full_message)
-          break
-        end
-      end
-    }
-    threads.push Thread.start {
-      loop do
-        begin
-          ptm.write context.io.readpartial(1024)
-        rescue EOFError => e
-          context.logger.info("IO is EOF")
-          break
-        rescue IOError => e
-          context.logger.warn("IO is closed")
-          break
-        rescue => e
-          context.logger.error(e.full_message)
-          break
-        end
-      end
-    }
-
-    pid, status = Process.waitpid2 pid
-    threads.each do |t|
-      begin
-        t.exit
-        t.join
-      rescue => e
-        context.logger.error(e.full_message)
-      end
-    end
-    status.exitstatus
-  }
-}
-conn_exec = HrrRbSsh::Connection::RequestHandler.new { |context|
-  context.chain_proc { |chain|
-    pid = fork do
-      Process.setsid
-      context.vars[:env] ||= Hash.new
-      exec context.vars[:env], context.command, in: context.io, out: context.io, err: context.io
-    end
-    pid, status = Process.waitpid2 pid
-    status.exitstatus
-  }
-}
+conn_pty   = HrrRbSsh::Connection::RequestHandler::ReferencePtyReqRequestHandler.new
+conn_env   = HrrRbSsh::Connection::RequestHandler::ReferenceEnvRequestHandler.new
+conn_shell = HrrRbSsh::Connection::RequestHandler::ReferenceShellRequestHandler.new
+conn_exec  = HrrRbSsh::Connection::RequestHandler::ReferenceExecRequestHandler.new
 
 
 options = {}

@@ -16,3 +16,8 @@ module HrrRbSsh
     end
   end
 end
+
+require 'hrr_rb_ssh/connection/request_handler/reference_pty_req_request_handler'
+require 'hrr_rb_ssh/connection/request_handler/reference_env_request_handler'
+require 'hrr_rb_ssh/connection/request_handler/reference_shell_request_handler'
+require 'hrr_rb_ssh/connection/request_handler/reference_exec_request_handler'
