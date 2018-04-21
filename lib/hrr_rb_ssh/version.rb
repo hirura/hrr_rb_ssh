@@ -2,5 +2,5 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
-  VERSION = "0.1.3"
+  VERSION = "0.1.4"
 end
