@@ -73,11 +73,6 @@ auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
   }
 }
 
-conn_pty   = HrrRbSsh::Connection::RequestHandler::ReferencePtyReqRequestHandler.new
-conn_env   = HrrRbSsh::Connection::RequestHandler::ReferenceEnvRequestHandler.new
-conn_shell = HrrRbSsh::Connection::RequestHandler::ReferenceShellRequestHandler.new
-conn_exec  = HrrRbSsh::Connection::RequestHandler::ReferenceExecRequestHandler.new
-
 
 options = {}
 
@@ -91,10 +86,11 @@ options['authentication_none_authenticator']      = auth_none
 options['authentication_publickey_authenticator'] = auth_publickey
 options['authentication_password_authenticator']  = auth_password
 
-options['connection_channel_request_pty_req'] = conn_pty
-options['connection_channel_request_env']     = conn_env
-options['connection_channel_request_shell']   = conn_shell
-options['connection_channel_request_exec']    = conn_exec
+options['connection_channel_request_pty_req']       = HrrRbSsh::Connection::RequestHandler::ReferencePtyReqRequestHandler.new
+options['connection_channel_request_env']           = HrrRbSsh::Connection::RequestHandler::ReferenceEnvRequestHandler.new
+options['connection_channel_request_shell']         = HrrRbSsh::Connection::RequestHandler::ReferenceShellRequestHandler.new
+options['connection_channel_request_exec']          = HrrRbSsh::Connection::RequestHandler::ReferenceExecRequestHandler.new
+options['connection_channel_request_window_change'] = HrrRbSsh::Connection::RequestHandler::ReferenceWindowChangeRequestHandler.new
 
 
 server = TCPServer.new 10022
