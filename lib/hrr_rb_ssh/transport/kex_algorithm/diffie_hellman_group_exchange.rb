@@ -27,7 +27,7 @@ module HrrRbSsh
         end
 
         def set_dh
-          p_list = KexAlgorithm.list_supported.map{ |e| KexAlgorithm[e] }.select{ |e| e.const_defined?(:P) }.map{ |e| [e::P.to_i(16).bit_length, e::P] }.sort_by{ |e| e[0] }.reverse
+          p_list = KexAlgorithm.list_supported.map{ |e| KexAlgorithm[e] }.select{ |e| e.const_defined?(:P) }.map{ |e| [OpenSSL::BN.new(e::P,16).num_bits, e::P] }.sort_by{ |e| e[0] }.reverse
           candidate = p_list.find{ |e| e[0] <= @n }
           raise unless (@min .. @max).include?(candidate[0])
           p = candidate[1]
