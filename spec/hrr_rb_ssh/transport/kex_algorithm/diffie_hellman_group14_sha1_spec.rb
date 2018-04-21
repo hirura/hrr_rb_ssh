@@ -166,7 +166,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
         expect(mock_t).to receive(:i_s).with(no_args).and_return("i_s").twice
         expect(mock_t).to receive(:server_host_key_algorithm).with(no_args).and_return(server_host_key_algorithm).exactly(3).times
 
-        expect( kex_algorithm.sign(mock_t) ).to eq server_host_key_algorithm.sign('sha1', kex_algorithm.hash(mock_t))
+        expect( kex_algorithm.sign(mock_t) ).to eq server_host_key_algorithm.sign(kex_algorithm.hash(mock_t))
       end
     end
   end

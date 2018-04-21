@@ -45,118 +45,110 @@ RSpec.describe HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa do
   describe '#sign' do
     let(:data){ 'testing' }
 
-    context "when digest is \"sha1\"" do
-      let(:digest){ 'sha1' }
-
-      it "returns encoded \"ssh-rsa\" || signed \"testing\"" do
-        encoded_data = \
-          "00000007" "7373682d" "72736100" "00010079" \
-          "9e4cd767" "4c1c76af" "e67df9d9" "3654cf82" \
-          "827510ae" "6918d691" "74112927" "872676dd" \
-          "98bf6387" "8f10062a" "812bd1b7" "8932550e" \
-          "74b494c5" "de4a03d3" "60f0d301" "21a0f87d" \
-          "1dbce6f9" "383ac666" "564e76d9" "01f6c2a1" \
-          "54629c90" "7a2745c1" "1682edae" "95788e34" \
-          "ec0c0a62" "cafcd282" "a7b8a5df" "4ac4cf8f" \
-          "d42d4ce3" "ee65e72e" "48a45518" "2529933f" \
-          "9b680aa7" "a3201a0c" "1f07d483" "05f1d29e" \
-          "8bcdb781" "316f0226" "7674ab17" "25924ece" \
-          "22187ae0" "e7d1a226" "6f4cba54" "23f16734" \
-          "bca97238" "89075e43" "c8815b62" "24cc7635" \
-          "85895582" "007227e1" "b33a5c42" "1c3dfc04" \
-          "331f6468" "bd557163" "b774360c" "2170dea0" \
-          "372c761d" "52d896fa" "279f7071" "ac544d6d" \
-          "a8b596f6" "6fdbd162" "60ee09e3" "c6b507"
-        expect( server_host_key_algorithm.sign digest, data ).to eq [encoded_data].pack("H*")
-      end
+    it "returns encoded \"ssh-rsa\" || signed \"testing\"" do
+      encoded_data = \
+        "00000007" "7373682d" "72736100" "00010079" \
+        "9e4cd767" "4c1c76af" "e67df9d9" "3654cf82" \
+        "827510ae" "6918d691" "74112927" "872676dd" \
+        "98bf6387" "8f10062a" "812bd1b7" "8932550e" \
+        "74b494c5" "de4a03d3" "60f0d301" "21a0f87d" \
+        "1dbce6f9" "383ac666" "564e76d9" "01f6c2a1" \
+        "54629c90" "7a2745c1" "1682edae" "95788e34" \
+        "ec0c0a62" "cafcd282" "a7b8a5df" "4ac4cf8f" \
+        "d42d4ce3" "ee65e72e" "48a45518" "2529933f" \
+        "9b680aa7" "a3201a0c" "1f07d483" "05f1d29e" \
+        "8bcdb781" "316f0226" "7674ab17" "25924ece" \
+        "22187ae0" "e7d1a226" "6f4cba54" "23f16734" \
+        "bca97238" "89075e43" "c8815b62" "24cc7635" \
+        "85895582" "007227e1" "b33a5c42" "1c3dfc04" \
+        "331f6468" "bd557163" "b774360c" "2170dea0" \
+        "372c761d" "52d896fa" "279f7071" "ac544d6d" \
+        "a8b596f6" "6fdbd162" "60ee09e3" "c6b507"
+      expect( server_host_key_algorithm.sign data ).to eq [encoded_data].pack("H*")
     end
   end
 
   describe '#verify' do
     let(:data){ 'testing' }
 
-    context "when digest is \"sha1\"" do
-      let(:digest){ 'sha1' }
+    context "with correct sign" do
+      let(:encoded_data){
+        "00000007" "7373682d" "72736100" "00010079" \
+        "9e4cd767" "4c1c76af" "e67df9d9" "3654cf82" \
+        "827510ae" "6918d691" "74112927" "872676dd" \
+        "98bf6387" "8f10062a" "812bd1b7" "8932550e" \
+        "74b494c5" "de4a03d3" "60f0d301" "21a0f87d" \
+        "1dbce6f9" "383ac666" "564e76d9" "01f6c2a1" \
+        "54629c90" "7a2745c1" "1682edae" "95788e34" \
+        "ec0c0a62" "cafcd282" "a7b8a5df" "4ac4cf8f" \
+        "d42d4ce3" "ee65e72e" "48a45518" "2529933f" \
+        "9b680aa7" "a3201a0c" "1f07d483" "05f1d29e" \
+        "8bcdb781" "316f0226" "7674ab17" "25924ece" \
+        "22187ae0" "e7d1a226" "6f4cba54" "23f16734" \
+        "bca97238" "89075e43" "c8815b62" "24cc7635" \
+        "85895582" "007227e1" "b33a5c42" "1c3dfc04" \
+        "331f6468" "bd557163" "b774360c" "2170dea0" \
+        "372c761d" "52d896fa" "279f7071" "ac544d6d" \
+        "a8b596f6" "6fdbd162" "60ee09e3" "c6b507"
+      }
+      let(:sign){ [encoded_data].pack("H*") }
 
-      context "with correct sign" do
-        let(:encoded_data){
-          "00000007" "7373682d" "72736100" "00010079" \
-          "9e4cd767" "4c1c76af" "e67df9d9" "3654cf82" \
-          "827510ae" "6918d691" "74112927" "872676dd" \
-          "98bf6387" "8f10062a" "812bd1b7" "8932550e" \
-          "74b494c5" "de4a03d3" "60f0d301" "21a0f87d" \
-          "1dbce6f9" "383ac666" "564e76d9" "01f6c2a1" \
-          "54629c90" "7a2745c1" "1682edae" "95788e34" \
-          "ec0c0a62" "cafcd282" "a7b8a5df" "4ac4cf8f" \
-          "d42d4ce3" "ee65e72e" "48a45518" "2529933f" \
-          "9b680aa7" "a3201a0c" "1f07d483" "05f1d29e" \
-          "8bcdb781" "316f0226" "7674ab17" "25924ece" \
-          "22187ae0" "e7d1a226" "6f4cba54" "23f16734" \
-          "bca97238" "89075e43" "c8815b62" "24cc7635" \
-          "85895582" "007227e1" "b33a5c42" "1c3dfc04" \
-          "331f6468" "bd557163" "b774360c" "2170dea0" \
-          "372c761d" "52d896fa" "279f7071" "ac544d6d" \
-          "a8b596f6" "6fdbd162" "60ee09e3" "c6b507"
-        }
-        let(:sign){ [encoded_data].pack("H*") }
-
-        it "returns true" do
-          expect( server_host_key_algorithm.verify digest, sign, data ).to be true
-        end
+      it "returns true" do
+        expect( server_host_key_algorithm.verify sign, data ).to be true
       end
+    end
 
-      context "with not \"ssh-rsa\"" do
-        let(:encoded_data){
-          "00000007" "01234567" "01234500" "00010079" \
-          "9e4cd767" "4c1c76af" "e67df9d9" "3654cf82" \
-          "827510ae" "6918d691" "74112927" "872676dd" \
-          "98bf6387" "8f10062a" "812bd1b7" "8932550e" \
-          "74b494c5" "de4a03d3" "60f0d301" "21a0f87d" \
-          "1dbce6f9" "383ac666" "564e76d9" "01f6c2a1" \
-          "54629c90" "7a2745c1" "1682edae" "95788e34" \
-          "ec0c0a62" "cafcd282" "a7b8a5df" "4ac4cf8f" \
-          "d42d4ce3" "ee65e72e" "48a45518" "2529933f" \
-          "9b680aa7" "a3201a0c" "1f07d483" "05f1d29e" \
-          "8bcdb781" "316f0226" "7674ab17" "25924ece" \
-          "22187ae0" "e7d1a226" "6f4cba54" "23f16734" \
-          "bca97238" "89075e43" "c8815b62" "24cc7635" \
-          "85895582" "007227e1" "b33a5c42" "1c3dfc04" \
-          "331f6468" "bd557163" "b774360c" "2170dea0" \
-          "372c761d" "52d896fa" "279f7071" "ac544d6d" \
-          "a8b596f6" "6fdbd162" "60ee09e3" "c6b507"
-        }
-        let(:sign){ [encoded_data].pack("H*") }
+    context "with not \"ssh-rsa\"" do
+      let(:encoded_data){
+        "00000007" "01234567" "01234500" "00010079" \
+        "9e4cd767" "4c1c76af" "e67df9d9" "3654cf82" \
+        "827510ae" "6918d691" "74112927" "872676dd" \
+        "98bf6387" "8f10062a" "812bd1b7" "8932550e" \
+        "74b494c5" "de4a03d3" "60f0d301" "21a0f87d" \
+        "1dbce6f9" "383ac666" "564e76d9" "01f6c2a1" \
+        "54629c90" "7a2745c1" "1682edae" "95788e34" \
+        "ec0c0a62" "cafcd282" "a7b8a5df" "4ac4cf8f" \
+        "d42d4ce3" "ee65e72e" "48a45518" "2529933f" \
+        "9b680aa7" "a3201a0c" "1f07d483" "05f1d29e" \
+        "8bcdb781" "316f0226" "7674ab17" "25924ece" \
+        "22187ae0" "e7d1a226" "6f4cba54" "23f16734" \
+        "bca97238" "89075e43" "c8815b62" "24cc7635" \
+        "85895582" "007227e1" "b33a5c42" "1c3dfc04" \
+        "331f6468" "bd557163" "b774360c" "2170dea0" \
+        "372c761d" "52d896fa" "279f7071" "ac544d6d" \
+        "a8b596f6" "6fdbd162" "60ee09e3" "c6b507"
+      }
+      let(:sign){ [encoded_data].pack("H*") }
 
-        it "returns false" do
-          expect( server_host_key_algorithm.verify digest, sign, data ).to be false
-        end
+      it "returns false" do
+        expect( server_host_key_algorithm.verify sign, data ).to be false
       end
+    end
 
-      context "with incorrect sign" do
-        let(:encoded_data){
-          "00000007" "7373682d" "72736178" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "12345678" \
-          "12345678" "12345678" "12345678" "123456"
-        }
-        let(:sign){ [encoded_data].pack("H*") }
+    context "with incorrect sign" do
+      let(:encoded_data){
+        "00000007" "7373682d" "72736178" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "12345678" \
+        "12345678" "12345678" "12345678" "123456"
+      }
+      let(:sign){ [encoded_data].pack("H*") }
 
-        it "returns false" do
-          expect( server_host_key_algorithm.verify digest, sign, data ).to be false
-        end
+      it "returns false" do
+        expect( server_host_key_algorithm.verify sign, data ).to be false
       end
     end
   end

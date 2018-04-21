@@ -9,9 +9,8 @@ module HrrRbSsh
     class ServerHostKeyAlgorithm
       class SshDss < ServerHostKeyAlgorithm
         NAME = 'ssh-dss'
-
         PREFERENCE = 10
-
+        DIGEST = 'sha1'
         SECRET_KEY = <<-EOB
 -----BEGIN DSA PRIVATE KEY-----
 MIIBuwIBAAKBgQD3fQ6cwTtOJpVI0iASOQZxkhwPRNy7UwovQkEK6bXW33HaCebO
@@ -43,8 +42,8 @@ MRl/p42OrQzL/chRPvRf
           PublicKeyBlob.encode payload
         end
 
-        def sign digest, data
-          hash = OpenSSL::Digest.digest(digest, data)
+        def sign data
+          hash = OpenSSL::Digest.digest(self.class::DIGEST, data)
           sign_der = @dss.syssign(hash)
           sign_asn1 = OpenSSL::ASN1.decode(sign_der)
           sign_r = sign_asn1.value[0].value.to_s(2).rjust(20, ["00"].pack("H"))
@@ -56,7 +55,7 @@ MRl/p42OrQzL/chRPvRf
           Signature.encode payload
         end
 
-        def verify digest, sign, data
+        def verify sign, data
           payload = Signature.decode sign
           dss_signature_blob = payload['dss_signature_blob']
           sign_r = dss_signature_blob[ 0, 20]
@@ -68,7 +67,7 @@ MRl/p42OrQzL/chRPvRf
             ]
           )
           sign_der = sign_asn1.to_der
-          hash = OpenSSL::Digest.digest(digest, data)
+          hash = OpenSSL::Digest.digest(self.class::DIGEST, data)
           payload['ssh-dss'] == 'ssh-dss' && @dss.sysverify(hash, sign_der)
         end
       end

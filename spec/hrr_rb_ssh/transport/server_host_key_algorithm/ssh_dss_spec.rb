@@ -55,43 +55,39 @@ RSpec.describe HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshDss do
   describe '#verify' do
     let(:data){ 'testing' }
 
-    context "when digest is \"sha1\"" do
-      let(:digest){ 'sha1' }
+    context "with correct sign" do
+      let(:sign){ server_host_key_algorithm.sign(data) }
 
-      context "with correct sign" do
-        let(:sign){ server_host_key_algorithm.sign(digest, data) }
-
-        it "returns true" do
-          expect( server_host_key_algorithm.verify digest, sign, data ).to be true
-        end
+      it "returns true" do
+        expect( server_host_key_algorithm.verify sign, data ).to be true
       end
+    end
 
-      context "with not \"ssh-dss\"" do
-        let(:encoded_data){
-          "00000007" "01234567" "01234500" "000028dd" \
-          "0c8ad315" "a3f59dde" "e8a42cfb" "3b40c459" \
-          "de0df3d6" "d6f39961" "c0b7ee85" "183ffc1c" \
-          "5f2f9c99" "ad5e12"
-        }
-        let(:sign){ [encoded_data].pack("H*") }
+    context "with not \"ssh-dss\"" do
+      let(:encoded_data){
+        "00000007" "01234567" "01234500" "000028dd" \
+        "0c8ad315" "a3f59dde" "e8a42cfb" "3b40c459" \
+        "de0df3d6" "d6f39961" "c0b7ee85" "183ffc1c" \
+        "5f2f9c99" "ad5e12"
+      }
+      let(:sign){ [encoded_data].pack("H*") }
 
-        it "returns false" do
-          expect( server_host_key_algorithm.verify digest, sign, data ).to be false
-        end
+      it "returns false" do
+        expect( server_host_key_algorithm.verify sign, data ).to be false
       end
+    end
 
-      context "with incorrect sign" do
-        let(:encoded_data){
-          "00000007" "7373682d" "64737367" "01234567" \
-          "01234567" "01234567" "01234567" "01234567" \
-          "01234567" "01234567" "01234567" "01234567" \
-          "01234567" "013456"
-        }
-        let(:sign){ [encoded_data].pack("H*") }
+    context "with incorrect sign" do
+      let(:encoded_data){
+        "00000007" "7373682d" "64737367" "01234567" \
+        "01234567" "01234567" "01234567" "01234567" \
+        "01234567" "01234567" "01234567" "01234567" \
+        "01234567" "013456"
+      }
+      let(:sign){ [encoded_data].pack("H*") }
 
-        it "returns false" do
-          expect( server_host_key_algorithm.verify digest, sign, data ).to be false
-        end
+      it "returns false" do
+        expect( server_host_key_algorithm.verify sign, data ).to be false
       end
     end
   end

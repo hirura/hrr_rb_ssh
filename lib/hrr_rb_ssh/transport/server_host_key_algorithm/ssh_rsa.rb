@@ -8,9 +8,8 @@ module HrrRbSsh
     class ServerHostKeyAlgorithm
       class SshRsa < ServerHostKeyAlgorithm
         NAME = 'ssh-rsa'
-
         PREFERENCE = 20
-
+        DIGEST = 'sha1'
         SECRET_KEY = <<-EOB
 -----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA71zHt9RvbXmxuOCWPKR65iBHO+a8M7Mfo4vRCs/dorZN7XL1
@@ -55,17 +54,17 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
           PublicKeyBlob.encode payload
         end
 
-        def sign digest, data
+        def sign data
           payload = {
             'ssh-rsa'            => 'ssh-rsa',
-            'rsa_signature_blob' => @rsa.sign(digest, data),
+            'rsa_signature_blob' => @rsa.sign(self.class::DIGEST, data),
           }
           Signature.encode payload
         end
 
-        def verify digest, sign, data
+        def verify sign, data
           payload = Signature.decode sign
-          payload['ssh-rsa'] == 'ssh-rsa' && @rsa.verify(digest, payload['rsa_signature_blob'], data)
+          payload['ssh-rsa'] == 'ssh-rsa' && @rsa.verify(self.class::DIGEST, payload['rsa_signature_blob'], data)
         end
       end
     end

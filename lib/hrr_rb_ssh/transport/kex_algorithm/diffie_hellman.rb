@@ -67,7 +67,7 @@ module HrrRbSsh
 
         def sign transport
           h = hash transport
-          s = transport.server_host_key_algorithm.sign self.class::DIGEST, h
+          s = transport.server_host_key_algorithm.sign h
 
           s
         end
