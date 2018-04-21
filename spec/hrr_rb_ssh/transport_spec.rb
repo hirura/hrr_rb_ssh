@@ -543,48 +543,6 @@ RSpec.describe HrrRbSsh::Transport do
         }
       }
       let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
-      let(:remote_kexdh_init_message){
-        {
-          'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_INIT::VALUE,
-          "e"              => remote_dh_pub_key,
-        }
-      }
-      let(:remote_kexdh_init_payload){ HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.encode remote_kexdh_init_message }
-      let(:dh_group14_p){
-        "FFFFFFFF" "FFFFFFFF" "C90FDAA2" "2168C234" \
-        "C4C6628B" "80DC1CD1" "29024E08" "8A67CC74" \
-        "020BBEA6" "3B139B22" "514A0879" "8E3404DD" \
-        "EF9519B3" "CD3A431B" "302B0A6D" "F25F1437" \
-        "4FE1356D" "6D51C245" "E485B576" "625E7EC6" \
-        "F44C42E9" "A637ED6B" "0BFF5CB6" "F406B7ED" \
-        "EE386BFB" "5A899FA5" "AE9F2411" "7C4B1FE6" \
-        "49286651" "ECE45B3D" "C2007CB8" "A163BF05" \
-        "98DA4836" "1C55D39A" "69163FA8" "FD24CF5F" \
-        "83655D23" "DCA3AD96" "1C62F356" "208552BB" \
-        "9ED52907" "7096966D" "670C354E" "4ABC9804" \
-        "F1746C08" "CA18217C" "32905E46" "2E36CE3B" \
-        "E39E772C" "180E8603" "9B2783A2" "EC07A28F" \
-        "B5C55DF0" "6F4C52C9" "DE2BCBF6" "95581718" \
-        "3995497C" "EA956AE5" "15D22618" "98FA0510" \
-        "15728E5A" "8AACAA68" "FFFFFFFF" "FFFFFFFF"
-      }
-      let(:dh_group14_g){
-        2
-      }
-      let(:remote_dh){
-        dh = OpenSSL::PKey::DH.new
-        if dh.respond_to?(:set_pqg)
-          dh.set_pqg OpenSSL::BN.new(dh_group14_p, 16), nil, OpenSSL::BN.new(dh_group14_g)
-        else
-          dh.p = OpenSSL::BN.new(dh_group14_p, 16)
-          dh.g = OpenSSL::BN.new(dh_group14_g)
-        end
-        dh.generate_key!
-        dh
-      }
-      let(:remote_dh_pub_key){ 
-        remote_dh.pub_key.to_i
-      }
       let(:remote_newkeys_message){
         {
           'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
@@ -604,8 +562,10 @@ RSpec.describe HrrRbSsh::Transport do
         expect(transport.i_c).to be nil
         expect(transport.i_s).to be nil
 
-        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(3).times
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
+        expect(transport).to receive(:start_kex_algorithm).with(no_args).once
+        expect(transport).to receive(:update_encryption_mac_compression_algorithms).with(no_args).once
+        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(2).times
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_newkeys_payload).exactly(2).times
 
         transport.exchange_key
 
@@ -632,33 +592,78 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       it "updates kex_algorithm" do
-        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(3).times
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
+        expect(transport).to receive(:start_kex_algorithm).with(no_args).once
+        expect(transport).to receive(:update_encryption_mac_compression_algorithms).with(no_args).once
+        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(2).times
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_newkeys_payload).exactly(2).times
 
         transport.exchange_key
 
         expect(transport.server_host_key_algorithm).to be_an_instance_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa
         expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1
       end
+    end
 
-      it "gets shared secret" do
-        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(3).times
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
+    describe "#start_kex_algorithm" do
+      let(:transport){ described_class.new io, mode }
+      let(:mock_kex_algorithm){ double('kex algorithm') }
 
-        transport.exchange_key
+      before :example do
+        transport.instance_variable_set('@kex_algorithm', mock_kex_algorithm)
+      end
 
-        local_kex_algorithm  = transport.instance_variable_get('@kex_algorithm')
-        local_e              = local_kex_algorithm.pub_key
-        local_shared_secret  = local_kex_algorithm.shared_secret
-        remote_shared_secret = OpenSSL::BN.new(remote_dh.compute_key(local_e), 2).to_i
-        expect(local_shared_secret).to eq remote_shared_secret
+      it "calls kex_algorithm#start" do
+        expect(mock_kex_algorithm).to receive(:start).with(transport, mode).once
+        transport.start_kex_algorithm
+      end
+    end
+
+    describe "#update_encryption_mac_compression_algorithms" do
+      let(:transport){ described_class.new io, mode }
+      let(:mock_kex_algorithm){ double('kex algorithm') }
+
+      let(:hash){ 'dummy hash' }
+      let(:iv_c_to_s ){ '1234567890123456'  }
+      let(:iv_s_to_c ){ '1234567890123456'  }
+      let(:key_c_to_s){ '1234567890123456' }
+      let(:key_s_to_c){ '1234567890123456' }
+      let(:mac_c_to_s){ '12345678901234567890' }
+      let(:mac_s_to_c){ '12345678901234567890' }
+
+      let(:remote_kex_algorithms                         ){ ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"] }
+      let(:remote_server_host_key_algorithms             ){ ["ssh-rsa", "ssh-dss"]                                        }
+      let(:remote_encryption_algorithms_client_to_server ){ ["aes128-cbc", "aes256-cbc"]                                  }
+      let(:remote_encryption_algorithms_server_to_client ){ ["aes128-cbc", "aes256-cbc"]                                  }
+      let(:remote_mac_algorithms_client_to_server        ){ ["hmac-sha1", "hmac-md5"]                                     }
+      let(:remote_mac_algorithms_server_to_client        ){ ["hmac-sha1", "hmac-md5"]                                     }
+      let(:remote_compression_algorithms_client_to_server){ ["none", "zlib@openssh.com", "zlib"]                          }
+      let(:remote_compression_algorithms_server_to_client){ ["none", "zlib@openssh.com", "zlib"]                          }
+
+      before :example do
+        transport.instance_variable_set('@kex_algorithm', mock_kex_algorithm)
+        transport.instance_variable_set('@remote_kex_algorithms',                          remote_kex_algorithms                         )
+        transport.instance_variable_set('@remote_server_host_key_algorithms',              remote_server_host_key_algorithms             )
+        transport.instance_variable_set('@remote_encryption_algorithms_client_to_server',  remote_encryption_algorithms_client_to_server )
+        transport.instance_variable_set('@remote_encryption_algorithms_server_to_client',  remote_encryption_algorithms_server_to_client )
+        transport.instance_variable_set('@remote_mac_algorithms_client_to_server',         remote_mac_algorithms_client_to_server        )
+        transport.instance_variable_set('@remote_mac_algorithms_server_to_client',         remote_mac_algorithms_server_to_client        )
+        transport.instance_variable_set('@remote_compression_algorithms_client_to_server', remote_compression_algorithms_client_to_server)
+        transport.instance_variable_set('@remote_compression_algorithms_server_to_client', remote_compression_algorithms_server_to_client)
       end
 
       it "updates encryption, mac, and compression algorithms" do
-        expect(mock_sender).to   receive(:send).with(transport, anything).exactly(3).times
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload, remote_kexdh_init_payload, remote_newkeys_payload).exactly(3).times
+        expect(mock_kex_algorithm).to receive(:hash).with(transport).and_return(hash).once
 
-        transport.exchange_key
+        expect(mock_kex_algorithm).to receive(:iv_c_to_s ).with(transport, 'aes128-cbc').and_return(iv_c_to_s).once
+        expect(mock_kex_algorithm).to receive(:iv_s_to_c ).with(transport, 'aes128-cbc').and_return(iv_s_to_c).once
+        expect(mock_kex_algorithm).to receive(:key_c_to_s).with(transport, 'aes128-cbc').and_return(key_c_to_s).once
+        expect(mock_kex_algorithm).to receive(:key_s_to_c).with(transport, 'aes128-cbc').and_return(key_s_to_c).once
+        expect(mock_kex_algorithm).to receive(:mac_c_to_s).with(transport, 'hmac-sha1' ).and_return(mac_c_to_s).once
+        expect(mock_kex_algorithm).to receive(:mac_s_to_c).with(transport, 'hmac-sha1' ).and_return(mac_s_to_c).once
+
+        transport.update_encryption_mac_compression_algorithms
+
+        expect(transport.session_id).to be hash
 
         expect(transport.incoming_encryption_algorithm).to  be_an_instance_of HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc
         expect(transport.outgoing_encryption_algorithm).to  be_an_instance_of HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc
@@ -837,8 +842,10 @@ RSpec.describe HrrRbSsh::Transport do
         expect(transport.i_c).to be nil
         expect(transport.i_s).to be nil
 
-        expect(mock_sender).to   receive(:send).with(transport, anything).once
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload).once
+        expect(transport).to receive(:start_kex_algorithm).with(no_args).once
+        expect(transport).to receive(:update_encryption_mac_compression_algorithms).with(no_args).once
+        expect(mock_sender).to   receive(:send).with(transport, anything).twice
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload).twice
 
         transport.exchange_key
 
@@ -865,8 +872,10 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       it "updates kex_algorithm" do
-        expect(mock_sender).to   receive(:send).with(transport, anything).once
-        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload).once
+        expect(transport).to receive(:start_kex_algorithm).with(no_args).once
+        expect(transport).to receive(:update_encryption_mac_compression_algorithms).with(no_args).once
+        expect(mock_sender).to   receive(:send).with(transport, anything).twice
+        expect(mock_receiver).to receive(:receive).with(transport).with(transport).and_return(remote_kexinit_payload).twice
 
         transport.exchange_key
 

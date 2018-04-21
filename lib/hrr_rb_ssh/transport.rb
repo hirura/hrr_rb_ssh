@@ -209,7 +209,6 @@ module HrrRbSsh
     def exchange_version
       send_version
       receive_version
-
       update_version_strings
     end
 
@@ -224,18 +223,17 @@ module HrrRbSsh
             receive_kexinit receive
           end
           update_kex_and_server_host_key_algorithms
-
-          case @mode
-          when HrrRbSsh::Transport::Mode::SERVER
-            receive_kexdh_init receive
-            send_kexdh_reply
-
-            send_newkeys
-            receive_newkeys receive
-          end
+          start_kex_algorithm
+          send_newkeys
+          receive_newkeys receive
+          update_encryption_mac_compression_algorithms
         end
       end
       @in_kex = false
+    end
+
+    def start_kex_algorithm
+      @kex_algorithm.start self, @mode
     end
 
     def verify_service_request
@@ -383,23 +381,6 @@ module HrrRbSsh
       update_remote_algorithms message
     end
 
-    def receive_kexdh_init payload
-      message = HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.decode payload
-      @kex_algorithm.set_e message['e']
-      @session_id ||= @kex_algorithm.hash self
-    end
-
-    def send_kexdh_reply
-        message = {
-          'message number'                                => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
-          'server public host key and certificates (K_S)' => @server_host_key_algorithm.server_public_host_key,
-          'f'                                             => @kex_algorithm.pub_key,
-          'signature of H'                                => @kex_algorithm.sign(self),
-        }
-        payload = HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.encode message
-        send payload
-    end
-
     def send_newkeys
         message = {
           'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
@@ -410,8 +391,6 @@ module HrrRbSsh
 
     def receive_newkeys payload
       message = HrrRbSsh::Message::SSH_MSG_NEWKEYS.decode payload
-
-      update_encryption_mac_compression_algorithms
     end
 
     def receive_service_request
@@ -456,6 +435,7 @@ module HrrRbSsh
     end
 
     def update_encryption_mac_compression_algorithms
+      @session_id ||= @kex_algorithm.hash(self)
       update_encryption_algorithm
       update_mac_algorithm
       update_compression_algorithm

@@ -68,6 +68,48 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup1Sha1 do
     end
   end
 
+  describe '#start' do
+    let(:mock_t){ double('mock transport') }
+
+    let(:remote_kexdh_init_message){
+      {
+        'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_INIT::VALUE,
+        "e"              => remote_dh_pub_key,
+      }
+    }
+    let(:remote_kexdh_init_payload){
+      HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.encode remote_kexdh_init_message
+    }
+    let(:server_host_key_algorithm){ double('server host key algorithm') }
+    let(:server_public_host_key){ 'server public host key' }
+    let(:sign){ 'sign' }
+    let(:local_kexdh_reply_message){
+      {
+        'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
+        'server public host key and certificates (K_S)' => server_public_host_key,
+        'f'                                             => kex_algorithm.pub_key,
+        'signature of H'                                => sign,
+      }
+    }
+    let(:local_kexdh_reply_payload){
+      HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.encode local_kexdh_reply_message
+    }
+
+    context "when transport mode is server" do
+      it "exchanges public keys and gets shared secret" do
+        expect(mock_t).to receive(:receive).with(no_args).and_return(remote_kexdh_init_payload).once
+        expect(mock_t).to receive(:send).with(local_kexdh_reply_payload).once
+        expect(mock_t).to receive(:server_host_key_algorithm).with(no_args).and_return(server_host_key_algorithm).once
+        expect(server_host_key_algorithm).to receive(:server_public_host_key).with(no_args).and_return(server_public_host_key).once
+        expect(kex_algorithm).to receive(:sign).with(mock_t).and_return(sign).once
+
+        kex_algorithm.start mock_t, HrrRbSsh::Transport::Mode::SERVER
+
+        expect(kex_algorithm.shared_secret).to eq OpenSSL::BN.new(remote_dh.compute_key(kex_algorithm.pub_key), 2).to_i
+      end
+    end
+  end
+
   describe '#set_e' do
     it "updates remote_dh_pub_key" do
       expect { kex_algorithm.set_e remote_dh_pub_key }.to change { kex_algorithm.instance_variable_get('@e') }.from( nil ).to( remote_dh_pub_key )
