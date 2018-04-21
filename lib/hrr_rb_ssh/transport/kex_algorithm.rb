@@ -16,3 +16,5 @@ end
 
 require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman_group1_sha1'
 require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman_group14_sha1'
+require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman_group_exchange_sha1'
+require 'hrr_rb_ssh/transport/kex_algorithm/diffie_hellman_group_exchange_sha256'
