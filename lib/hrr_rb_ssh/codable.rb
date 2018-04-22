@@ -25,8 +25,13 @@ module HrrRbSsh
       logger.debug('encoding message: ' + message.inspect)
       definition = common_definition + conditional_definition(message.merge complementary_message)
       definition.map{ |data_type, field_name|
-        field_value = if message[field_name].instance_of? ::Proc then message[field_name].call else message[field_name] end
-        data_type.encode( field_value )
+        begin
+          field_value = if message[field_name].instance_of? ::Proc then message[field_name].call else message[field_name] end
+          data_type.encode( field_value )
+        rescue => e
+          logger.debug("'field_name', 'field_value': #{field_name.inspect}, #{field_value.inspect}")
+          raise e
+        end
       }.join
     end
 
