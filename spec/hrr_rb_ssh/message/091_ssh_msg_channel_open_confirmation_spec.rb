@@ -64,8 +64,6 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
         'sender channel'      => 2,
         'initial window size' => 3,
         'maximum packet size' => 4,
-        'originator address'  => '1.2.3.4',
-        'originator port'     => 12345,
       }
     }
     let(:payload){
@@ -75,8 +73,6 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
         HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
         HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message['originator address']),
-        HrrRbSsh::DataType::Uint32.encode(message['originator port']),
       ].join
     }
 
@@ -107,10 +103,6 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
         'sender channel'             => 2,
         'initial window size'        => 3,
         'maximum packet size'        => 4,
-        'address that was connected' => '4.3.2.1',
-        'port that was connected'    => 54321,
-        'originator IP address'      => '1.2.3.4',
-        'originator port'            => 12345,
       }
     }
     let(:payload){
@@ -120,10 +112,6 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
         HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
         HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message['address that was connected']),
-        HrrRbSsh::DataType::Uint32.encode(message['port that was connected']),
-        HrrRbSsh::DataType::String.encode(message['originator IP address']),
-        HrrRbSsh::DataType::Uint32.encode(message['originator port']),
       ].join
     }
 
@@ -154,10 +142,6 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
         'sender channel'        => 2,
         'initial window size'   => 3,
         'maximum packet size'   => 4,
-        'host to connect'       => '4.3.2.1',
-        'port to connect'       => 54321,
-        'originator IP address' => '1.2.3.4',
-        'originator port'       => 12345,
       }
     }
     let(:payload){
@@ -167,10 +151,6 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
         HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
         HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
         HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message['host to connect']),
-        HrrRbSsh::DataType::Uint32.encode(message['port to connect']),
-        HrrRbSsh::DataType::String.encode(message['originator IP address']),
-        HrrRbSsh::DataType::Uint32.encode(message['originator port']),
       ].join
     }
 

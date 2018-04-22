@@ -31,26 +31,16 @@ module HrrRbSsh
       X11_DEFINITION = [
         #[DataType, Field Name]
         #[DataType::String,   'channel type' : "x11"],
-        [DataType::String,    'originator address'],
-        [DataType::Uint32,    'originator port'],
       ]
 
       FORWARDED_TCPIP_DEFINITION = [
         #[DataType, Field Name]
         #[DataType::String,   'channel type' : "forwarded-tcpip"],
-        [DataType::String,    'address that was connected'],
-        [DataType::Uint32,    'port that was connected'],
-        [DataType::String,    'originator IP address'],
-        [DataType::Uint32,    'originator port'],
       ]
 
       DIRECT_TCPIP_DEFINITION = [
         #[DataType, Field Name]
         #[DataType::String,   'channel type' : "direct-tcpip"],
-        [DataType::String,    'host to connect'],
-        [DataType::Uint32,    'port to connect'],
-        [DataType::String,    'originator IP address'],
-        [DataType::Uint32,    'originator port'],
       ]
 
       CONDITIONAL_DEFINITION = {
