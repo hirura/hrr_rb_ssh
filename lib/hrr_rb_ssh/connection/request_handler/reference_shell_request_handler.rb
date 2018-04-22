@@ -23,7 +23,7 @@ module HrrRbSsh
                 STDERR.reopen pts, 'w'
                 pts.close
                 context.vars[:env] ||= Hash.new
-                exec context.vars[:env], 'login', '-f', context.username
+                exec context.vars[:env], 'login', '-pf', context.username
               end
 
               pts.close
