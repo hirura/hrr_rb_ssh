@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-RSpec.describe HrrRbSsh::Connection::Channel::ProcChain do
+RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::ProcChain do
   describe ".new" do
     it "takes no arguments" do
       expect { described_class.new }.not_to raise_error
@@ -51,7 +51,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::ProcChain do
     let(:proc_chain){ described_class.new }
     let(:q){ proc_chain.instance_variable_get('@q') }
     let(:next_proc){ double('next proc') }
-    let(:chain_context_class){ HrrRbSsh::Connection::Channel::ProcChain::ChainContext }
+    let(:chain_context_class){ HrrRbSsh::Connection::Channel::ChannelType::Session::ProcChain::ChainContext }
     let(:arguments){ [1, 2, 3] }
 
     before :example do

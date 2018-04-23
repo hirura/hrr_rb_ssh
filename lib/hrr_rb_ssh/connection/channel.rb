@@ -3,7 +3,6 @@
 
 require 'socket'
 require 'hrr_rb_ssh/logger'
-require 'hrr_rb_ssh/connection/channel/proc_chain'
 require 'hrr_rb_ssh/connection/channel/channel_type'
 
 module HrrRbSsh
@@ -13,24 +12,34 @@ module HrrRbSsh
       MAXIMUM_PACKET_SIZE = 100000
 
       attr_reader \
-        :receive_payload_queue
+        :channel_type,
+        :local_channel,
+        :remote_channel,
+        :local_window_size,
+        :local_maximum_packet_size,
+        :remote_window_size,
+        :remote_maximum_packet_size,
+        :receive_message_queue,
+        :request_handler_io
 
-      def initialize connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
+      def initialize connection, message
         @logger = HrrRbSsh::Logger.new self.class.name
 
         @connection = connection
-        @channel_type = channel_type
-        @local_channel  = local_channel
-        @remote_channel = remote_channel
+
+        @channel_type = message['channel type']
+        @local_channel  = message['sender channel']
+        @remote_channel = message['sender channel']
         @local_window_size          = INITIAL_WINDOW_SIZE
         @local_maximum_packet_size  = MAXIMUM_PACKET_SIZE
-        @remote_window_size         = initial_window_size
-        @remote_maximum_packet_size = maximum_packet_size
+        @remote_window_size         = message['initial window size']
+        @remote_maximum_packet_size = message['maximum packet size']
 
-        @receive_payload_queue = Queue.new
+        @channel_type_instance = ChannelType[@channel_type].new connection, self, message
+
+        @receive_message_queue = Queue.new
         @receive_data_queue = Queue.new
 
-        @proc_chain = ProcChain.new
         @channel_io, @request_handler_io = UNIXSocket.pair
 
         @closed = nil
@@ -40,7 +49,7 @@ module HrrRbSsh
         @channel_loop_thread = channel_loop_thread
         @sender_thread       = sender_thread
         @receiver_thread     = receiver_thread
-        @proc_chain_thread   = proc_chain_thread
+        @channel_type_instance.start
         @closed = false
       end
 
@@ -48,10 +57,10 @@ module HrrRbSsh
         return if @closed
         @logger.info("close channel")
         @closed = true
-        unless from == :proc_chain_thread
-          @proc_chain_thread.exit
+        unless from == :channel_type_instance
+          @channel_type_instance.close
         end
-        @receive_payload_queue.close
+        @receive_message_queue.close
         @receive_data_queue.close
         begin
           @request_handler_io.close
@@ -64,7 +73,7 @@ module HrrRbSsh
           Thread.pass
         end
         begin
-          if from == :proc_chain_thread
+          if from == :channel_type_instance
             send_channel_eof
             case exitstatus
             when Integer
@@ -89,11 +98,10 @@ module HrrRbSsh
       def channel_loop_thread
         Thread.start do
           @logger.info("start channel loop thread")
-          variables = {}
           loop do
             begin
-              message = @receive_payload_queue.deq
-              if message.nil? && @receive_payload_queue.closed?
+              message = @receive_message_queue.deq
+              if message.nil? && @receive_message_queue.closed?
                 @receive_data_queue.close
                 @logger.info("closing channel loop thread")
                 break
@@ -101,7 +109,7 @@ module HrrRbSsh
               case message['message number']
               when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
                 @logger.info("received channel request: #{message['request type']}")
-                request message, variables
+                @channel_type_instance.request message
                 if message['want reply']
                   send_channel_success
                 end
@@ -189,27 +197,6 @@ module HrrRbSsh
           end
           @logger.info("receiver thread closed")
         }
-      end
-
-      def proc_chain_thread
-        Thread.start {
-          @logger.info("start proc chain thread")
-          begin
-            exitstatus = @proc_chain.call_next
-          rescue => e
-            @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
-            exitstatus = 1
-          ensure
-            @logger.info("closing proc chain thread")
-            close from=:proc_chain_thread, exitstatus=exitstatus
-            @logger.info("proc chain thread closed")
-          end
-        }
-      end
-
-      def request message, variables
-        request_type = message['request type']
-        ChannelType[@channel_type]::RequestType[request_type].run @proc_chain, @connection.username, @request_handler_io, variables, message, @connection.options
       end
 
       def send_channel_success

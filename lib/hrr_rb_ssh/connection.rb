@@ -99,36 +99,31 @@ module HrrRbSsh
     def channel_open payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.decode payload
-      channel_type = message['channel type']
-      local_channel  = message['sender channel']
-      remote_channel = message['sender channel']
-      initial_window_size = message['initial window size']
-      maximum_packet_size = message['maximum packet size']
-      channel = Channel.new self, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
-      @channels[local_channel] = channel
+      channel = Channel.new self, message
+      @channels[channel.local_channel] = channel
       channel.start
-      send_channel_open_confirmation channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
+      send_channel_open_confirmation channel
     end
 
     def channel_request payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.decode payload
       local_channel = message['recipient channel']
-      @channels[local_channel].receive_payload_queue.enq message
+      @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_window_adjust payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.decode payload
       local_channel = message['recipient channel']
-      @channels[local_channel].receive_payload_queue.enq message
+      @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_data payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.decode payload
       local_channel = message['recipient channel']
-      @channels[local_channel].receive_payload_queue.enq message
+      @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_eof payload
@@ -136,7 +131,7 @@ module HrrRbSsh
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.decode payload
       local_channel = message['recipient channel']
       channel = @channels[local_channel]
-      channel.receive_payload_queue.close
+      channel.receive_message_queue.close
     end
 
     def channel_close payload
@@ -166,14 +161,14 @@ module HrrRbSsh
       @authentication.send payload
     end
 
-    def send_channel_open_confirmation channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size
+    def send_channel_open_confirmation channel
       message = {
         'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
-        'channel type'        => channel_type,
-        'recipient channel'   => remote_channel,
-        'sender channel'      => local_channel,
-        'initial window size' => initial_window_size,
-        'maximum packet size' => maximum_packet_size,
+        'channel type'        => channel.channel_type,
+        'recipient channel'   => channel.remote_channel,
+        'sender channel'      => channel.local_channel,
+        'initial window size' => channel.local_window_size,
+        'maximum packet size' => channel.local_maximum_packet_size,
       }
       payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.encode message
       @authentication.send payload

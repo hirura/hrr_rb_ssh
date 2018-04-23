@@ -279,7 +279,7 @@ RSpec.describe HrrRbSsh::Connection do
       }
 
       let(:channel0){ double('channel0') }
-      let(:channel0_receive_payload_queue){ double('channel0_receive_payload_queue') }
+      let(:channel0_receive_message_queue){ double('channel0_receive_message_queue') }
 
       before :example do
         connection.instance_variable_get('@channels')[0] = channel0
@@ -399,8 +399,8 @@ RSpec.describe HrrRbSsh::Connection do
           "channel type"        => "session",
           "recipient channel"   => 0,
           "sender channel"      => 0,
-          "initial window size" => 2097152,
-          "maximum packet size" => 32768,
+          "initial window size" => HrrRbSsh::Connection::Channel::INITIAL_WINDOW_SIZE,
+          "maximum packet size" => HrrRbSsh::Connection::Channel::MAXIMUM_PACKET_SIZE,
         }
       }
       let(:channel_open_confirmation_payload){
@@ -437,16 +437,16 @@ RSpec.describe HrrRbSsh::Connection do
       }
 
       let(:channel){ double('channel') }
-      let(:receive_payload_queue){ Queue.new }
+      let(:receive_message_queue){ Queue.new }
 
       before :example do
         connection.instance_variable_get('@channels')[0] = channel
       end
 
       it "calls channel_request" do
-        allow(channel).to receive(:receive_payload_queue).and_return(receive_payload_queue)
+        allow(channel).to receive(:receive_message_queue).and_return(receive_message_queue)
         connection.channel_request channel_request_payload
-        expect(connection.instance_variable_get('@channels')[0].receive_payload_queue.pop).to eq channel_request_message
+        expect(connection.instance_variable_get('@channels')[0].receive_message_queue.pop).to eq channel_request_message
       end
     end
   end
@@ -472,16 +472,16 @@ RSpec.describe HrrRbSsh::Connection do
       }
 
       let(:channel){ double('channel') }
-      let(:receive_payload_queue){ Queue.new }
+      let(:receive_message_queue){ Queue.new }
 
       before :example do
         connection.instance_variable_get('@channels')[0] = channel
       end
 
       it "calls channel_window_adjust" do
-        allow(channel).to receive(:receive_payload_queue).and_return(receive_payload_queue)
+        allow(channel).to receive(:receive_message_queue).and_return(receive_message_queue)
         connection.channel_window_adjust channel_window_adjust_payload
-        expect(connection.instance_variable_get('@channels')[0].receive_payload_queue.pop).to eq channel_window_adjust_message
+        expect(connection.instance_variable_get('@channels')[0].receive_message_queue.pop).to eq channel_window_adjust_message
       end
     end
   end
@@ -507,16 +507,16 @@ RSpec.describe HrrRbSsh::Connection do
       }
 
       let(:channel){ double('channel') }
-      let(:receive_payload_queue){ Queue.new }
+      let(:receive_message_queue){ Queue.new }
 
       before :example do
         connection.instance_variable_get('@channels')[0] = channel
       end
 
       it "calls channel_data" do
-        allow(channel).to receive(:receive_payload_queue).and_return(receive_payload_queue)
+        allow(channel).to receive(:receive_message_queue).and_return(receive_message_queue)
         connection.channel_data channel_data_payload
-        expect(connection.instance_variable_get('@channels')[0].receive_payload_queue.pop).to eq channel_data_message
+        expect(connection.instance_variable_get('@channels')[0].receive_message_queue.pop).to eq channel_data_message
       end
     end
   end
@@ -530,7 +530,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:connection){ described_class.new authentication, options }
 
     let(:channel0){ double('channel0') }
-    let(:channel0_receive_payload_queue){ double('channel0_receive_payload_queue') }
+    let(:channel0_receive_message_queue){ double('channel0_receive_message_queue') }
 
     before :example do
       connection.instance_variable_get('@channels')[0] = channel0
@@ -548,8 +548,8 @@ RSpec.describe HrrRbSsh::Connection do
       }
 
       it "eofs the channel and delete the channel from channels" do
-        expect(channel0).to receive(:receive_payload_queue).with(no_args).and_return(channel0_receive_payload_queue).once
-        expect(channel0_receive_payload_queue).to receive(:close).with(no_args).once
+        expect(channel0).to receive(:receive_message_queue).with(no_args).and_return(channel0_receive_message_queue).once
+        expect(channel0_receive_message_queue).to receive(:close).with(no_args).once
         connection.channel_eof channel_eof_payload
       end
     end

@@ -13,7 +13,16 @@ RSpec.describe HrrRbSsh::Connection::Channel do
   let(:remote_channel){ 0 }
   let(:initial_window_size){ 2097152 }
   let(:maximum_packet_size){ 32768 }
-  let(:channel){ described_class.new(connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size) }
+  let(:channel_open_message){
+    {
+      'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+      'channel type'        => channel_type,
+      'sender channel'      => remote_channel,
+      'initial window size' => initial_window_size,
+      'maximum packet size' => maximum_packet_size,
+    }
+  }
+  let(:channel){ described_class.new(connection, channel_open_message) }
 
   describe '::INITIAL_WINDOW_SIZE' do
     it "is defined" do
@@ -28,22 +37,32 @@ RSpec.describe HrrRbSsh::Connection::Channel do
   end
 
   describe '.new' do
-    it "takes six arguments: connection, channel_type, local_channel, remote_channel, initial_window_size, maximum_packet_size" do
+    it "takes two arguments: connection, channel_open_message" do
       expect { channel }.not_to raise_error
     end
 
-    it "initializes receive_payload_queue readable" do
-      expect(channel.receive_payload_queue).to be_an_instance_of ::Queue
-      expect(channel.receive_payload_queue.size).to eq 0
+    it "initializes receive_message_queue readable" do
+      expect(channel.receive_message_queue).to be_an_instance_of ::Queue
+      expect(channel.receive_message_queue.size).to eq 0
+    end
+
+    it "instantiate an instance of ChannelType" do
+      expect(channel.instance_variable_get('@channel_type_instance')).to be_an_instance_of HrrRbSsh::Connection::Channel::ChannelType::Session
     end
   end
 
   describe "#start" do
+    let(:mock_channel_type_instance){ double('channel type instance') }
+
+    before :example do
+      channel.instance_variable_set('@channel_type_instance', mock_channel_type_instance)
+    end
+
     it "starts threads and becomes not closed" do
       expect(channel).to receive(:channel_loop_thread).with(no_args).once
       expect(channel).to receive(:sender_thread).with(no_args).once
       expect(channel).to receive(:receiver_thread).with(no_args).once
-      expect(channel).to receive(:proc_chain_thread).with(no_args).once
+      expect(mock_channel_type_instance).to receive(:start).with(no_args).once
       channel.start
       expect(channel.instance_variable_get('@closed')).to be false
     end
@@ -65,7 +84,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         channel.instance_variable_set('@closed', false)
       end
 
-      context "from proc_chain_thread" do
+      context "from channel_type_instance" do
         context "when connection is not closed" do
           let(:channel_eof_message){
             {
@@ -104,9 +123,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
               expect(connection).to receive(:send).with(channel_eof_payload).once
               expect(connection).to receive(:send).with(channel_request_exit_status_payload).once
               expect(connection).to receive(:send).with(channel_close_payload).once
-              channel.close from=:proc_chain_thread, exitstatus
+              channel.close from=:channel_type_instance, exitstatus
               expect(channel.instance_variable_get('@closed')).to be true
-              expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+              expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
               expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
               expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
               expect(channel.instance_variable_get('@channel_io').closed?).to be true
@@ -118,9 +137,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
             it "updates closed with true, closes queues and IOs, and send EOF, exit-status, and CLOSE" do
               expect(connection).to receive(:send).with(channel_eof_payload).once
               expect(connection).to receive(:send).with(channel_close_payload).once
-              channel.close from=:proc_chain_thread, exitstatus
+              channel.close from=:channel_type_instance, exitstatus
               expect(channel.instance_variable_get('@closed')).to be true
-              expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+              expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
               expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
               expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
               expect(channel.instance_variable_get('@channel_io').closed?).to be true
@@ -131,9 +150,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         context "when connection is closed" do
           it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
             expect(channel).to receive(:send_channel_eof).with(no_args).and_raise(HrrRbSsh::ClosedConnectionError).once
-            expect { channel.close from=:proc_chain_thread }.not_to raise_error
+            expect { channel.close from=:channel_type_instance }.not_to raise_error
             expect(channel.instance_variable_get('@closed')).to be true
-            expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+            expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
             expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
             expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
             expect(channel.instance_variable_get('@channel_io').closed?).to be true
@@ -143,9 +162,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         context "when send raises unexpected error" do
           it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
             expect(channel).to receive(:send_channel_eof).with(no_args).and_raise(RuntimeError).once
-            expect { channel.close from=:proc_chain_thread }.not_to raise_error
+            expect { channel.close from=:channel_type_instance }.not_to raise_error
             expect(channel.instance_variable_get('@closed')).to be true
-            expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+            expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
             expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
             expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
             expect(channel.instance_variable_get('@channel_io').closed?).to be true
@@ -155,15 +174,18 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
       context "from others" do
         context "when connection is not closed" do
+          let(:mock_channel_type_instance){ double('channel type instance') }
+
           before :example do
-            channel.instance_variable_set('@proc_chain_thread', Thread.new {})
+            channel.instance_variable_set('@channel_type_instance', mock_channel_type_instance)
           end
 
           it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
             expect(channel).to receive(:send_channel_close).with(no_args).once
+            expect(mock_channel_type_instance).to receive(:close).with(no_args).once
             channel.close
             expect(channel.instance_variable_get('@closed')).to be true
-            expect(channel.instance_variable_get('@receive_payload_queue').closed?).to be true
+            expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
             expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
             expect(channel.instance_variable_get('@request_handler_io').closed?).to be true
             expect(channel.instance_variable_get('@channel_io').closed?).to be true
@@ -205,7 +227,6 @@ RSpec.describe HrrRbSsh::Connection::Channel do
           "want reply"        => want_reply,
         }
       }
-      let(:variables){ Hash.new }
 
       let(:channel_success_message){
         {
@@ -221,16 +242,15 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         let(:want_reply){ true }
 
         before :example do
-          channel.instance_variable_set('@proc_chain_thread', Thread.new {})
-          channel.receive_payload_queue.enq channel_request_message
+          channel.receive_message_queue.enq channel_request_message
         end
 
         it "calls #request and returns channel success" do
-          expect(channel).to receive(:request).with(channel_request_message, variables).once
+          expect(channel.instance_variable_get('@channel_type_instance')).to receive(:request).with(channel_request_message).once
           expect(connection).to receive(:send).with(channel_success_payload).once
           allow(connection).to receive(:send).with(any_args)
           t = channel.channel_loop_thread
-          channel.receive_payload_queue.close
+          channel.receive_message_queue.close
           channel.close
           t.join
         end
@@ -240,15 +260,14 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         let(:want_reply){ false }
 
         before :example do
-          channel.instance_variable_set('@proc_chain_thread', Thread.new {})
-          channel.receive_payload_queue.enq channel_request_message
+          channel.receive_message_queue.enq channel_request_message
         end
 
         it "calls #request and returns channel success" do
-          expect(channel).to receive(:request).with(channel_request_message, variables).once
+          expect(channel.instance_variable_get('@channel_type_instance')).to receive(:request).with(channel_request_message).once
           allow(connection).to receive(:send).with(any_args)
           t = channel.channel_loop_thread
-          channel.receive_payload_queue.close
+          channel.receive_message_queue.close
           channel.close
           t.join
         end
@@ -265,15 +284,14 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       }
 
       before :example do
-        channel.instance_variable_set('@proc_chain_thread', Thread.new {})
-        channel.receive_payload_queue.enq channel_data_message
+        channel.receive_message_queue.enq channel_data_message
       end
 
       it "enqueues data into @receive_data" do
         allow(connection).to receive(:send).with(any_args)
         t = channel.channel_loop_thread
         expect(channel.instance_variable_get('@receive_data_queue').deq).to be channel_data_message['data']
-        channel.receive_payload_queue.close
+        channel.receive_message_queue.close
         channel.close
         t.join
       end
@@ -289,14 +307,13 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       }
 
       before :example do
-        channel.instance_variable_set('@proc_chain_thread', Thread.new {})
-        channel.receive_payload_queue.enq channel_window_adjust_message
+        channel.receive_message_queue.enq channel_window_adjust_message
       end
 
       it "updates remote window size" do
         allow(connection).to receive(:send).with(any_args)
         t = channel.channel_loop_thread
-        channel.receive_payload_queue.close
+        channel.receive_message_queue.close
         channel.close
         t.join
         expect(channel.instance_variable_get('@remote_window_size')).to eq (2097152 + 12345)
@@ -311,14 +328,13 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       }
 
       before :example do
-        channel.instance_variable_set('@proc_chain_thread', Thread.new {})
-        channel.receive_payload_queue.enq unknown_message
+        channel.receive_message_queue.enq unknown_message
       end
 
       it "do nothing" do
         allow(connection).to receive(:send).with(any_args)
         t = channel.channel_loop_thread
-        channel.receive_payload_queue.close
+        channel.receive_message_queue.close
         channel.close
         t.join
       end
@@ -334,10 +350,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       }
 
       before :example do
-        channel.instance_variable_set('@proc_chain_thread', Thread.new {})
         channel.instance_variable_get('@receive_data_queue').close
-        channel.receive_payload_queue.enq channel_data_message
-        channel.receive_payload_queue.close
+        channel.receive_message_queue.enq channel_data_message
+        channel.receive_message_queue.close
       end
 
       it "enqueues data into @receive_data_queue" do
@@ -364,7 +379,6 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
     before :example do
       channel.instance_variable_set('@closed', false)
-      channel.instance_variable_set('@proc_chain_thread', Thread.new {})
       channel.instance_variable_get('@request_handler_io').write send_data
     end
 
@@ -409,7 +423,6 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
     before :example do
       channel.instance_variable_set('@closed', false)
-      channel.instance_variable_set('@proc_chain_thread', Thread.new {})
     end
 
     context "when no error occurs" do
@@ -492,58 +505,6 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         t = channel.receiver_thread
         t.join
       end
-    end
-  end
-
-  describe '#proc_chain_thread' do
-    before :example do
-      channel.instance_variable_set('@closed', false)
-    end
-
-    context "when no error occurs" do
-      it "calls @proc_chain.call_next with no arguments, and closes itself" do
-        expect(channel.instance_variable_get('@proc_chain')).to receive(:call_next).with(no_args).once
-        t = channel.proc_chain_thread
-        t.join
-        expect(channel.closed?).to be true
-      end
-    end
-
-    context "when error occurs" do
-      it "closes itself as well" do
-        expect(channel.instance_variable_get('@proc_chain')).to receive(:call_next).with(no_args).and_raise(RuntimeError).once
-        t = channel.proc_chain_thread
-        t.join
-        expect(channel.closed?).to be true
-      end
-    end
-  end
-
-  describe "#request" do
-    let(:request_type){ 'shell' }
-    let(:channel_request_message){
-      {
-        'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-        "recipient channel" => 0,
-        "request type"      => request_type,
-        "want reply"        => true,
-      }
-    }
-    let(:variables){ Hash.new }
-    let(:arguments){
-      [
-        channel.instance_variable_get('@proc_chain'),
-        channel.instance_variable_get('@username'),
-        channel.instance_variable_get('@request_handler_io'),
-        variables,
-        channel_request_message,
-        channel.instance_variable_get('@connection').options,
-      ]
-    }
-
-    it "calls ChannelType['session']::RequestType['shell'].run" do
-      expect(HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Shell).to receive(:run).with(*arguments).once
-      channel.request(channel_request_message, variables)
     end
   end
 end

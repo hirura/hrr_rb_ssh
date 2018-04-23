@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-RSpec.describe HrrRbSsh::Connection::Channel::ProcChain::ChainContext do
+RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::ProcChain::ChainContext do
   describe ".new" do
     let(:proc_chain){ double("proc_chain") }
 
