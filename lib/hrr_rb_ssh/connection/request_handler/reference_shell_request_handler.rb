@@ -1,6 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'timeout'
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/request_handler'
 
@@ -62,16 +63,35 @@ module HrrRbSsh
                 end
               }
 
-              pid, status = Process.waitpid2 pid
-              threads.each do |t|
-                begin
-                  t.exit
-                  t.join
-                rescue => e
-                  context.logger.error(e.full_message)
+              begin
+                pid, status = Process.waitpid2 pid
+                context.logger.info "shell exited with status #{status.inspect}"
+                status.exitstatus
+              ensure
+                unless status
+                  context.logger.info "exiting shell"
+                  Process.kill :TERM, pid
+                  begin
+                    Timeout.timeout(1) do
+                      pid, status = Process.waitpid2 pid
+                    end
+                  rescue Timeout::Error
+                    context.logger.warn "force exiting shell"
+                    Process.kill :KILL, pid
+                    pid, status = Process.waitpid2 pid
+                  end
+                  context.logger.info "shell exited with status #{status.inspect}"
                 end
+                threads.each do |t|
+                  begin
+                    t.exit
+                    t.join
+                  rescue => e
+                    context.logger.error(e.full_message)
+                  end
+                end
+                context.logger.info "proc chain finished"
               end
-              status.exitstatus
             }
           }
         end
