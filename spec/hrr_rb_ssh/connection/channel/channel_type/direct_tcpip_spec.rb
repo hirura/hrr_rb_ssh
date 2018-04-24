@@ -70,7 +70,6 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::DirectTcpip do
     after :example do
       channel_type_instance.instance_variable_get('@sender_thread').exit
       channel_type_instance.instance_variable_get('@receiver_thread').exit
-      channel_type_instance.instance_variable_get('@socket').close
       server.close
     end
 
