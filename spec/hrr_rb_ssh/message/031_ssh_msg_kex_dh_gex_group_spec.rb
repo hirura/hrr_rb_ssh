@@ -19,16 +19,16 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP do
 
   let(:message){
     {
-      'message number' => value,
-      'p'              => 1234567890,
-      'g'              => 2,
+      :'message number' => value,
+      :'p'              => 1234567890,
+      :'g'              => 2,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Mpint.encode(message['p']),
-      HrrRbSsh::DataType::Mpint.encode(message['g']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Mpint.encode(message[:'p']),
+      HrrRbSsh::DataType::Mpint.encode(message[:'g']),
     ].join
   }
 

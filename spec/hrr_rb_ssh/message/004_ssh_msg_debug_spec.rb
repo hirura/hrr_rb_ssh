@@ -19,18 +19,18 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_DEBUG do
 
   let(:message){
     {
-      'message number' => value,
-      'always_display' => true,
-      'message'        => 'debug message',
-      'language tag'   => '',
+      :'message number' => value,
+      :'always_display' => true,
+      :'message'        => 'debug message',
+      :'language tag'   => '',
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Boolean.encode(message['always_display']),
-      HrrRbSsh::DataType::String.encode(message['message']),
-      HrrRbSsh::DataType::String.encode(message['language tag']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Boolean.encode(message[:'always_display']),
+      HrrRbSsh::DataType::String.encode(message[:'message']),
+      HrrRbSsh::DataType::String.encode(message[:'language tag']),
     ].join
   }
 

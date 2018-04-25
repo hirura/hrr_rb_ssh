@@ -17,18 +17,18 @@ module HrrRbSsh
         end
 
         def authenticate userauth_request_message
-          public_key_algorithm_name = userauth_request_message['public key algorithm name']
+          public_key_algorithm_name = userauth_request_message[:'public key algorithm name']
           unless Algorithm.list_preferred.include?(public_key_algorithm_name)
             @logger.info("unsupported public key algorithm: #{public_key_algorithm_name}")
             return false
           end
-          unless userauth_request_message['with signature']
+          unless userauth_request_message[:'with signature']
             @logger.info("public key algorithm is ok, require signature")
-            public_key_blob = userauth_request_message['public key blob']
+            public_key_blob = userauth_request_message[:'public key blob']
             userauth_pk_ok_message public_key_algorithm_name, public_key_blob
           else
             @logger.info("verify signature")
-            username = userauth_request_message['user name']
+            username = userauth_request_message[:'user name']
             algorithm = Algorithm[public_key_algorithm_name].new
             context = Context.new(username, algorithm, @session_id, userauth_request_message)
             @authenticator.authenticate context
@@ -37,9 +37,9 @@ module HrrRbSsh
 
         def userauth_pk_ok_message public_key_algorithm_name, public_key_blob
           message = {
-            'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
-            'public key algorithm name from the request' => public_key_algorithm_name,
-            'public key blob from the request'           => public_key_blob,
+            :'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
+            :'public key algorithm name from the request' => public_key_algorithm_name,
+            :'public key blob from the request'           => public_key_blob,
           }
           payload = HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.encode message
         end

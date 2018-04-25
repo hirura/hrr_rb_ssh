@@ -25,8 +25,8 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password do
   describe "#authenticate" do
     let(:userauth_request_message){
       {
-        'user name'          => 'username',
-        'plaintext password' => 'password',
+        :'user name'          => "username",
+        :'plaintext password' => "password",
       }
     }
 

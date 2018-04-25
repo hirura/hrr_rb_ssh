@@ -44,7 +44,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
     context "when 'public key algorithm name' is unsupported" do
       let(:userauth_request_message){
         {
-          'public key algorithm name' => 'unsupported',
+          :'public key algorithm name' => "unsupported",
         }
       }
 
@@ -71,17 +71,17 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
       context "when 'with signature' is false" do
         let(:userauth_request_message){
           {
-            'with signature'            => false,
-            'public key algorithm name' => 'supported',
-            'public key blob'           => 'dummy',
+            :'with signature'            => false,
+            :'public key algorithm name' => "supported",
+            :'public key blob'           => "dummy",
           }
         }
 
         let(:userauth_pk_ok_message){
           {
-            'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
-            'public key algorithm name from the request' => 'supported',
-            'public key blob from the request'           => 'dummy',
+            :'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
+            :'public key algorithm name from the request' => "supported",
+            :'public key blob from the request'           => "dummy",
 
           }
         }
@@ -97,14 +97,14 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
       context "when 'with signature' is true" do
         let(:userauth_request_message){
           {
-            'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
-            'user name'                 => 'username',
-            'service name'              => 'ssh-connection',
-            'method name'               => 'publickey',
-            'with signature'            => true,
-            'public key algorithm name' => 'supported',
-            'public key blob'           => 'dummy',
-            'signature'                 => 'signature',
+            :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+            :'user name'                 => "username",
+            :'service name'              => "ssh-connection",
+            :'method name'               => "publickey",
+            :'with signature'            => true,
+            :'public key algorithm name' => "supported",
+            :'public key blob'           => "dummy",
+            :'signature'                 => "signature",
           }
         }
 

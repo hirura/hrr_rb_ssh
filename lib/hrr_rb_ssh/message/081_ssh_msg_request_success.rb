@@ -16,19 +16,19 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
+        [DataType::Byte,      :'message number'],
       ]
 
       TCPIP_FORWARD_DEFINITION = [
         #[DataType, Field Name]
-        #[DataType::String,   'request name' : "tcpip-forward"],
-        [DataType::Uint32,    'port that was bound on the server'],
+        #[DataType::String,   :'request name' : "tcpip-forward"],
+        [DataType::Uint32,    :'port that was bound on the server'],
       ]
 
       CONDITIONAL_DEFINITION = {
         # Field Name => {Field Value => Conditional Definition}
-        'request name' => {
-          'tcpip-forward' => TCPIP_FORWARD_DEFINITION,
+        :'request name' => {
+          "tcpip-forward" => TCPIP_FORWARD_DEFINITION,
         }
       }
     end

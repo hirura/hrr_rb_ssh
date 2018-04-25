@@ -13,14 +13,14 @@ module HrrRbSsh
             include Codable
           end
           DEFINITION = [
-            [DataType::String, 'V_C'],
-            [DataType::String, 'V_S'],
-            [DataType::String, 'I_C'],
-            [DataType::String, 'I_S'],
-            [DataType::String, 'K_S'],
-            [DataType::Mpint,  'e'],
-            [DataType::Mpint,  'f'],
-            [DataType::Mpint,  'k'],
+            [DataType::String, :'V_C'],
+            [DataType::String, :'V_S'],
+            [DataType::String, :'I_C'],
+            [DataType::String, :'I_S'],
+            [DataType::String, :'K_S'],
+            [DataType::Mpint,  :'e'],
+            [DataType::Mpint,  :'f'],
+            [DataType::Mpint,  :'k'],
           ]
         end
       end

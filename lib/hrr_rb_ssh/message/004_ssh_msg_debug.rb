@@ -16,10 +16,10 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::Boolean,   'always_display'],
-        [DataType::String,    'message'],
-        [DataType::String,    'language tag'],
+        [DataType::Byte,      :'message number'],
+        [DataType::Boolean,   :'always_display'],
+        [DataType::String,    :'message'],
+        [DataType::String,    :'language tag'],
       ]
     end
   end

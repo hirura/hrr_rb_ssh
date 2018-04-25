@@ -90,7 +90,7 @@ module HrrRbSsh
     def global_request payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::ID)
       message = HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.decode payload
-      if message['want reply']
+      if message[:'want reply']
         # returns always failure because global request is not supported so far
         send_request_failure
       end
@@ -108,28 +108,28 @@ module HrrRbSsh
     def channel_request payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.decode payload
-      local_channel = message['recipient channel']
+      local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_window_adjust payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.decode payload
-      local_channel = message['recipient channel']
+      local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_data payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.decode payload
-      local_channel = message['recipient channel']
+      local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_eof payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.decode payload
-      local_channel = message['recipient channel']
+      local_channel = message[:'recipient channel']
       channel = @channels[local_channel]
       channel.receive_message_queue.close
     end
@@ -137,7 +137,7 @@ module HrrRbSsh
     def channel_close payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.decode payload
-      local_channel = message['recipient channel']
+      local_channel = message[:'recipient channel']
       channel = @channels[local_channel]
       channel.close
       @logger.info("deleting channel")
@@ -147,7 +147,7 @@ module HrrRbSsh
 
     def send_request_success
       message = {
-        'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
+        :'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
       }
       payload = HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS.encode message
       @authentication.send payload
@@ -155,7 +155,7 @@ module HrrRbSsh
 
     def send_request_failure
       message = {
-        'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
+        :'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
       }
       payload = HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE.encode message
       @authentication.send payload
@@ -163,12 +163,12 @@ module HrrRbSsh
 
     def send_channel_open_confirmation channel
       message = {
-        'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
-        'channel type'        => channel.channel_type,
-        'recipient channel'   => channel.remote_channel,
-        'sender channel'      => channel.local_channel,
-        'initial window size' => channel.local_window_size,
-        'maximum packet size' => channel.local_maximum_packet_size,
+        :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
+        :'channel type'        => channel.channel_type,
+        :'recipient channel'   => channel.remote_channel,
+        :'sender channel'      => channel.local_channel,
+        :'initial window size' => channel.local_window_size,
+        :'maximum packet size' => channel.local_maximum_packet_size,
       }
       payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.encode message
       @authentication.send payload

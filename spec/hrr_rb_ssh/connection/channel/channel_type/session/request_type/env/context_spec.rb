@@ -8,12 +8,12 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   let(:variables){ Hash.new }
   let(:message){
     {
-      'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-      'recipient channel' => 1,
-      'request type'      => 'env',
-      'want reply'        => true,
-      'variable name'     => 'variable name',
-      'variable value'    => 'variable value',
+      :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+      :'recipient channel' => 1,
+      :'request type'      => 'env',
+      :'want reply'        => true,
+      :'variable name'     => 'variable name',
+      :'variable value'    => 'variable value',
     }
   }
   let(:context){ described_class.new proc_chain, username, io, variables, message }
@@ -69,14 +69,14 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   end
 
   describe "#variable_name" do
-    it "returns message['variable name']" do
-      expect(context.variable_name).to be message['variable name']
+    it "returns message[:'variable name']" do
+      expect(context.variable_name).to be message[:'variable name']
     end
   end
 
   describe "#variable_value" do
-    it "returns message['variable value']" do
-      expect(context.variable_value).to be message['variable value']
+    it "returns message[:'variable value']" do
+      expect(context.variable_value).to be message[:'variable value']
     end
   end
 end

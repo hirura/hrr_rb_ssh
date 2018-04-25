@@ -259,10 +259,10 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives disconnect message" do
         let(:disconnect_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
-            'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-            'description'    => 'disconnected by user',
-            'language tag'   => '',
+            :'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+            :'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+            :'description'    => 'disconnected by user',
+            :'language tag'   => '',
           }
         }
         let(:disconnect_payload){
@@ -279,8 +279,8 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives ignore message and then some message" do
         let(:ignore_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE,
-            'data'           => 'ignored',
+            :'message number' => HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE,
+            :'data'           => 'ignored',
           }
         }
         let(:ignore_payload){
@@ -297,8 +297,8 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives unimplemented message and then some message" do
         let(:unimplemented_message){
           {
-            'message number'                             => HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE,
-            'packet sequence number of rejected message' => 123,
+            :'message number'                             => HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE,
+            :'packet sequence number of rejected message' => 123,
           }
         }
         let(:unimplemented_payload){
@@ -315,10 +315,10 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives debug message and then some message" do
         let(:debug_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE,
-            'always_display' => true,
-            'message'        => 'message',
-            'language tag'   => 'language tag',
+            :'message number' => HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE,
+            :'always_display' => true,
+            :'message'        => 'message',
+            :'language tag'   => 'language tag',
           }
         }
         let(:debug_payload){
@@ -335,8 +335,8 @@ RSpec.describe HrrRbSsh::Transport do
       context "when receives other message" do
         let(:service_request_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
-            'service name'   => 'service name',
+            :'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
+            :'service name'   => 'service name',
           }
         }
         let(:service_request_payload){
@@ -441,10 +441,10 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:disconnect_message){
         {
-          'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
-          "reason code"    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-          "description"    => "disconnected by user",
-          "language tag"   => ""
+          :'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+          :'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+          :'description'    => "disconnected by user",
+          :'language tag'   => ""
         }
       }
       let(:disconnect_payload){
@@ -526,26 +526,26 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:remote_kexinit_message){
         {
-          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
-          "cookie (random byte)"                    => 0,
-          "kex_algorithms"                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
-          "server_host_key_algorithms"              => ["ssh-rsa", "ssh-dss"],
-          "encryption_algorithms_client_to_server"  => ["aes128-cbc", "aes256-cbc"],
-          "encryption_algorithms_server_to_client"  => ["aes128-cbc", "aes256-cbc"],
-          "mac_algorithms_client_to_server"         => ["hmac-sha1", "hmac-md5"],
-          "mac_algorithms_server_to_client"         => ["hmac-sha1", "hmac-md5"],
-          "compression_algorithms_client_to_server" => ["none", "zlib@openssh.com", "zlib"],
-          "compression_algorithms_server_to_client" => ["none", "zlib@openssh.com", "zlib"],
-          "languages_client_to_server"              => [],
-          "languages_server_to_client"              => [],
-          "first_kex_packet_follows"                => false,
-          "0 (reserved for future extension)"       => 0
+          :'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+          :'cookie (random byte)'                    => 0,
+          :'kex_algorithms'                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
+          :'server_host_key_algorithms'              => ["ssh-rsa", "ssh-dss"],
+          :'encryption_algorithms_client_to_server'  => ["aes128-cbc", "aes256-cbc"],
+          :'encryption_algorithms_server_to_client'  => ["aes128-cbc", "aes256-cbc"],
+          :'mac_algorithms_client_to_server'         => ["hmac-sha1", "hmac-md5"],
+          :'mac_algorithms_server_to_client'         => ["hmac-sha1", "hmac-md5"],
+          :'compression_algorithms_client_to_server' => ["none", "zlib@openssh.com", "zlib"],
+          :'compression_algorithms_server_to_client' => ["none", "zlib@openssh.com", "zlib"],
+          :'languages_client_to_server'              => [],
+          :'languages_server_to_client'              => [],
+          :'first_kex_packet_follows'                => false,
+          :'0 (reserved for future extension)'       => 0
         }
       }
       let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
       let(:remote_newkeys_message){
         {
-          'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
+          :'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
         }
       }
       let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode remote_newkeys_message }
@@ -682,8 +682,8 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:service_request_message){
         {
-          'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
-          "service name"   => 'ssh-userauth',
+          :'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
+          :'service name'   => 'ssh-userauth',
         }
       }
       let(:service_request_payload){
@@ -692,8 +692,8 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:service_accept_message){
         {
-          'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
-          "service name"   => 'ssh-userauth',
+          :'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
+          :'service name'   => 'ssh-userauth',
         }
       }
       let(:service_accept_payload){
@@ -720,10 +720,10 @@ RSpec.describe HrrRbSsh::Transport do
       context "when 'ssh-userauth' is not registered as acceptable service" do
         let(:disconnect_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
-            'reason code'        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-            'description'        => 'disconnected by user',
-            'language tag'       => '',
+            :'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+            :'reason code'        => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+            :'description'        => 'disconnected by user',
+            :'language tag'       => '',
           }
         }
         let(:disconnect_payload){
@@ -794,20 +794,20 @@ RSpec.describe HrrRbSsh::Transport do
 
       let(:remote_kexinit_message){
         {
-          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
-          "cookie (random byte)"                    => 37,
-          "kex_algorithms"                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
-          "server_host_key_algorithms"              => ["ssh-rsa", "ssh-dss"],
-          "encryption_algorithms_client_to_server"  => ["aes128-cbc", "aes256-cbc"],
-          "encryption_algorithms_server_to_client"  => ["aes128-cbc", "aes256-cbc"],
-          "mac_algorithms_client_to_server"         => ["hmac-sha1", "hmac-md5"],
-          "mac_algorithms_server_to_client"         => ["hmac-sha1", "hmac-md5"],
-          "compression_algorithms_client_to_server" => ["none", "zlib@openssh.com", "zlib"],
-          "compression_algorithms_server_to_client" => ["none", "zlib@openssh.com", "zlib"],
-          "languages_client_to_server"              => [],
-          "languages_server_to_client"              => [],
-          "first_kex_packet_follows"                => false,
-          "0 (reserved for future extension)"       => 0
+          :'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+          :'cookie (random byte)'                    => 37,
+          :'kex_algorithms'                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
+          :'server_host_key_algorithms'              => ["ssh-rsa", "ssh-dss"],
+          :'encryption_algorithms_client_to_server'  => ["aes128-cbc", "aes256-cbc"],
+          :'encryption_algorithms_server_to_client'  => ["aes128-cbc", "aes256-cbc"],
+          :'mac_algorithms_client_to_server'         => ["hmac-sha1", "hmac-md5"],
+          :'mac_algorithms_server_to_client'         => ["hmac-sha1", "hmac-md5"],
+          :'compression_algorithms_client_to_server' => ["none", "zlib@openssh.com", "zlib"],
+          :'compression_algorithms_server_to_client' => ["none", "zlib@openssh.com", "zlib"],
+          :'languages_client_to_server'              => [],
+          :'languages_server_to_client'              => [],
+          :'first_kex_packet_follows'                => false,
+          :'0 (reserved for future extension)'       => 0
         }
       }
       let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
@@ -822,20 +822,20 @@ RSpec.describe HrrRbSsh::Transport do
 
       it "updates i_c and i_s" do
         local_kexinit_message = {
-          'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
-          'cookie (random byte)'                    => lambda { rand(0x01_00) },
-          "kex_algorithms"                          => HrrRbSsh::Transport::KexAlgorithm.list_preferred,
-          "server_host_key_algorithms"              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred,
-          "encryption_algorithms_client_to_server"  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
-          "encryption_algorithms_server_to_client"  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
-          "mac_algorithms_client_to_server"         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
-          "mac_algorithms_server_to_client"         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
-          "compression_algorithms_client_to_server" => HrrRbSsh::Transport::CompressionAlgorithm.list_preferred,
-          "compression_algorithms_server_to_client" => HrrRbSsh::Transport::CompressionAlgorithm.list_preferred,
-          "languages_client_to_server"              => [],
-          "languages_server_to_client"              => [],
-          "first_kex_packet_follows"                => false,
-          "0 (reserved for future extension)"       => 0
+          :'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+          :'cookie (random byte)'                    => lambda { rand(0x01_00) },
+          :'kex_algorithms'                          => HrrRbSsh::Transport::KexAlgorithm.list_preferred,
+          :'server_host_key_algorithms'              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred,
+          :'encryption_algorithms_client_to_server'  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
+          :'encryption_algorithms_server_to_client'  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
+          :'mac_algorithms_client_to_server'         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
+          :'mac_algorithms_server_to_client'         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
+          :'compression_algorithms_client_to_server' => HrrRbSsh::Transport::CompressionAlgorithm.list_preferred,
+          :'compression_algorithms_server_to_client' => HrrRbSsh::Transport::CompressionAlgorithm.list_preferred,
+          :'languages_client_to_server'              => [],
+          :'languages_server_to_client'              => [],
+          :'first_kex_packet_follows'                => false,
+          :'0 (reserved for future extension)'       => 0
         }
         local_kexinit_payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode(local_kexinit_message)
 

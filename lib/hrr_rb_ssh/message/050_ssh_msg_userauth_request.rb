@@ -16,40 +16,40 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::String,    'user name'],
-        [DataType::String,    'service name'],
-        [DataType::String,    'method name'],
+        [DataType::Byte,      :'message number'],
+        [DataType::String,    :'user name'],
+        [DataType::String,    :'service name'],
+        [DataType::String,    :'method name'],
       ]
 
       PUBLICKEY_DEFINITION = [
         #[DataType, Field Name]
-        #[DataType::String,   'method name' : "publickey"],
-        [DataType::Boolean,   'with signature'],
-        [DataType::String,    'public key algorithm name'],
-        [DataType::String,    'public key blob'],
+        #[DataType::String,   :'method name' : "publickey"],
+        [DataType::Boolean,   :'with signature'],
+        [DataType::String,    :'public key algorithm name'],
+        [DataType::String,    :'public key blob'],
       ]
 
       PUBLICKEY_SIGNATURE_DEFINITION = [
         #[DataType, Field Name]
-        #[DataType::String,   'with signature' : "TRUE"],
-        [DataType::String,    'signature'],
+        #[DataType::String,   :'with signature' : "TRUE"],
+        [DataType::String,    :'signature'],
       ]
 
       PASSWORD_DEFINITION = [
         #[DataType, Field Name]
-        #[DataType::String,   'method name' : "password"],
-        [DataType::Boolean,   'FALSE'],
-        [DataType::String,    'plaintext password'],
+        #[DataType::String,   :'method name' : "password"],
+        [DataType::Boolean,   :'FALSE'],
+        [DataType::String,    :'plaintext password'],
       ]
 
       CONDITIONAL_DEFINITION = {
         # Field Name => {Field Value => Conditional Definition}
-        'method name' => {
-          'publickey' => PUBLICKEY_DEFINITION,
-          'password'  => PASSWORD_DEFINITION,
+        :'method name' => {
+          "publickey" => PUBLICKEY_DEFINITION,
+          "password"  => PASSWORD_DEFINITION,
         },
-        'with signature' => {
+        :'with signature' => {
           true => PUBLICKEY_SIGNATURE_DEFINITION,
         },
       }

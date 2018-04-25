@@ -19,14 +19,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS do
 
   let(:message){
     {
-      'message number'    => value,
-      'recipient channel' => 1,
+      :'message number'    => value,
+      :'recipient channel' => 1,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
     ].join
   }
 

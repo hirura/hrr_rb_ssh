@@ -15,11 +15,11 @@ module HrrRbSsh
                 include Codable
               end
               DEFINITION = [
-                [DataType::String, 'public key algorithm name'],
-                [DataType::Mpint,  'p'],
-                [DataType::Mpint,  'q'],
-                [DataType::Mpint,  'g'],
-                [DataType::Mpint,  'y'],
+                [DataType::String, :'public key algorithm name'],
+                [DataType::Mpint,  :'p'],
+                [DataType::Mpint,  :'q'],
+                [DataType::Mpint,  :'g'],
+                [DataType::Mpint,  :'y'],
               ]
             end
           end

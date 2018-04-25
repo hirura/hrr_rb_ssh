@@ -8,11 +8,11 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   let(:variables){ Hash.new }
   let(:message){
     {
-      'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-      'recipient channel' => 1,
-      'request type'      => 'exec',
-      'want reply'        => true,
-      'command'           => 'command',
+      :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+      :'recipient channel' => 1,
+      :'request type'      => 'exec',
+      :'want reply'        => true,
+      :'command'           => 'command',
     }
   }
   let(:context){ described_class.new proc_chain, username, io, variables, message }
@@ -68,8 +68,8 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   end
 
   describe "#command" do
-    it "returns message['command']" do
-      expect(context.command).to be message['command']
+    it "returns message[:'command']" do
+      expect(context.command).to be message[:'command']
     end
   end
 end

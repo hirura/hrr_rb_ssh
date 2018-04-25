@@ -31,10 +31,10 @@ module HrrRbSsh
                   @variables  = variables
                   @vars       = variables
 
-                  @terminal_width_columns = message['terminal width, columns']
-                  @terminal_height_rows   = message['terminal height, rows']
-                  @terminal_width_pixels  = message['terminal width, pixels']
-                  @terminal_height_pixels = message['terminal height, pixels']
+                  @terminal_width_columns = message[:'terminal width, columns']
+                  @terminal_height_rows   = message[:'terminal height, rows']
+                  @terminal_width_pixels  = message[:'terminal width, pixels']
+                  @terminal_height_pixels = message[:'terminal height, pixels']
                 end
 
                 def chain_proc &block

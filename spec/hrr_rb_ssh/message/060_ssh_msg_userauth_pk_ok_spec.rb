@@ -19,16 +19,16 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK do
 
   let(:message){
     {
-      'message number'                             => value,
-      'public key algorithm name from the request' => 'dummy',
-      'public key blob from the request'           => 'dummy',
+      :'message number'                             => value,
+      :'public key algorithm name from the request' => 'dummy',
+      :'public key blob from the request'           => 'dummy',
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::String.encode(message['public key algorithm name from the request']),
-      HrrRbSsh::DataType::String.encode(message['public key blob from the request']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::String.encode(message[:'public key algorithm name from the request']),
+      HrrRbSsh::DataType::String.encode(message[:'public key blob from the request']),
     ].join
   }
 

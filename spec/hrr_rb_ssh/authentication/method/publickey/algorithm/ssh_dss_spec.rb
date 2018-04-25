@@ -129,19 +129,19 @@ yFHINL3X2CjZDKKLJ2Fl
         HrrRbSsh::DataType::Mpint.encode(pkey.pub_key.to_i),
       ].join
     }
-    let(:session_id){ 'session id' }
-    let(:username){ 'username' }
+    let(:session_id){ "session id" }
+    let(:username){ "username" }
     let(:message){
       {
-        'session identifier'        => session_id,
-        'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
-        'user name'                 => username,
-        'service name'              => 'ssh-connection',
-        'method name'               => 'publickey',
-        'with signature'            => true,
-        'public key algorithm name' => name,
-        'public key blob'           => public_key_blob,
-        'signature'                 => signature,
+        :'session identifier'        => session_id,
+        :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'user name'                 => username,
+        :'service name'              => "ssh-connection",
+        :'method name'               => "publickey",
+        :'with signature'            => true,
+        :'public key algorithm name' => name,
+        :'public key blob'           => public_key_blob,
+        :'signature'                 => signature,
       }
     }
     let(:data){
@@ -149,8 +149,8 @@ yFHINL3X2CjZDKKLJ2Fl
         HrrRbSsh::DataType::String.encode(session_id),
         HrrRbSsh::DataType::Byte.encode(HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE),
         HrrRbSsh::DataType::String.encode(username),
-        HrrRbSsh::DataType::String.encode('ssh-connection'),
-        HrrRbSsh::DataType::String.encode('publickey'),
+        HrrRbSsh::DataType::String.encode("ssh-connection"),
+        HrrRbSsh::DataType::String.encode("publickey"),
         HrrRbSsh::DataType::Boolean.encode(true),
         HrrRbSsh::DataType::String.encode(name),
         HrrRbSsh::DataType::String.encode(public_key_blob),
@@ -185,7 +185,7 @@ yFHINL3X2CjZDKKLJ2Fl
       let(:signature_blob){ sign_r + sign_s }
       let(:signature){
         [
-          HrrRbSsh::DataType::String.encode('incorrect'),
+          HrrRbSsh::DataType::String.encode("incorrect"),
           HrrRbSsh::DataType::String.encode(signature_blob),
         ].join
       }
@@ -202,7 +202,7 @@ yFHINL3X2CjZDKKLJ2Fl
       let(:sign_r){ sign_asn1.value[0].value.to_s(2).rjust(20, ["00"].pack("H")) }
       let(:sign_s){ sign_asn1.value[1].value.to_s(2).rjust(20, ["00"].pack("H")) }
       let(:signature_blob){ sign_r + sign_s }
-      let(:incorrect_signature_blob){ 'incorrect' + signature_blob }
+      let(:incorrect_signature_blob){ "incorrect" + signature_blob }
       let(:signature){
         [
           HrrRbSsh::DataType::String.encode(name),

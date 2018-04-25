@@ -16,9 +16,9 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::String,    'public key algorithm name from the request'],
-        [DataType::String,    'public key blob from the request'],
+        [DataType::Byte,      :'message number'],
+        [DataType::String,    :'public key algorithm name from the request'],
+        [DataType::String,    :'public key blob from the request'],
       ]
     end
   end

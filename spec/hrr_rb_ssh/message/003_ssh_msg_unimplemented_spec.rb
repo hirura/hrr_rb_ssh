@@ -19,14 +19,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED do
 
   let(:message){
     {
-      'message number'                             => value,
-      'packet sequence number of rejected message' => 123,
+      :'message number'                             => value,
+      :'packet sequence number of rejected message' => 123,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Uint32.encode(message['packet sequence number of rejected message']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'packet sequence number of rejected message']),
     ].join
   }
 

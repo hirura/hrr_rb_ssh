@@ -19,16 +19,16 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA do
 
   let(:message){
     {
-      'message number'    => value,
-      'recipient channel' => 1,
-      'data'              => 'data',
+      :'message number'    => value,
+      :'recipient channel' => 1,
+      :'data'              => 'data',
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-      HrrRbSsh::DataType::String.encode(message['data']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+      HrrRbSsh::DataType::String.encode(message[:'data']),
     ].join
   }
 

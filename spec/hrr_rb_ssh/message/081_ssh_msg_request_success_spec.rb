@@ -19,20 +19,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS do
 
   let(:message){
     {
-      'message number'                    => value,
-      'port that was bound on the server' => 1080,
+      :'message number'                    => value,
+      :'port that was bound on the server' => 1080,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Uint32.encode(message['port that was bound on the server']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'port that was bound on the server']),
     ].join
   }
 
   let(:complementary_message){
     {
-      'request name' => 'tcpip-forward',
+      :'request name' => "tcpip-forward",
     }
   }
 

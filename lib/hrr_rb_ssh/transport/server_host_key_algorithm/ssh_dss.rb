@@ -33,11 +33,11 @@ MRl/p42OrQzL/chRPvRf
 
         def server_public_host_key
           payload = {
-            'ssh-dss' => 'ssh-dss',
-            'p'       => @dss.p.to_i,
-            'q'       => @dss.q.to_i,
-            'g'       => @dss.g.to_i,
-            'y'       => @dss.pub_key.to_i,
+            :'ssh-dss' => "ssh-dss",
+            :'p'       => @dss.p.to_i,
+            :'q'       => @dss.q.to_i,
+            :'g'       => @dss.g.to_i,
+            :'y'       => @dss.pub_key.to_i,
           }
           PublicKeyBlob.encode payload
         end
@@ -49,15 +49,15 @@ MRl/p42OrQzL/chRPvRf
           sign_r = sign_asn1.value[0].value.to_s(2).rjust(20, ["00"].pack("H"))
           sign_s = sign_asn1.value[1].value.to_s(2).rjust(20, ["00"].pack("H"))
           payload = {
-            'ssh-dss'            => 'ssh-dss',
-            'dss_signature_blob' => (sign_r + sign_s),
+            :'ssh-dss'            => "ssh-dss",
+            :'dss_signature_blob' => (sign_r + sign_s),
           }
           Signature.encode payload
         end
 
         def verify sign, data
           payload = Signature.decode sign
-          dss_signature_blob = payload['dss_signature_blob']
+          dss_signature_blob = payload[:'dss_signature_blob']
           sign_r = dss_signature_blob[ 0, 20]
           sign_s = dss_signature_blob[20, 20]
           sign_asn1 = OpenSSL::ASN1::Sequence.new(
@@ -68,7 +68,7 @@ MRl/p42OrQzL/chRPvRf
           )
           sign_der = sign_asn1.to_der
           hash = OpenSSL::Digest.digest(self.class::DIGEST, data)
-          payload['ssh-dss'] == 'ssh-dss' && @dss.sysverify(hash, sign_der)
+          payload[:'ssh-dss'] == "ssh-dss" && @dss.sysverify(hash, sign_der)
         end
       end
     end

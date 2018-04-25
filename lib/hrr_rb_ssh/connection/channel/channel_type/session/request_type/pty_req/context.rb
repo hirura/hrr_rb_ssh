@@ -33,12 +33,12 @@ module HrrRbSsh
                   @variables  = variables
                   @vars       = variables
 
-                  @term_environment_variable_value = message['TERM environment variable value']
-                  @terminal_width_characters       = message['terminal width, characters']
-                  @terminal_height_rows            = message['terminal height, rows']
-                  @terminal_width_pixels           = message['terminal width, pixels']
-                  @terminal_height_pixels          = message['terminal height, pixels']
-                  @encoded_terminal_modes          = message['encoded terminal modes']
+                  @term_environment_variable_value = message[:'TERM environment variable value']
+                  @terminal_width_characters       = message[:'terminal width, characters']
+                  @terminal_height_rows            = message[:'terminal height, rows']
+                  @terminal_width_pixels           = message[:'terminal width, pixels']
+                  @terminal_height_pixels          = message[:'terminal height, pixels']
+                  @encoded_terminal_modes          = message[:'encoded terminal modes']
                 end
 
                 def chain_proc &block

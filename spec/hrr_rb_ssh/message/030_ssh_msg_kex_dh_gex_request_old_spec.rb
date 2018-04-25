@@ -19,14 +19,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST_OLD do
 
   let(:message){
     {
-      'message number' => value,
-      'n'              => 1024,
+      :'message number' => value,
+      :'n'              => 1024,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Uint32.encode(message['n']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'n']),
     ].join
   }
 

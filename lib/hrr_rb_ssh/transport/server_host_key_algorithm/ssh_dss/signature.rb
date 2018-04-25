@@ -13,8 +13,8 @@ module HrrRbSsh
             include Codable
           end
           DEFINITION = [
-            [DataType::String, 'ssh-dss'],
-            [DataType::String, 'dss_signature_blob'],
+            [DataType::String, :'ssh-dss'],
+            [DataType::String, :'dss_signature_blob'],
           ]
         end
       end

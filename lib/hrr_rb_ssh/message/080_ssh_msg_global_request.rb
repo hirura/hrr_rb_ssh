@@ -16,30 +16,30 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::String,    'request name'],
-        [DataType::Boolean,   'want reply'],
+        [DataType::Byte,      :'message number'],
+        [DataType::String,    :'request name'],
+        [DataType::Boolean,   :'want reply'],
       ]
 
       TCPIP_FORWARD_DEFINITION = [
         #[DataType, Field Name]
-        #[DataType::String,   'request name' : "tcpip-forward"],
-        [DataType::String,    'address to bind'],
-        [DataType::Uint32,    'port number to bind'],
+        #[DataType::String,   :'request name' : "tcpip-forward"],
+        [DataType::String,    :'address to bind'],
+        [DataType::Uint32,    :'port number to bind'],
       ]
 
       CANCEL_TCPIP_FORWARD_DEFINITION = [
         #[DataType, Field Name]
-        #[DataType::String,   'request name' : "cancel-tcpip-forward"],
-        [DataType::String,    'address to bind'],
-        [DataType::Uint32,    'port number to bind'],
+        #[DataType::String,   :'request name' : "cancel-tcpip-forward"],
+        [DataType::String,    :'address to bind'],
+        [DataType::Uint32,    :'port number to bind'],
       ]
 
       CONDITIONAL_DEFINITION = {
         # Field Name => {Field Value => Conditional Definition}
-        'request name' => {
-          'tcpip-forward'        => TCPIP_FORWARD_DEFINITION,
-          'cancel-tcpip-forward' => CANCEL_TCPIP_FORWARD_DEFINITION,
+        :'request name' => {
+          "tcpip-forward"        => TCPIP_FORWARD_DEFINITION,
+          "cancel-tcpip-forward" => CANCEL_TCPIP_FORWARD_DEFINITION,
         },
       }
     end

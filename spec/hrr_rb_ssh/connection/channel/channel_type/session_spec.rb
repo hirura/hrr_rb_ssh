@@ -15,11 +15,11 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session do
   let(:maximum_packet_size){ 32768 }
   let(:channel_open_message){
     {
-      'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
-      'channel type'        => channel_type,
-      'sender channel'      => remote_channel,
-      'initial window size' => initial_window_size,
-      'maximum packet size' => maximum_packet_size,
+      :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+      :'channel type'        => channel_type,
+      :'sender channel'      => remote_channel,
+      :'initial window size' => initial_window_size,
+      :'maximum packet size' => maximum_packet_size,
     }
   }
   let(:channel){ HrrRbSsh::Connection::Channel.new(connection, channel_open_message) }
@@ -72,10 +72,10 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session do
     let(:request_type){ 'shell' }
     let(:channel_request_message){
       {
-        'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-        "recipient channel" => 0,
-        "request type"      => request_type,
-        "want reply"        => true,
+        :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+        :'recipient channel' => 0,
+        :'request type'      => request_type,
+        :'want reply'        => true,
       }
     }
     let(:variables){ Hash.new }

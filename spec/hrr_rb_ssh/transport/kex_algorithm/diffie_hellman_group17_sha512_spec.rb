@@ -93,8 +93,8 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup17Sha512 do
 
     let(:remote_kexdh_init_message){
       {
-        'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_INIT::VALUE,
-        "e"              => remote_dh_pub_key,
+        :'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_INIT::VALUE,
+        :'e'              => remote_dh_pub_key,
       }
     }
     let(:remote_kexdh_init_payload){
@@ -105,10 +105,10 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup17Sha512 do
     let(:sign){ 'sign' }
     let(:local_kexdh_reply_message){
       {
-        'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
-        'server public host key and certificates (K_S)' => server_public_host_key,
-        'f'                                             => kex_algorithm.pub_key,
-        'signature of H'                                => sign,
+        :'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
+        :'server public host key and certificates (K_S)' => server_public_host_key,
+        :'f'                                             => kex_algorithm.pub_key,
+        :'signature of H'                                => sign,
       }
     }
     let(:local_kexdh_reply_payload){

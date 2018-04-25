@@ -19,16 +19,16 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE do
 
   let(:message){
     {
-      'message number'                    => value,
-      'authentications that can continue' => ['publickey', 'password'],
-      'partial success'                   => false,
+      :'message number'                    => value,
+      :'authentications that can continue' => ['publickey', 'password'],
+      :'partial success'                   => false,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::NameList.encode(message['authentications that can continue']),
-      HrrRbSsh::DataType::Boolean.encode(message['partial success']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::NameList.encode(message[:'authentications that can continue']),
+      HrrRbSsh::DataType::Boolean.encode(message[:'partial success']),
     ].join
   }
 

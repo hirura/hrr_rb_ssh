@@ -141,15 +141,15 @@ RiRsowkxGlUrp56nZQ0Rj3JNmQeafYplYLNAv3/3vWGiFRUZALIjMg==
     let(:username){ 'username' }
     let(:message){
       {
-        'session identifier'        => session_id,
-        'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
-        'user name'                 => username,
-        'service name'              => 'ssh-connection',
-        'method name'               => 'publickey',
-        'with signature'            => true,
-        'public key algorithm name' => name,
-        'public key blob'           => public_key_blob,
-        'signature'                 => signature,
+        :'session identifier'        => session_id,
+        :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'user name'                 => username,
+        :'service name'              => "ssh-connection",
+        :'method name'               => "publickey",
+        :'with signature'            => true,
+        :'public key algorithm name' => name,
+        :'public key blob'           => public_key_blob,
+        :'signature'                 => signature,
       }
     }
     let(:data){
@@ -157,8 +157,8 @@ RiRsowkxGlUrp56nZQ0Rj3JNmQeafYplYLNAv3/3vWGiFRUZALIjMg==
         HrrRbSsh::DataType::String.encode(session_id),
         HrrRbSsh::DataType::Byte.encode(HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE),
         HrrRbSsh::DataType::String.encode(username),
-        HrrRbSsh::DataType::String.encode('ssh-connection'),
-        HrrRbSsh::DataType::String.encode('publickey'),
+        HrrRbSsh::DataType::String.encode("ssh-connection"),
+        HrrRbSsh::DataType::String.encode("publickey"),
         HrrRbSsh::DataType::Boolean.encode(true),
         HrrRbSsh::DataType::String.encode(name),
         HrrRbSsh::DataType::String.encode(public_key_blob),
@@ -183,7 +183,7 @@ RiRsowkxGlUrp56nZQ0Rj3JNmQeafYplYLNAv3/3vWGiFRUZALIjMg==
       let(:signature_blob){ pkey.sign(digest, data) }
       let(:signature){
         [
-          HrrRbSsh::DataType::String.encode('incorrect'),
+          HrrRbSsh::DataType::String.encode("incorrect"),
           HrrRbSsh::DataType::String.encode(signature_blob),
         ].join
       }
@@ -195,7 +195,7 @@ RiRsowkxGlUrp56nZQ0Rj3JNmQeafYplYLNAv3/3vWGiFRUZALIjMg==
 
     context "with incorrect signature" do
       let(:signature_blob){ pkey.sign(digest, data) }
-      let(:incorrect_signature_blob){ 'incorrect' + signature_blob }
+      let(:incorrect_signature_blob){ "incorrect" + signature_blob }
       let(:signature){
         [
           HrrRbSsh::DataType::String.encode(name),

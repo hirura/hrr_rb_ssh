@@ -103,10 +103,10 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroupExchangeSha2
 
         let(:remote_kex_dh_gex_request_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
-            "min"            => 1024,
-            "n"              => requested_n,
-            "max"            => 8192,
+            :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
+            :'min'            => 1024,
+            :'n'              => requested_n,
+            :'max'            => 8192,
           }
         }
         let(:remote_kex_dh_gex_request_payload){
@@ -114,8 +114,8 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroupExchangeSha2
         }
         let(:remote_kex_dh_gex_init_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
-            "e"              => remote_dh_pub_key,
+            :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
+            :'e'              => remote_dh_pub_key,
           }
         }
         let(:remote_kex_dh_gex_init_payload){
@@ -123,9 +123,9 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroupExchangeSha2
         }
         let(:local_kex_dh_gex_group_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
-            'p'              => dh_p.to_i(16),
-            'g'              => dh_g,
+            :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
+            :'p'              => dh_p.to_i(16),
+            :'g'              => dh_g,
           }
         }
         let(:local_kex_dh_gex_group_payload){
@@ -136,10 +136,10 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroupExchangeSha2
         let(:sign){ 'sign' }
         let(:local_kex_dh_gex_reply_message){
           {
-            'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
-            'server public host key and certificates (K_S)' => server_public_host_key,
-            'f'                                             => kex_algorithm.pub_key,
-            'signature of H'                                => sign,
+            :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
+            :'server public host key and certificates (K_S)' => server_public_host_key,
+            :'f'                                             => kex_algorithm.pub_key,
+            :'signature of H'                                => sign,
           }
         }
         let(:local_kex_dh_gex_reply_payload){

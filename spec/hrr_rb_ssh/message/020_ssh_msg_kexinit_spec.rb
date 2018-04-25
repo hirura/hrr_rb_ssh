@@ -27,53 +27,53 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXINIT do
   let(:compression_algorithms){ HrrRbSsh::Transport::CompressionAlgorithm.list_preferred }
   let(:message){
     {
-      'message number'                          => value,
-      'cookie (random byte)'                    => lambda { rand(0x01_00) },
-      'kex_algorithms'                          => kex_algorithms,
-      'server_host_key_algorithms'              => server_host_key_algorithms,
-      'encryption_algorithms_client_to_server'  => encryption_algorithms,
-      'encryption_algorithms_server_to_client'  => encryption_algorithms,
-      'mac_algorithms_client_to_server'         => mac_algorithms,
-      'mac_algorithms_server_to_client'         => mac_algorithms,
-      'compression_algorithms_client_to_server' => compression_algorithms,
-      'compression_algorithms_server_to_client' => compression_algorithms,
-      'languages_client_to_server'              => [],
-      'languages_server_to_client'              => [],
-      'first_kex_packet_follows'                => false,
-      '0 (reserved for future extension)'       => 0,
+      :'message number'                          => value,
+      :'cookie (random byte)'                    => lambda { rand(0x01_00) },
+      :'kex_algorithms'                          => kex_algorithms,
+      :'server_host_key_algorithms'              => server_host_key_algorithms,
+      :'encryption_algorithms_client_to_server'  => encryption_algorithms,
+      :'encryption_algorithms_server_to_client'  => encryption_algorithms,
+      :'mac_algorithms_client_to_server'         => mac_algorithms,
+      :'mac_algorithms_server_to_client'         => mac_algorithms,
+      :'compression_algorithms_client_to_server' => compression_algorithms,
+      :'compression_algorithms_server_to_client' => compression_algorithms,
+      :'languages_client_to_server'              => [],
+      :'languages_server_to_client'              => [],
+      :'first_kex_packet_follows'                => false,
+      :'0 (reserved for future extension)'       => 0,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::Byte.encode(message['cookie (random byte)'].call),
-      HrrRbSsh::DataType::NameList.encode(message['kex_algorithms']),
-      HrrRbSsh::DataType::NameList.encode(message['server_host_key_algorithms']),
-      HrrRbSsh::DataType::NameList.encode(message['encryption_algorithms_client_to_server']),
-      HrrRbSsh::DataType::NameList.encode(message['encryption_algorithms_server_to_client']),
-      HrrRbSsh::DataType::NameList.encode(message['mac_algorithms_client_to_server']),
-      HrrRbSsh::DataType::NameList.encode(message['mac_algorithms_server_to_client']),
-      HrrRbSsh::DataType::NameList.encode(message['compression_algorithms_client_to_server']),
-      HrrRbSsh::DataType::NameList.encode(message['compression_algorithms_server_to_client']),
-      HrrRbSsh::DataType::NameList.encode(message['languages_client_to_server']),
-      HrrRbSsh::DataType::NameList.encode(message['languages_server_to_client']),
-      HrrRbSsh::DataType::Boolean.encode(message['first_kex_packet_follows']),
-      HrrRbSsh::DataType::Uint32.encode(message['0 (reserved for future extension)']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::Byte.encode(message[:'cookie (random byte)'].call),
+      HrrRbSsh::DataType::NameList.encode(message[:'kex_algorithms']),
+      HrrRbSsh::DataType::NameList.encode(message[:'server_host_key_algorithms']),
+      HrrRbSsh::DataType::NameList.encode(message[:'encryption_algorithms_client_to_server']),
+      HrrRbSsh::DataType::NameList.encode(message[:'encryption_algorithms_server_to_client']),
+      HrrRbSsh::DataType::NameList.encode(message[:'mac_algorithms_client_to_server']),
+      HrrRbSsh::DataType::NameList.encode(message[:'mac_algorithms_server_to_client']),
+      HrrRbSsh::DataType::NameList.encode(message[:'compression_algorithms_client_to_server']),
+      HrrRbSsh::DataType::NameList.encode(message[:'compression_algorithms_server_to_client']),
+      HrrRbSsh::DataType::NameList.encode(message[:'languages_client_to_server']),
+      HrrRbSsh::DataType::NameList.encode(message[:'languages_server_to_client']),
+      HrrRbSsh::DataType::Boolean.encode(message[:'first_kex_packet_follows']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'0 (reserved for future extension)']),
     ].join
   }
 
@@ -86,19 +86,19 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXINIT do
 
   describe ".decode" do
     it "returns message decoded" do
-      expect(described_class.decode(payload)['message number']).to eq message['message number']
-      expect(described_class.decode(payload)['kex_algorithms']).to eq message['kex_algorithms']
-      expect(described_class.decode(payload)['server_host_key_algorithms']).to eq message['server_host_key_algorithms']
-      expect(described_class.decode(payload)['encryption_algorithms_client_to_server']).to eq message['encryption_algorithms_client_to_server']
-      expect(described_class.decode(payload)['encryption_algorithms_server_to_client']).to eq message['encryption_algorithms_server_to_client']
-      expect(described_class.decode(payload)['mac_algorithms_client_to_server']).to eq message['mac_algorithms_client_to_server']
-      expect(described_class.decode(payload)['mac_algorithms_server_to_client']).to eq message['mac_algorithms_server_to_client']
-      expect(described_class.decode(payload)['compression_algorithms_client_to_server']).to eq message['compression_algorithms_client_to_server']
-      expect(described_class.decode(payload)['compression_algorithms_server_to_client']).to eq message['compression_algorithms_server_to_client']
-      expect(described_class.decode(payload)['languages_client_to_server']).to eq message['languages_client_to_server']
-      expect(described_class.decode(payload)['languages_server_to_client']).to eq message['languages_server_to_client']
-      expect(described_class.decode(payload)['first_kex_packet_follows']).to eq message['first_kex_packet_follows']
-      expect(described_class.decode(payload)['0 (reserved for future extension)']).to eq message['0 (reserved for future extension)']
+      expect(described_class.decode(payload)[:'message number']).to eq message[:'message number']
+      expect(described_class.decode(payload)[:'kex_algorithms']).to eq message[:'kex_algorithms']
+      expect(described_class.decode(payload)[:'server_host_key_algorithms']).to eq message[:'server_host_key_algorithms']
+      expect(described_class.decode(payload)[:'encryption_algorithms_client_to_server']).to eq message[:'encryption_algorithms_client_to_server']
+      expect(described_class.decode(payload)[:'encryption_algorithms_server_to_client']).to eq message[:'encryption_algorithms_server_to_client']
+      expect(described_class.decode(payload)[:'mac_algorithms_client_to_server']).to eq message[:'mac_algorithms_client_to_server']
+      expect(described_class.decode(payload)[:'mac_algorithms_server_to_client']).to eq message[:'mac_algorithms_server_to_client']
+      expect(described_class.decode(payload)[:'compression_algorithms_client_to_server']).to eq message[:'compression_algorithms_client_to_server']
+      expect(described_class.decode(payload)[:'compression_algorithms_server_to_client']).to eq message[:'compression_algorithms_server_to_client']
+      expect(described_class.decode(payload)[:'languages_client_to_server']).to eq message[:'languages_client_to_server']
+      expect(described_class.decode(payload)[:'languages_server_to_client']).to eq message[:'languages_server_to_client']
+      expect(described_class.decode(payload)[:'first_kex_packet_follows']).to eq message[:'first_kex_packet_follows']
+      expect(described_class.decode(payload)[:'0 (reserved for future extension)']).to eq message[:'0 (reserved for future extension)']
     end
   end
 end

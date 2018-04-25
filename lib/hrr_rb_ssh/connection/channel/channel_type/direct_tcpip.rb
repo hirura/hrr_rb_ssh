@@ -14,10 +14,10 @@ module HrrRbSsh
             @logger = HrrRbSsh::Logger.new self.class.name
             @connection = connection
             @channel = channel
-            @host_to_connect       = message['host to connect']
-            @port_to_connect       = message['port to connect']
-            @originator_IP_address = message['originator IP address']
-            @originator_port       = message['originator port']
+            @host_to_connect       = message[:'host to connect']
+            @port_to_connect       = message[:'port to connect']
+            @originator_IP_address = message[:'originator IP address']
+            @originator_port       = message[:'originator port']
           end
 
           def start

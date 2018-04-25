@@ -8,14 +8,14 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   let(:variables){ Hash.new }
   let(:message){
     {
-      'message number'          => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-      'recipient channel'       => 1,
-      'request type'            => 'window-change',
-      'want reply'              => false,
-      'terminal width, columns' => 80,
-      'terminal height, rows'   => 24,
-      'terminal width, pixels'  => 400,
-      'terminal height, pixels' => 120,
+      :'message number'          => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+      :'recipient channel'       => 1,
+      :'request type'            => 'window-change',
+      :'want reply'              => false,
+      :'terminal width, columns' => 80,
+      :'terminal height, rows'   => 24,
+      :'terminal width, pixels'  => 400,
+      :'terminal height, pixels' => 120,
     }
   }
   let(:context){ described_class.new proc_chain, username, io, variables, message }
@@ -72,26 +72,26 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   end
 
   describe "#terminal_width_columns" do
-    it "returns message['terminal width, columns']" do
-      expect(context.terminal_width_columns).to be message['terminal width, columns']
+    it "returns message[:'terminal width, columns']" do
+      expect(context.terminal_width_columns).to be message[:'terminal width, columns']
     end
   end
 
   describe "#terminal_height_rows" do
-    it "returns message['terminal height, rows']" do
-      expect(context.terminal_height_rows).to be message['terminal height, rows']
+    it "returns message[:'terminal height, rows']" do
+      expect(context.terminal_height_rows).to be message[:'terminal height, rows']
     end
   end
 
   describe "#terminal_width_pixels" do
-    it "returns message['terminal width, pixels']" do
-      expect(context.terminal_width_pixels).to be message['terminal width, pixels']
+    it "returns message[:'terminal width, pixels']" do
+      expect(context.terminal_width_pixels).to be message[:'terminal width, pixels']
     end
   end
 
   describe "#terminal_height_pixels" do
-    it "returns message['terminal height, pixels']" do
-      expect(context.terminal_height_pixels).to be message['terminal height, pixels']
+    it "returns message[:'terminal height, pixels']" do
+      expect(context.terminal_height_pixels).to be message[:'terminal height, pixels']
     end
   end
 end

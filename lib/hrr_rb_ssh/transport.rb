@@ -238,7 +238,7 @@ module HrrRbSsh
 
     def verify_service_request
       service_request_message = receive_service_request
-      service_name = service_request_message['service name']
+      service_name = service_request_message[:'service name']
       if @acceptable_services.include? service_name
         send_service_accept service_name
       else
@@ -333,10 +333,10 @@ module HrrRbSsh
 
     def send_disconnect
       message = {
-        'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
-        "reason code"    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
-        "description"    => "disconnected by user",
-        "language tag"   => ""
+        :'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+        :'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+        :'description'    => "disconnected by user",
+        :'language tag'   => ""
       }
       payload = HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode message
       send payload
@@ -344,20 +344,20 @@ module HrrRbSsh
 
     def send_kexinit
       message = {
-        'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
-        'cookie (random byte)'                    => lambda { rand(0x01_00) },
-        'kex_algorithms'                          => @local_kex_algorithms,
-        'server_host_key_algorithms'              => @local_server_host_key_algorithms,
-        'encryption_algorithms_client_to_server'  => @local_encryption_algorithms_client_to_server,
-        'encryption_algorithms_server_to_client'  => @local_encryption_algorithms_server_to_client,
-        'mac_algorithms_client_to_server'         => @local_mac_algorithms_client_to_server,
-        'mac_algorithms_server_to_client'         => @local_mac_algorithms_server_to_client,
-        'compression_algorithms_client_to_server' => @local_compression_algorithms_client_to_server,
-        'compression_algorithms_server_to_client' => @local_compression_algorithms_server_to_client,
-        'languages_client_to_server'              => [],
-        'languages_server_to_client'              => [],
-        'first_kex_packet_follows'                => false,
-        '0 (reserved for future extension)'       => 0,
+        :'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+        :'cookie (random byte)'                    => lambda { rand(0x01_00) },
+        :'kex_algorithms'                          => @local_kex_algorithms,
+        :'server_host_key_algorithms'              => @local_server_host_key_algorithms,
+        :'encryption_algorithms_client_to_server'  => @local_encryption_algorithms_client_to_server,
+        :'encryption_algorithms_server_to_client'  => @local_encryption_algorithms_server_to_client,
+        :'mac_algorithms_client_to_server'         => @local_mac_algorithms_client_to_server,
+        :'mac_algorithms_server_to_client'         => @local_mac_algorithms_server_to_client,
+        :'compression_algorithms_client_to_server' => @local_compression_algorithms_client_to_server,
+        :'compression_algorithms_server_to_client' => @local_compression_algorithms_server_to_client,
+        :'languages_client_to_server'              => [],
+        :'languages_server_to_client'              => [],
+        :'first_kex_packet_follows'                => false,
+        :'0 (reserved for future extension)'       => 0,
       }
       payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode message
       send payload
@@ -383,7 +383,7 @@ module HrrRbSsh
 
     def send_newkeys
         message = {
-          'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
+          :'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
         }
         payload = HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode message
         send payload
@@ -402,22 +402,22 @@ module HrrRbSsh
 
     def send_service_accept service_name
         message = {
-          'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
-          'service name'   => service_name,
+          :'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
+          :'service name'   => service_name,
         }
         payload = HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode message
         send payload
     end
 
     def update_remote_algorithms message
-      @remote_kex_algorithms                          = message['kex_algorithms']
-      @remote_server_host_key_algorithms              = message['server_host_key_algorithms']
-      @remote_encryption_algorithms_client_to_server  = message['encryption_algorithms_client_to_server']
-      @remote_encryption_algorithms_server_to_client  = message['encryption_algorithms_server_to_client']
-      @remote_mac_algorithms_client_to_server         = message['mac_algorithms_client_to_server']
-      @remote_mac_algorithms_server_to_client         = message['mac_algorithms_server_to_client']
-      @remote_compression_algorithms_client_to_server = message['compression_algorithms_client_to_server']
-      @remote_compression_algorithms_server_to_client = message['compression_algorithms_server_to_client']
+      @remote_kex_algorithms                          = message[:'kex_algorithms']
+      @remote_server_host_key_algorithms              = message[:'server_host_key_algorithms']
+      @remote_encryption_algorithms_client_to_server  = message[:'encryption_algorithms_client_to_server']
+      @remote_encryption_algorithms_server_to_client  = message[:'encryption_algorithms_server_to_client']
+      @remote_mac_algorithms_client_to_server         = message[:'mac_algorithms_client_to_server']
+      @remote_mac_algorithms_server_to_client         = message[:'mac_algorithms_server_to_client']
+      @remote_compression_algorithms_client_to_server = message[:'compression_algorithms_client_to_server']
+      @remote_compression_algorithms_server_to_client = message[:'compression_algorithms_server_to_client']
     end
 
     def update_kex_and_server_host_key_algorithms

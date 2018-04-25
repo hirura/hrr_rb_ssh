@@ -25,7 +25,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
   describe "#authenticate" do
     let(:userauth_request_message){
       {
-        'user name' => 'username',
+        :'user name' => "username",
       }
     }
 

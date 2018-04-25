@@ -19,14 +19,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXDH_INIT do
 
   let(:message){
     {
-      'message number' => value,
-      'e'              => 1234567890,
+      :'message number' => value,
+      :'e'              => 1234567890,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Mpint.encode(message['e']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Mpint.encode(message[:'e']),
     ].join
   }
 

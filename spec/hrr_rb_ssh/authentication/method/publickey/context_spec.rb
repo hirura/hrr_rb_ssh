@@ -9,14 +9,14 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Context do
   let(:public_key_blob){ "dummy" }
   let(:message){
     {
-      'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
-      'user name'                 => username,
-      'service name'              => 'ssh-connection',
-      'method name'               => 'publickey',
-      'with signature'            => true,
-      'public key algorithm name' => public_key_algorithm_name,
-      'public key blob'           => public_key_blob,
-      'signature'                 => 'signature',
+      :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+      :'user name'                 => username,
+      :'service name'              => "ssh-connection",
+      :'method name'               => "publickey",
+      :'with signature'            => true,
+      :'public key algorithm name' => public_key_algorithm_name,
+      :'public key blob'           => public_key_blob,
+      :'signature'                 => "signature",
     }
   }
   let(:context){ described_class.new username, algorithm, session_id, message }

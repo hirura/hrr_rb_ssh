@@ -13,11 +13,11 @@ module HrrRbSsh
             include Codable
           end
           DEFINITION = [
-            [DataType::String, 'ssh-dss'],
-            [DataType::Mpint,  'p'],
-            [DataType::Mpint,  'q'],
-            [DataType::Mpint,  'g'],
-            [DataType::Mpint,  'y'],
+            [DataType::String, :'ssh-dss'],
+            [DataType::Mpint,  :'p'],
+            [DataType::Mpint,  :'q'],
+            [DataType::Mpint,  :'g'],
+            [DataType::Mpint,  :'y'],
           ]
         end
       end

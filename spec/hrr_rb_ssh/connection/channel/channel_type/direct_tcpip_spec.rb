@@ -20,15 +20,15 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::DirectTcpip do
 
   let(:channel_open_message){
     {
-      'message number'        => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
-      'channel type'          => channel_type,
-      'sender channel'        => remote_channel,
-      'initial window size'   => initial_window_size,
-      'maximum packet size'   => maximum_packet_size,
-      'host to connect'       => host_to_connect,
-      'port to connect'       => port_to_connect,
-      'originator IP address' => originator_IP_address,
-      'originator port'       => originator_port,
+      :'message number'        => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+      :'channel type'          => channel_type,
+      :'sender channel'        => remote_channel,
+      :'initial window size'   => initial_window_size,
+      :'maximum packet size'   => maximum_packet_size,
+      :'host to connect'       => host_to_connect,
+      :'port to connect'       => port_to_connect,
+      :'originator IP address' => originator_IP_address,
+      :'originator port'       => originator_port,
     }
   }
   let(:channel){ HrrRbSsh::Connection::Channel.new(connection, channel_open_message) }

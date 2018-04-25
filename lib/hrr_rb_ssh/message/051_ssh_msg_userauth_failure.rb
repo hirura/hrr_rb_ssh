@@ -16,9 +16,9 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::NameList, 'authentications that can continue'],
-        [DataType::Boolean,   'partial success'],
+        [DataType::Byte,      :'message number'],
+        [DataType::NameList,  :'authentications that can continue'],
+        [DataType::Boolean,   :'partial success'],
       ]
     end
   end

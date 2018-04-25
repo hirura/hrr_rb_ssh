@@ -20,20 +20,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
   context "when 'channel type' is \"session\"" do
     let(:message){
       {
-        'message number'      => value,
-        'channel type'        => 'session',
-        'sender channel'      => 1,
-        'initial window size' => 2,
-        'maximum packet size' => 3,
+        :'message number'      => value,
+        :'channel type'        => 'session',
+        :'sender channel'      => 1,
+        :'initial window size' => 2,
+        :'maximum packet size' => 3,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::String.encode(message['channel type']),
-        HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::String.encode(message[:'channel type']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
@@ -53,24 +53,24 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
   context "when 'channel type' is \"x11\"" do
     let(:message){
       {
-        'message number'      => value,
-        'channel type'        => 'x11',
-        'sender channel'      => 1,
-        'initial window size' => 2,
-        'maximum packet size' => 3,
-        'originator address'  => '1.2.3.4',
-        'originator port'     => 12345,
+        :'message number'      => value,
+        :'channel type'        => 'x11',
+        :'sender channel'      => 1,
+        :'initial window size' => 2,
+        :'maximum packet size' => 3,
+        :'originator address'  => '1.2.3.4',
+        :'originator port'     => 12345,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::String.encode(message['channel type']),
-        HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message['originator address']),
-        HrrRbSsh::DataType::Uint32.encode(message['originator port']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::String.encode(message[:'channel type']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataType::String.encode(message[:'originator address']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'originator port']),
       ].join
     }
 
@@ -90,28 +90,28 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
   context "when 'channel type' is \"forwarded-tcpip\"" do
     let(:message){
       {
-        'message number'             => value,
-        'channel type'               => 'forwarded-tcpip',
-        'sender channel'             => 1,
-        'initial window size'        => 2,
-        'maximum packet size'        => 3,
-        'address that was connected' => '4.3.2.1',
-        'port that was connected'    => 54321,
-        'originator IP address'      => '1.2.3.4',
-        'originator port'            => 12345,
+        :'message number'             => value,
+        :'channel type'               => 'forwarded-tcpip',
+        :'sender channel'             => 1,
+        :'initial window size'        => 2,
+        :'maximum packet size'        => 3,
+        :'address that was connected' => '4.3.2.1',
+        :'port that was connected'    => 54321,
+        :'originator IP address'      => '1.2.3.4',
+        :'originator port'            => 12345,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::String.encode(message['channel type']),
-        HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message['address that was connected']),
-        HrrRbSsh::DataType::Uint32.encode(message['port that was connected']),
-        HrrRbSsh::DataType::String.encode(message['originator IP address']),
-        HrrRbSsh::DataType::Uint32.encode(message['originator port']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::String.encode(message[:'channel type']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataType::String.encode(message[:'address that was connected']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'port that was connected']),
+        HrrRbSsh::DataType::String.encode(message[:'originator IP address']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'originator port']),
       ].join
     }
 
@@ -131,28 +131,28 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
   context "when 'channel type' is \"direct-tcpip\"" do
     let(:message){
       {
-        'message number'        => value,
-        'channel type'          => 'direct-tcpip',
-        'sender channel'        => 1,
-        'initial window size'   => 2,
-        'maximum packet size'   => 3,
-        'host to connect'       => '4.3.2.1',
-        'port to connect'       => 54321,
-        'originator IP address' => '1.2.3.4',
-        'originator port'       => 12345,
+        :'message number'        => value,
+        :'channel type'          => 'direct-tcpip',
+        :'sender channel'        => 1,
+        :'initial window size'   => 2,
+        :'maximum packet size'   => 3,
+        :'host to connect'       => '4.3.2.1',
+        :'port to connect'       => 54321,
+        :'originator IP address' => '1.2.3.4',
+        :'originator port'       => 12345,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::String.encode(message['channel type']),
-        HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message['host to connect']),
-        HrrRbSsh::DataType::Uint32.encode(message['port to connect']),
-        HrrRbSsh::DataType::String.encode(message['originator IP address']),
-        HrrRbSsh::DataType::Uint32.encode(message['originator port']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::String.encode(message[:'channel type']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataType::String.encode(message[:'host to connect']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'port to connect']),
+        HrrRbSsh::DataType::String.encode(message[:'originator IP address']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'originator port']),
       ].join
     }
 

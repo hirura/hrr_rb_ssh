@@ -13,9 +13,9 @@ module HrrRbSsh
             include Codable
           end
           DEFINITION = [
-            [DataType::String, 'ssh-rsa'],
-            [DataType::Mpint,  'e'],
-            [DataType::Mpint,  'n'],
+            [DataType::String, :'ssh-rsa'],
+            [DataType::Mpint,  :'e'],
+            [DataType::Mpint,  :'n'],
           ]
         end
       end

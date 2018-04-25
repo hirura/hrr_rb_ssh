@@ -8,11 +8,11 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   let(:variables){ Hash.new }
   let(:message){
     {
-      'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-      'recipient channel' => 1,
-      'request type'      => 'subsystem',
-      'want reply'        => true,
-      'subsystem name'    => 'subsystem name',
+      :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+      :'recipient channel' => 1,
+      :'request type'      => 'subsystem',
+      :'want reply'        => true,
+      :'subsystem name'    => 'subsystem name',
     }
   }
   let(:context){ described_class.new proc_chain, username, io, variables, message }
@@ -68,8 +68,8 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   end
 
   describe "#subsystem_name" do
-    it "returns message['subsystem name']" do
-      expect(context.subsystem_name).to be message['subsystem name']
+    it "returns message[:'subsystem name']" do
+      expect(context.subsystem_name).to be message[:'subsystem name']
     end
   end
 end

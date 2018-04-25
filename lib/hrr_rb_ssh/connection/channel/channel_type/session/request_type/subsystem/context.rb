@@ -28,7 +28,7 @@ module HrrRbSsh
                   @variables  = variables
                   @vars       = variables
 
-                  @subsystem_name = message['subsystem name']
+                  @subsystem_name = message[:'subsystem name']
                 end
 
                 def chain_proc &block

@@ -16,9 +16,9 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::Uint32,    'recipient channel'],
-        [DataType::Uint32,    'bytes to add'],
+        [DataType::Byte,      :'message number'],
+        [DataType::Uint32,    :'recipient channel'],
+        [DataType::Uint32,    :'bytes to add'],
       ]
     end
   end

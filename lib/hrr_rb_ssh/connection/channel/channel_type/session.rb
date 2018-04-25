@@ -29,7 +29,7 @@ module HrrRbSsh
           end
 
           def request message
-            request_type = message['request type']
+            request_type = message[:'request type']
             RequestType[request_type].run @proc_chain, @connection.username, @channel.request_handler_io, @variables, message, @connection.options
           end
 

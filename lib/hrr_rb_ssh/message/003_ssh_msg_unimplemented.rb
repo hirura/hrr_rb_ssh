@@ -16,8 +16,8 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::Uint32,    'packet sequence number of rejected message'],
+        [DataType::Byte,      :'message number'],
+        [DataType::Uint32,    :'packet sequence number of rejected message'],
       ]
     end
   end

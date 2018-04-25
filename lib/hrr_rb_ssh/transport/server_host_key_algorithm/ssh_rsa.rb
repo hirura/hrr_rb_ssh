@@ -47,24 +47,24 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
 
         def server_public_host_key
           payload = {
-            'ssh-rsa' => 'ssh-rsa',
-            'e'       => @rsa.e.to_i,
-            'n'       => @rsa.n.to_i,
+            :'ssh-rsa' => "ssh-rsa",
+            :'e'       => @rsa.e.to_i,
+            :'n'       => @rsa.n.to_i,
           }
           PublicKeyBlob.encode payload
         end
 
         def sign data
           payload = {
-            'ssh-rsa'            => 'ssh-rsa',
-            'rsa_signature_blob' => @rsa.sign(self.class::DIGEST, data),
+            :'ssh-rsa'            => "ssh-rsa",
+            :'rsa_signature_blob' => @rsa.sign(self.class::DIGEST, data),
           }
           Signature.encode payload
         end
 
         def verify sign, data
           payload = Signature.decode sign
-          payload['ssh-rsa'] == 'ssh-rsa' && @rsa.verify(self.class::DIGEST, payload['rsa_signature_blob'], data)
+          payload[:'ssh-rsa'] == "ssh-rsa" && @rsa.verify(self.class::DIGEST, payload[:'rsa_signature_blob'], data)
         end
       end
     end

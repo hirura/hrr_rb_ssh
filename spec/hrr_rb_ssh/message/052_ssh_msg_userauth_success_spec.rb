@@ -19,12 +19,12 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS do
 
   let(:message){
     {
-      'message number' => value,
+      :'message number' => value,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
     ].join
   }
 

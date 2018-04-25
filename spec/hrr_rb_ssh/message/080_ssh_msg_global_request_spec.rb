@@ -20,20 +20,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST do
   context "when 'request name' is \"tcpip-forward\"" do
     let(:message){
       {
-        'message number'      => value,
-        'request name'        => 'tcpip-forward',
-        'want reply'          => false,
-        'address to bind'     => '0.0.0.0',
-        'port number to bind' => 1080,
+        :'message number'      => value,
+        :'request name'        => 'tcpip-forward',
+        :'want reply'          => false,
+        :'address to bind'     => '0.0.0.0',
+        :'port number to bind' => 1080,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::String.encode(message['request name']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::String.encode(message['address to bind']),
-        HrrRbSsh::DataType::Uint32.encode(message['port number to bind']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::String.encode(message[:'request name']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::String.encode(message[:'address to bind']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'port number to bind']),
       ].join
     }
 
@@ -53,20 +53,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST do
   context "when 'request name' is \"cancel-tcpip-forward\"" do
     let(:message){
       {
-        'message number'      => value,
-        'request name'        => 'cancel-tcpip-forward',
-        'want reply'          => false,
-        'address to bind'     => '0.0.0.0',
-        'port number to bind' => 1080,
+        :'message number'      => value,
+        :'request name'        => 'cancel-tcpip-forward',
+        :'want reply'          => false,
+        :'address to bind'     => '0.0.0.0',
+        :'port number to bind' => 1080,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::String.encode(message['request name']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::String.encode(message['address to bind']),
-        HrrRbSsh::DataType::Uint32.encode(message['port number to bind']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::String.encode(message[:'request name']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::String.encode(message[:'address to bind']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'port number to bind']),
       ].join
     }
 

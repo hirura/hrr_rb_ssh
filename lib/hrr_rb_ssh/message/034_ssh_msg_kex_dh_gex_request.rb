@@ -16,10 +16,10 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::Uint32,    'min'],
-        [DataType::Uint32,    'n'],
-        [DataType::Uint32,    'max'],
+        [DataType::Byte,      :'message number'],
+        [DataType::Uint32,    :'min'],
+        [DataType::Uint32,    :'n'],
+        [DataType::Uint32,    :'max'],
       ]
     end
   end

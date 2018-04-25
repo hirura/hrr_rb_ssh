@@ -19,18 +19,18 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA do
 
   let(:message){
     {
-      'message number'    => value,
-      'recipient channel' => 1,
-      'data type code'    => 2,
-      'data'              => 'data',
+      :'message number'    => value,
+      :'recipient channel' => 1,
+      :'data type code'    => 2,
+      :'data'              => 'data',
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-      HrrRbSsh::DataType::Uint32.encode(message['data type code']),
-      HrrRbSsh::DataType::String.encode(message['data']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'data type code']),
+      HrrRbSsh::DataType::String.encode(message[:'data']),
     ].join
   }
 

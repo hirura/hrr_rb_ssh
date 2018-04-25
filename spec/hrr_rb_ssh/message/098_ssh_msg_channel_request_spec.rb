@@ -139,30 +139,30 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"pty-req\"" do
     let(:message){
       {
-        'message number'                  => value,
-        'recipient channel'               => 1,
-        'request type'                    => 'pty-req',
-        'want reply'                      => true,
-        'TERM environment variable value' => 'foo',
-        'terminal width, characters'      => 80,
-        'terminal height, rows'           => 24,
-        'terminal width, pixels'          => 400,
-        'terminal height, pixels'         => 120,
-        'encoded terminal modes'          => 'bar',
+        :'message number'                  => value,
+        :'recipient channel'               => 1,
+        :'request type'                    => 'pty-req',
+        :'want reply'                      => true,
+        :'TERM environment variable value' => 'foo',
+        :'terminal width, characters'      => 80,
+        :'terminal height, rows'           => 24,
+        :'terminal width, pixels'          => 400,
+        :'terminal height, pixels'         => 120,
+        :'encoded terminal modes'          => 'bar',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::String.encode(message['TERM environment variable value']),
-        HrrRbSsh::DataType::Uint32.encode(message['terminal width, characters']),
-        HrrRbSsh::DataType::Uint32.encode(message['terminal height, rows']),
-        HrrRbSsh::DataType::Uint32.encode(message['terminal width, pixels']),
-        HrrRbSsh::DataType::Uint32.encode(message['terminal height, pixels']),
-        HrrRbSsh::DataType::String.encode(message['encoded terminal modes']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::String.encode(message[:'TERM environment variable value']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'terminal width, characters']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'terminal height, rows']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'terminal width, pixels']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'terminal height, pixels']),
+        HrrRbSsh::DataType::String.encode(message[:'encoded terminal modes']),
       ].join
     }
 
@@ -182,27 +182,27 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"x11-req\"" do
     let(:message){
       {
-        'message number'              => value,
-        'recipient channel'           => 1,
-        'request type'                => 'x11-req',
-        'want reply'                  => true,
-        'single connection'           => true,
-        'x11 authentication protocol' => 'foo',
-        'x11 authentication cookie'   => 'bar',
-        'x11 screen number'           => 2,
+        :'message number'              => value,
+        :'recipient channel'           => 1,
+        :'request type'                => 'x11-req',
+        :'want reply'                  => true,
+        :'single connection'           => true,
+        :'x11 authentication protocol' => 'foo',
+        :'x11 authentication cookie'   => 'bar',
+        :'x11 screen number'           => 2,
 
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::Boolean.encode(message['single connection']),
-        HrrRbSsh::DataType::String.encode(message['x11 authentication protocol']),
-        HrrRbSsh::DataType::String.encode(message['x11 authentication cookie']),
-        HrrRbSsh::DataType::Uint32.encode(message['x11 screen number']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'single connection']),
+        HrrRbSsh::DataType::String.encode(message[:'x11 authentication protocol']),
+        HrrRbSsh::DataType::String.encode(message[:'x11 authentication cookie']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'x11 screen number']),
       ].join
     }
 
@@ -222,22 +222,22 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"env\"" do
     let(:message){
       {
-        'message number'    => value,
-        'recipient channel' => 1,
-        'request type'      => 'env',
-        'want reply'        => true,
-        'variable name'     => 'name',
-        'variable value'    => 'value',
+        :'message number'    => value,
+        :'recipient channel' => 1,
+        :'request type'      => 'env',
+        :'want reply'        => true,
+        :'variable name'     => 'name',
+        :'variable value'    => 'value',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::String.encode(message['variable name']),
-        HrrRbSsh::DataType::String.encode(message['variable value']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::String.encode(message[:'variable name']),
+        HrrRbSsh::DataType::String.encode(message[:'variable value']),
       ].join
     }
 
@@ -257,18 +257,18 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"shell\"" do
     let(:message){
       {
-        'message number'    => value,
-        'recipient channel' => 1,
-        'request type'      => 'shell',
-        'want reply'        => true,
+        :'message number'    => value,
+        :'recipient channel' => 1,
+        :'request type'      => 'shell',
+        :'want reply'        => true,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
       ].join
     }
 
@@ -288,20 +288,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"exec\"" do
     let(:message){
       {
-        'message number'    => value,
-        'recipient channel' => 1,
-        'request type'      => 'exec',
-        'want reply'        => true,
-        'command'           => 'command',
+        :'message number'    => value,
+        :'recipient channel' => 1,
+        :'request type'      => 'exec',
+        :'want reply'        => true,
+        :'command'           => 'command',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::String.encode(message['command']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::String.encode(message[:'command']),
       ].join
     }
 
@@ -321,20 +321,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"subsystem\"" do
     let(:message){
       {
-        'message number'    => value,
-        'recipient channel' => 1,
-        'request type'      => 'subsystem',
-        'want reply'        => true,
-        'subsystem name'    => 'subsystem',
+        :'message number'    => value,
+        :'recipient channel' => 1,
+        :'request type'      => 'subsystem',
+        :'want reply'        => true,
+        :'subsystem name'    => 'subsystem',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::String.encode(message['subsystem name']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::String.encode(message[:'subsystem name']),
       ].join
     }
 
@@ -354,26 +354,26 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"window-change\"" do
     let(:message){
       {
-        'message number'          => value,
-        'recipient channel'       => 1,
-        'request type'            => 'window-change',
-        'want reply'              => true,
-        'terminal width, columns' => 80,
-        'terminal height, rows'   => 24,
-        'terminal width, pixels'  => 400,
-        'terminal height, pixels' => 120,
+        :'message number'          => value,
+        :'recipient channel'       => 1,
+        :'request type'            => 'window-change',
+        :'want reply'              => true,
+        :'terminal width, columns' => 80,
+        :'terminal height, rows'   => 24,
+        :'terminal width, pixels'  => 400,
+        :'terminal height, pixels' => 120,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::Uint32.encode(message['terminal width, columns']),
-        HrrRbSsh::DataType::Uint32.encode(message['terminal height, rows']),
-        HrrRbSsh::DataType::Uint32.encode(message['terminal width, pixels']),
-        HrrRbSsh::DataType::Uint32.encode(message['terminal height, pixels']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'terminal width, columns']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'terminal height, rows']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'terminal width, pixels']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'terminal height, pixels']),
       ].join
     }
 
@@ -393,20 +393,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"xon-xoff\"" do
     let(:message){
       {
-        'message number'    => value,
-        'recipient channel' => 1,
-        'request type'      => 'xon-xoff',
-        'want reply'        => true,
-        'client can do'     => true,
+        :'message number'    => value,
+        :'recipient channel' => 1,
+        :'request type'      => 'xon-xoff',
+        :'want reply'        => true,
+        :'client can do'     => true,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::Boolean.encode(message['client can do']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'client can do']),
       ].join
     }
 
@@ -426,20 +426,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"signal\"" do
     let(:message){
       {
-        'message number'    => value,
-        'recipient channel' => 1,
-        'request type'      => 'signal',
-        'want reply'        => true,
-        'signal name'       => 'signal',
+        :'message number'    => value,
+        :'recipient channel' => 1,
+        :'request type'      => 'signal',
+        :'want reply'        => true,
+        :'signal name'       => 'signal',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::String.encode(message['signal name']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::String.encode(message[:'signal name']),
       ].join
     }
 
@@ -459,20 +459,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"exit-status\"" do
     let(:message){
       {
-        'message number'    => value,
-        'recipient channel' => 1,
-        'request type'      => 'exit-status',
-        'want reply'        => true,
-        'exit status'       => 2,
+        :'message number'    => value,
+        :'recipient channel' => 1,
+        :'request type'      => 'exit-status',
+        :'want reply'        => true,
+        :'exit status'       => 2,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::Uint32.encode(message['exit status']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'exit status']),
       ].join
     }
 
@@ -492,26 +492,26 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST do
   context "when 'request type' is \"exit-signal\"" do
     let(:message){
       {
-        'message number'    => value,
-        'recipient channel' => 1,
-        'request type'      => 'exit-signal',
-        'want reply'        => true,
-        'signal name'       => 'sig',
-        'core dumped'       => true,
-        'error message'     => 'error',
-        'language tag'      => 'tag',
+        :'message number'    => value,
+        :'recipient channel' => 1,
+        :'request type'      => 'exit-signal',
+        :'want reply'        => true,
+        :'signal name'       => 'sig',
+        :'core dumped'       => true,
+        :'error message'     => 'error',
+        :'language tag'      => 'tag',
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::String.encode(message['request type']),
-        HrrRbSsh::DataType::Boolean.encode(message['want reply']),
-        HrrRbSsh::DataType::String.encode(message['signal name']),
-        HrrRbSsh::DataType::Boolean.encode(message['core dumped']),
-        HrrRbSsh::DataType::String.encode(message['error message']),
-        HrrRbSsh::DataType::String.encode(message['language tag']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::String.encode(message[:'request type']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'want reply']),
+        HrrRbSsh::DataType::String.encode(message[:'signal name']),
+        HrrRbSsh::DataType::Boolean.encode(message[:'core dumped']),
+        HrrRbSsh::DataType::String.encode(message[:'error message']),
+        HrrRbSsh::DataType::String.encode(message[:'language tag']),
       ].join
     }
 

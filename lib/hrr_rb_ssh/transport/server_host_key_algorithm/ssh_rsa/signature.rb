@@ -13,8 +13,8 @@ module HrrRbSsh
             include Codable
           end
           DEFINITION = [
-            [DataType::String, 'ssh-rsa'],
-            [DataType::String, 'rsa_signature_blob'],
+            [DataType::String, :'ssh-rsa'],
+            [DataType::String, :'rsa_signature_blob'],
           ]
         end
       end

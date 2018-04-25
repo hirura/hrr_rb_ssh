@@ -19,14 +19,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_IGNORE do
 
   let(:message){
     {
-      'message number' => value,
-      'data'           => 'ignored',
+      :'message number' => value,
+      :'data'           => 'ignored',
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::String.encode(message['data']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::String.encode(message[:'data']),
     ].join
   }
 

@@ -15,8 +15,8 @@ module HrrRbSsh
                 include Codable
               end
               DEFINITION = [
-                [DataType::String, 'public key algorithm name'],
-                [DataType::String, 'signature blob'],
+                [DataType::String, :'public key algorithm name'],
+                [DataType::String, :'signature blob'],
               ]
             end
           end

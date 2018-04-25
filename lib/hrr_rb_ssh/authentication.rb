@@ -68,14 +68,14 @@ module HrrRbSsh
         case payload[0,1].unpack("C")[0]
         when HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE
           userauth_request_message = HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.decode payload
-          method_name = userauth_request_message['method name']
+          method_name = userauth_request_message[:'method name']
           method = Method[method_name].new({'session id' => @transport.session_id}.merge(@options))
           result = method.authenticate(userauth_request_message)
           case result
           when TrueClass
             @logger.info("verified")
             send_userauth_success
-            @username = userauth_request_message['user name']
+            @username = userauth_request_message[:'user name']
             @closed = false
             break
           when FalseClass
@@ -94,9 +94,9 @@ module HrrRbSsh
 
     def send_userauth_failure
       message = {
-        'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
-        'authentications that can continue' => Method.list_preferred,
-        'partial success'                   => false,
+        :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        :'authentications that can continue' => Method.list_preferred,
+        :'partial success'                   => false,
       }
       payload = HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE.encode message
       @transport.send payload
@@ -104,7 +104,7 @@ module HrrRbSsh
 
     def send_userauth_success
       message = {
-        'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
+        :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
       payload = HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS.encode message
       @transport.send payload

@@ -16,8 +16,8 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::Mpint,     'e'],
+        [DataType::Byte,      :'message number'],
+        [DataType::Mpint,     :'e'],
       ]
     end
   end

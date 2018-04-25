@@ -20,20 +20,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
   context "when 'channel type' is \"session\"" do
     let(:message){
       {
-        'message number'      => value,
-        'recipient channel'   => 1,
-        'sender channel'      => 2,
-        'initial window size' => 3,
-        'maximum packet size' => 4,
+        :'message number'      => value,
+        :'recipient channel'   => 1,
+        :'sender channel'      => 2,
+        :'initial window size' => 3,
+        :'maximum packet size' => 4,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
@@ -59,20 +59,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
   context "when 'channel type' is \"x11\"" do
     let(:message){
       {
-        'message number'      => value,
-        'recipient channel'   => 1,
-        'sender channel'      => 2,
-        'initial window size' => 3,
-        'maximum packet size' => 4,
+        :'message number'      => value,
+        :'recipient channel'   => 1,
+        :'sender channel'      => 2,
+        :'initial window size' => 3,
+        :'maximum packet size' => 4,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
@@ -98,20 +98,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
   context "when 'channel type' is \"forwarded-tcpip\"" do
     let(:message){
       {
-        'message number'             => value,
-        'recipient channel'          => 1,
-        'sender channel'             => 2,
-        'initial window size'        => 3,
-        'maximum packet size'        => 4,
+        :'message number'             => value,
+        :'recipient channel'          => 1,
+        :'sender channel'             => 2,
+        :'initial window size'        => 3,
+        :'maximum packet size'        => 4,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
@@ -137,20 +137,20 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
   context "when 'channel type' is \"direct-tcpip\"" do
     let(:message){
       {
-        'message number'        => value,
-        'recipient channel'     => 1,
-        'sender channel'        => 2,
-        'initial window size'   => 3,
-        'maximum packet size'   => 4,
+        :'message number'        => value,
+        :'recipient channel'     => 1,
+        :'sender channel'        => 2,
+        :'initial window size'   => 3,
+        :'maximum packet size'   => 4,
       }
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message['message number']),
-        HrrRbSsh::DataType::Uint32.encode(message['recipient channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message['initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message['maximum packet size']),
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 

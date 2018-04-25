@@ -15,14 +15,14 @@ module HrrRbSsh
                 include Codable
               end
               DEFINITION = [
-                [DataType::String,  'session identifier'],
-                [DataType::Byte,    'message number'],
-                [DataType::String,  'user name'],
-                [DataType::String,  'service name'],
-                [DataType::String,  'method name'],
-                [DataType::Boolean, 'with signature'],
-                [DataType::String,  'public key algorithm name'],
-                [DataType::String,  'public key blob'],
+                [DataType::String,  :'session identifier'],
+                [DataType::Byte,    :'message number'],
+                [DataType::String,  :'user name'],
+                [DataType::String,  :'service name'],
+                [DataType::String,  :'method name'],
+                [DataType::Boolean, :'with signature'],
+                [DataType::String,  :'public key algorithm name'],
+                [DataType::String,  :'public key blob'],
               ]
             end
           end

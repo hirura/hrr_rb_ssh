@@ -60,19 +60,19 @@ module HrrRbSsh
           f = pub_key
 
           h0_payload = {
-            'V_C' => transport.v_c,
-            'V_S' => transport.v_s,
-            'I_C' => transport.i_c,
-            'I_S' => transport.i_s,
-            'K_S' => transport.server_host_key_algorithm.server_public_host_key,
-            'min' => @min,
-            'n'   => @n,
-            'max' => @max,
-            'p'   => @dh.p.to_i,
-            'g'   => @dh.g.to_i,
-            'e'   => e,
-            'f'   => f,
-            'k'   => k,
+            :'V_C' => transport.v_c,
+            :'V_S' => transport.v_s,
+            :'I_C' => transport.i_c,
+            :'I_S' => transport.i_s,
+            :'K_S' => transport.server_host_key_algorithm.server_public_host_key,
+            :'min' => @min,
+            :'n'   => @n,
+            :'max' => @max,
+            :'p'   => @dh.p.to_i,
+            :'g'   => @dh.g.to_i,
+            :'e'   => e,
+            :'f'   => f,
+            :'k'   => k,
           }
           h0 = H0.encode h0_payload
 
@@ -132,16 +132,16 @@ module HrrRbSsh
 
         def receive_kex_dh_gex_request payload
           message = HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST.decode payload
-          @min = message['min']
-          @n   = message['n']
-          @max = message['max']
+          @min = message[:'min']
+          @n   = message[:'n']
+          @max = message[:'max']
         end
 
         def send_kex_dh_gex_group transport
           message = {
-            'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
-            'p'              => @dh.p.to_i,
-            'g'              => @dh.g.to_i,
+            :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
+            :'p'              => @dh.p.to_i,
+            :'g'              => @dh.g.to_i,
           }
           payload = HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP.encode message
           transport.send payload
@@ -149,15 +149,15 @@ module HrrRbSsh
 
         def receive_kex_dh_gex_init payload
           message = HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_INIT.decode payload
-          set_e message['e']
+          set_e message[:'e']
         end
 
         def send_kex_dh_gex_reply transport
           message = {
-            'message number'                                => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
-            'server public host key and certificates (K_S)' => transport.server_host_key_algorithm.server_public_host_key,
-            'f'                                             => pub_key,
-            'signature of H'                                => sign(transport),
+            :'message number'                                => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
+            :'server public host key and certificates (K_S)' => transport.server_host_key_algorithm.server_public_host_key,
+            :'f'                                             => pub_key,
+            :'signature of H'                                => sign(transport),
           }
           payload = HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY.encode message
           transport.send payload

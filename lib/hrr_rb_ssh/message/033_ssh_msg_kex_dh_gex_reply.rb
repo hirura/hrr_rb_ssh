@@ -16,10 +16,10 @@ module HrrRbSsh
 
       DEFINITION = [
         #[DataType, Field Name]
-        [DataType::Byte,      'message number'],
-        [DataType::String,    'server public host key and certificates (K_S)'],
-        [DataType::Mpint,     'f'],
-        [DataType::String,    'signature of H'],
+        [DataType::Byte,      :'message number'],
+        [DataType::String,    :'server public host key and certificates (K_S)'],
+        [DataType::Mpint,     :'f'],
+        [DataType::String,    :'signature of H'],
       ]
     end
   end

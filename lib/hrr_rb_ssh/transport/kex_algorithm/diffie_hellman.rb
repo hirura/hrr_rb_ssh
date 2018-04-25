@@ -49,14 +49,14 @@ module HrrRbSsh
           f = pub_key
 
           h0_payload = {
-            'V_C' => transport.v_c,
-            'V_S' => transport.v_s,
-            'I_C' => transport.i_c,
-            'I_S' => transport.i_s,
-            'K_S' => transport.server_host_key_algorithm.server_public_host_key,
-            'e'   => e,
-            'f'   => f,
-            'k'   => k,
+            :'V_C' => transport.v_c,
+            :'V_S' => transport.v_s,
+            :'I_C' => transport.i_c,
+            :'I_S' => transport.i_s,
+            :'K_S' => transport.server_host_key_algorithm.server_public_host_key,
+            :'e'   => e,
+            :'f'   => f,
+            :'k'   => k,
           }
           h0 = H0.encode h0_payload
 
@@ -117,15 +117,15 @@ module HrrRbSsh
 
         def receive_kexdh_init payload
           message = HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.decode payload
-          set_e message['e']
+          set_e message[:'e']
         end
 
         def send_kexdh_reply transport
           message = {
-            'message number'                                => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
-            'server public host key and certificates (K_S)' => transport.server_host_key_algorithm.server_public_host_key,
-            'f'                                             => pub_key,
-            'signature of H'                                => sign(transport),
+            :'message number'                                => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
+            :'server public host key and certificates (K_S)' => transport.server_host_key_algorithm.server_public_host_key,
+            :'f'                                             => pub_key,
+            :'signature of H'                                => sign(transport),
           }
           payload = HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.encode message
           transport.send payload

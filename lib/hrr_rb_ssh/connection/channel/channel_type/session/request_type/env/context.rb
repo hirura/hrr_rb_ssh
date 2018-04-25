@@ -29,8 +29,8 @@ module HrrRbSsh
                   @variables  = variables
                   @vars       = variables
 
-                  @variable_name  = message['variable name']
-                  @variable_value = message['variable value']
+                  @variable_name  = message[:'variable name']
+                  @variable_value = message[:'variable value']
                 end
 
                 def chain_proc &block

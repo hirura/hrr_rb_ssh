@@ -25,13 +25,13 @@ module HrrRbSsh
             @session_id = session_id
             @message    = message
 
-            @message_number            = message['message number']
-            @service_name              = message['service name']
-            @method_name               = message['method name']
-            @with_signature            = message['with signature']
-            @public_key_algorithm_name = message['public key algorithm name']
-            @public_key_blob           = message['public key blob']
-            @signature                 = message['signature']
+            @message_number            = message[:'message number']
+            @service_name              = message[:'service name']
+            @method_name               = message[:'method name']
+            @with_signature            = message[:'with signature']
+            @public_key_algorithm_name = message[:'public key algorithm name']
+            @public_key_blob           = message[:'public key blob']
+            @signature                 = message[:'signature']
           end
 
           def verify username, public_key_algorithm_name, public_key

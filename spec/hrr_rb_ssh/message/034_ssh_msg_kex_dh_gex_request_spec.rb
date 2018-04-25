@@ -19,18 +19,18 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST do
 
   let(:message){
     {
-      'message number' => value,
-      'min'            => 1024,
-      'n'              => 1024,
-      'max'            => 8192,
+      :'message number' => value,
+      :'min'            => 1024,
+      :'n'              => 1024,
+      :'max'            => 8192,
     }
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message['message number']),
-      HrrRbSsh::DataType::Uint32.encode(message['min']),
-      HrrRbSsh::DataType::Uint32.encode(message['n']),
-      HrrRbSsh::DataType::Uint32.encode(message['max']),
+      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'min']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'n']),
+      HrrRbSsh::DataType::Uint32.encode(message[:'max']),
     ].join
   }
 
