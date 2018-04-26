@@ -16,3 +16,6 @@ end
 
 require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_dss'
 require 'hrr_rb_ssh/transport/server_host_key_algorithm/ssh_rsa'
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ecdsa_sha2_nistp256'
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ecdsa_sha2_nistp384'
+require 'hrr_rb_ssh/transport/server_host_key_algorithm/ecdsa_sha2_nistp521'
