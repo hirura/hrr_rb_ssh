@@ -19,7 +19,7 @@ HrrRbSsh::Logger.initialize logger
 
 
 tran_preferred_encryption_algorithms      = %w(aes128-ctr aes192-ctr aes256-ctr aes128-cbc 3des-cbc blowfish-cbc cast128-cbc aes192-cbc aes256-cbc arcfour)
-tran_preferred_server_host_key_algorithms = %w(ssh-rsa ssh-dss)
+tran_preferred_server_host_key_algorithms = %w(ecdsa-sha2-nistp521 ecdsa-sha2-nistp384 ecdsa-sha2-nistp256 ssh-rsa ssh-dss)
 tran_preferred_kex_algorithms             = %w(ecdh-sha2-nistp521 ecdh-sha2-nistp384 ecdh-sha2-nistp256 diffie-hellman-group14-sha1 diffie-hellman-group1-sha1)
 tran_preferred_mac_algorithms             = %w(hmac-sha1 hmac-md5 hmac-sha1-96 hmac-md5-96)
 tran_preferred_compression_algorithms     = %w(none zlib)
