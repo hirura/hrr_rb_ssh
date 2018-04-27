@@ -63,7 +63,6 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::DirectTcpip do
   describe '#close' do
     let(:server){ TCPServer.new(port_to_connect) }
     before :example do
-      HrrRbSsh::Logger.initialize(::Logger.new(STDOUT, :DEBUG))
       server
       channel_type_instance.start
     end
