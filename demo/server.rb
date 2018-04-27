@@ -56,9 +56,17 @@ wqbQt4paM0aEuypWE+CaizA0I+El7f0y+59sUqTAN/7F9UlXaOBdd9SZkhACBrAR
 nQIDAQAB
 -----END PUBLIC KEY-----
   EOB
+  ecdsa_sha2_nistp256_public_key_algorithm_name = 'ecdsa-sha2-nistp256'
+  ecdsa_sha2_nistp256_public_key = <<-'EOB'
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE9DPmu6CIA5VCBaN9wpUP2UUZQ+dw
+77mTZ7lD+z5cjzF7OL/cPL1/zklAsYaH7z7OcPYRbe24QCG5YfJQZjevJQ==
+-----END PUBLIC KEY-----
+  EOB
   [
     [dss_public_key_algorithm_name, dss_public_key],
     [rsa_public_key_algorithm_name, rsa_public_key],
+    [ecdsa_sha2_nistp256_public_key_algorithm_name, ecdsa_sha2_nistp256_public_key],
   ].any? { |public_key_algorithm_name, public_key|
     context.verify username, public_key_algorithm_name, public_key
   }
