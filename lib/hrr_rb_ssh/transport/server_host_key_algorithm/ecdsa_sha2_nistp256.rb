@@ -30,9 +30,7 @@ SpNC6qrqdhUfVAjsF9y5O/3Z/LGh/lNTig==
             :'[identifier]'            => self.class::IDENTIFIER,
             :'Q'                       => @algorithm.public_key.to_bn.to_s(2)
           }
-          tmp = PublicKeyBlob.encode payload
-          p tmp.unpack("H*")[0]
-          tmp
+          PublicKeyBlob.encode payload
         end
 
         def ecdsa_signature_blob data
