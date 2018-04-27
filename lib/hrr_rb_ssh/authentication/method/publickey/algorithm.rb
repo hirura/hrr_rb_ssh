@@ -20,3 +20,6 @@ end
 
 require 'hrr_rb_ssh/authentication/method/publickey/algorithm/ssh_dss'
 require 'hrr_rb_ssh/authentication/method/publickey/algorithm/ssh_rsa'
+require 'hrr_rb_ssh/authentication/method/publickey/algorithm/ecdsa_sha2_nistp256'
+require 'hrr_rb_ssh/authentication/method/publickey/algorithm/ecdsa_sha2_nistp384'
+require 'hrr_rb_ssh/authentication/method/publickey/algorithm/ecdsa_sha2_nistp521'
