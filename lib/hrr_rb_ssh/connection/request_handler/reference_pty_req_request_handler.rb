@@ -16,6 +16,8 @@ module HrrRbSsh
             ptm.winsize = [context.terminal_height_rows, context.terminal_width_characters]
             context.vars[:ptm] = ptm
             context.vars[:pts] = pts
+            context.vars[:env] ||= Hash.new
+            context.vars[:env]['TERM'] = context.term_environment_variable_value
             context.chain_proc { |chain|
               begin
                 chain.call_next
