@@ -51,8 +51,8 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::DirectTcpip do
     end
 
     it "starts a tcp socket and starts sender and receiver threads" do
-      allow(channel.instance_variable_get('@request_handler_io')).to receive(:write).with(any_args)
-      allow(channel.instance_variable_get('@request_handler_io')).to receive(:readpartial).with(any_args).and_return('dummy')
+      allow(channel.instance_variable_get('@w_io_out')).to receive(:write).with(any_args)
+      allow(channel.instance_variable_get('@r_io_in' )).to receive(:readpartial).with(any_args).and_return('dummy')
       channel_type_instance.start
       expect(channel_type_instance.instance_variable_get('@socket').closed?).to be false
       expect(channel_type_instance.instance_variable_get('@sender_thread').alive?).to be true
@@ -73,8 +73,8 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::DirectTcpip do
     end
 
     it "finishes the threads and the socket, and calls channel#close" do
-      allow(channel.instance_variable_get('@request_handler_io')).to receive(:write).with(any_args)
-      allow(channel.instance_variable_get('@request_handler_io')).to receive(:readpartial).with(any_args).and_return('dummy')
+      allow(channel.instance_variable_get('@w_io_out')).to receive(:write).with(any_args)
+      allow(channel.instance_variable_get('@r_io_in' )).to receive(:readpartial).with(any_args).and_return('dummy')
       allow(channel).to receive(:close).with(:channel_type_instance)
       channel_type_instance.instance_variable_set('@sender_thread_finished', true)
       channel_type_instance.instance_variable_set('@receiver_thread_finished', true)

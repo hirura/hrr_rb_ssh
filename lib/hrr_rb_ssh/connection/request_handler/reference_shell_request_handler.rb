@@ -15,6 +15,8 @@ module HrrRbSsh
             ptm = context.vars[:ptm]
             pts = context.vars[:pts]
 
+            context.io[2].close # never use err output in shell handler
+
             context.chain_proc { |chain|
               pid = fork do
                 ptm.close
@@ -33,7 +35,7 @@ module HrrRbSsh
               threads.push Thread.start {
                 loop do
                   begin
-                    context.io.write ptm.readpartial(1024)
+                    context.io[1].write ptm.readpartial(1024)
                   rescue EOFError => e
                     context.logger.info("ptm is EOF")
                     break
@@ -45,11 +47,12 @@ module HrrRbSsh
                     break
                   end
                 end
+                context.io[1].close
               }
               threads.push Thread.start {
                 loop do
                   begin
-                    ptm.write context.io.readpartial(1024)
+                    ptm.write context.io[0].readpartial(1024)
                   rescue EOFError => e
                     context.logger.info("IO is EOF")
                     break
@@ -61,6 +64,7 @@ module HrrRbSsh
                     break
                   end
                 end
+                ptm.close
               }
 
               begin

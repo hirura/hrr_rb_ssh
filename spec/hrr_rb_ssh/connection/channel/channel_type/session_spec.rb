@@ -83,7 +83,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session do
       [
         session.instance_variable_get('@proc_chain'),
         session.instance_variable_get('@connection').username,
-        session.instance_variable_get('@channel').request_handler_io,
+        session.instance_variable_get('@channel').io,
         session.instance_variable_get('@variables'),
         channel_request_message,
         session.instance_variable_get('@connection').options,

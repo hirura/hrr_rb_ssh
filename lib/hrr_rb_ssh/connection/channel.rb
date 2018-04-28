@@ -19,8 +19,7 @@ module HrrRbSsh
         :local_maximum_packet_size,
         :remote_window_size,
         :remote_maximum_packet_size,
-        :receive_message_queue,
-        :request_handler_io
+        :receive_message_queue
 
       def initialize connection, message
         @logger = HrrRbSsh::Logger.new self.class.name
@@ -40,17 +39,28 @@ module HrrRbSsh
         @receive_message_queue = Queue.new
         @receive_data_queue = Queue.new
 
-        @channel_io, @request_handler_io = UNIXSocket.pair
+        @r_io_in,  @w_io_in  = IO.pipe
+        @r_io_out, @w_io_out = IO.pipe
+        @r_io_err, @w_io_err = IO.pipe
 
         @closed = nil
       end
 
+      def io
+        [@r_io_in, @w_io_out, @w_io_err]
+      end
+
       def start
         @channel_loop_thread = channel_loop_thread
-        @sender_thread       = sender_thread
+        @out_sender_thread   = out_sender_thread
+        @err_sender_thread   = err_sender_thread
         @receiver_thread     = receiver_thread
         @channel_type_instance.start
         @closed = false
+      end
+
+      def wait_until_senders_closed
+        [@out_sender_thread, @err_sender_thread].select{ |t| t.instance_of? Thread }.each(&:join)
       end
 
       def close from=:outside, exitstatus=0
@@ -62,16 +72,13 @@ module HrrRbSsh
         end
         @receive_message_queue.close
         @receive_data_queue.close
-        begin
-          @request_handler_io.close
-        rescue IOError # for compatibility for Ruby version < 2.3
-          Thread.pass
-        end
-        begin
-          @channel_io.close
-        rescue IOError # for compatibility for Ruby version < 2.3
-          Thread.pass
-        end
+        [@r_io_in, @w_io_in, @r_io_out, @w_io_out, @r_io_err, @w_io_err].each{ |io|
+          begin
+            io.close
+          rescue IOError # for compatibility for Ruby version < 2.3
+            Thread.pass
+          end
+        }
         begin
           if from == :channel_type_instance
             send_channel_eof
@@ -133,23 +140,23 @@ module HrrRbSsh
         end
       end
 
-      def sender_thread
+      def out_sender_thread
         Thread.start {
-          @logger.info("start sender thread")
+          @logger.info("start out sender thread")
           loop do
-            if @channel_io.closed?
-              @logger.info("closing sender thread")
+            if @r_io_out.closed?
+              @logger.info("closing out sender thread")
               break
             end
             begin
-              data = @channel_io.readpartial(1024)
+              data = @r_io_out.readpartial(1024)
               sendable_size = [data.size, @remote_window_size].min
               sending_data = data[0, sendable_size]
               send_channel_data sending_data if sendable_size > 0
               @remote_window_size -= sendable_size
             rescue EOFError => e
               begin
-                @channel_io.close
+                @r_io_out.close
               rescue IOError # for compatibility for Ruby version < 2.3
                 Thread.pass
               end
@@ -161,7 +168,39 @@ module HrrRbSsh
               close
             end
           end
-          @logger.info("sender thread closed")
+          @logger.info("out sender thread closed")
+        }
+      end
+
+      def err_sender_thread
+        Thread.start {
+          @logger.info("start err sender thread")
+          loop do
+            if @r_io_err.closed?
+              @logger.info("closing err sender thread")
+              break
+            end
+            begin
+              data = @r_io_err.readpartial(1024)
+              sendable_size = [data.size, @remote_window_size].min
+              sending_data = data[0, sendable_size]
+              send_channel_extended_data sending_data if sendable_size > 0
+              @remote_window_size -= sendable_size
+            rescue EOFError => e
+              begin
+                @r_io_err.close
+              rescue IOError # for compatibility for Ruby version < 2.3
+                Thread.pass
+              end
+            rescue IOError => e
+              @logger.warn("channel IO is closed")
+              close
+            rescue => e
+              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+              close
+            end
+          end
+          @logger.info("err sender thread closed")
         }
       end
 
@@ -174,11 +213,11 @@ module HrrRbSsh
               if data.nil? && @receive_data_queue.closed?
                 @logger.info("closing receiver thread")
                 @logger.info("closing channel IO write")
-                @channel_io.close_write
+                @w_io_in.close_write
                 @logger.info("channel IO write closed")
                 break
               end
-              @channel_io.write data
+              @w_io_in.write data
               @local_window_size -= data.size
               if @local_window_size < INITIAL_WINDOW_SIZE/2
                 @logger.info("send channel window adjust")
@@ -225,6 +264,17 @@ module HrrRbSsh
           :'data'              => data,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.encode message
+        @connection.send payload
+      end
+
+      def send_channel_extended_data data, code=HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypeCode::SSH_EXTENDED_DATA_STDERR
+        message = {
+          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE,
+          :'recipient channel' => @remote_channel,
+          :'data type code'    => code,
+          :'data'              => data,
+        }
+        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA.encode message
         @connection.send payload
       end
 

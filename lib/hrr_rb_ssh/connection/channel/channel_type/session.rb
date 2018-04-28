@@ -30,7 +30,7 @@ module HrrRbSsh
 
           def request message
             request_type = message[:'request type']
-            RequestType[request_type].run @proc_chain, @connection.username, @channel.request_handler_io, @variables, message, @connection.options
+            RequestType[request_type].run @proc_chain, @connection.username, @channel.io, @variables, message, @connection.options
           end
 
           def proc_chain_thread
@@ -43,6 +43,9 @@ module HrrRbSsh
                 exitstatus = 1
               ensure
                 @logger.info("closing proc chain thread")
+                @logger.info("wait for sending output")
+                @channel.wait_until_senders_closed
+                @logger.info("sending output finished")
                 @channel.close from=:channel_type_instance, exitstatus=exitstatus
                 @logger.info("proc chain thread closed")
               end

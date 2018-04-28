@@ -44,18 +44,18 @@ module HrrRbSsh
               begin
                 loop do
                   begin
-                    @channel.request_handler_io.write s.readpartial(10240)
+                    @channel.io[1].write s.readpartial(10240)
                   rescue EOFError
                     @logger.info("socket is EOF")
-                    @channel.request_handler_io.close_write
+                    @channel.io[1].close
                     break
                   rescue IOError
                     @logger.info("socket is closed")
-                    @channel.request_handler_io.close_write
+                    @channel.io[1].close
                     break
                   rescue => e
                     @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
-                    @channel.request_handler_io.close_write
+                    @channel.io[1].close
                     break
                   end
                 end
@@ -73,7 +73,7 @@ module HrrRbSsh
               begin
                 loop do
                   begin
-                    s.write @channel.request_handler_io.readpartial(10240)
+                    s.write @channel.io[0].readpartial(10240)
                   rescue EOFError
                     @logger.info("io is EOF")
                     s.close_write

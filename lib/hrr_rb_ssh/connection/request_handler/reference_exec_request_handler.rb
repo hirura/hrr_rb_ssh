@@ -15,8 +15,9 @@ module HrrRbSsh
               pid = fork do
                 Process.setsid
                 context.vars[:env] ||= Hash.new
-                exec context.vars[:env], context.command, in: context.io, out: context.io, err: context.io
+                exec context.vars[:env], context.command, in: context.io[0], out: context.io[1], err: context.io[2]
               end
+              context.io.each{ |io| io.close }
               pid, status = Process.waitpid2 pid
               status.exitstatus
             }
