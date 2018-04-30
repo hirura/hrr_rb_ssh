@@ -540,6 +540,38 @@ RSpec.describe HrrRbSsh::Connection do
         expect(connection.instance_variable_get('@channels')).to include(channel_open_message[:'sender channel'])
       end
     end
+
+    context "when receives invalid channel open message" do
+      let(:channel_open_message){
+        {
+          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+          :'channel type'        => "unsupportd",
+          :'sender channel'      => 0,
+          :'initial window size' => 2097152,
+          :'maximum packet size' => 32768,
+        }
+      }
+      let(:channel_open_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.encode channel_open_message
+      }
+      let(:channel_open_failure_message){
+        {
+          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE::VALUE,
+          :'recipient channel'   => 0,
+          :'reason code'         => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE::ReasonCode::SSH_OPEN_CONNECT_FAILED,
+          :'description'         => "undefined method `new' for nil:NilClass",
+          :'language tag'        => "",
+        }
+      }
+      let(:channel_open_failure_payload){
+        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE.encode channel_open_failure_message
+      }
+
+      it "calls channel_open" do
+        expect(authentication).to receive(:send).with(channel_open_failure_payload).once
+        connection.channel_open channel_open_payload
+      end
+    end
   end
 
   describe '#channel_open_confirmation' do

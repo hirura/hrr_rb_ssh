@@ -140,10 +140,15 @@ module HrrRbSsh
     def channel_open payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::ID)
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.decode payload
-      channel = Channel.new self, message
-      @channels[channel.local_channel] = channel
-      channel.start
-      send_channel_open_confirmation channel
+      begin
+        channel = Channel.new self, message
+        @channels[channel.local_channel] = channel
+        channel.start
+        send_channel_open_confirmation channel
+      rescue => e
+        recipient_channel = message[:'sender channel']
+        send_channel_open_failure recipient_channel, Message::SSH_MSG_CHANNEL_OPEN_FAILURE::ReasonCode::SSH_OPEN_CONNECT_FAILED, e.message
+      end
     end
 
     def channel_open_confirmation payload
@@ -225,6 +230,18 @@ module HrrRbSsh
         :'maximum packet size' => channel.local_maximum_packet_size,
       }
       payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.encode message
+      @authentication.send payload
+    end
+
+    def send_channel_open_failure recipient_channel, reason_code, description
+      message = {
+        :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE::VALUE,
+        :'recipient channel'   => recipient_channel,
+        :'reason code'         => reason_code,
+        :'description'         => description,
+        :'language tag'        => "",
+      }
+      payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE.encode message
       @authentication.send payload
     end
   end
