@@ -57,7 +57,32 @@ while true
 end
 ```
 
-Where an `options` variable is an instance of `Hash`, which has optional (or sometimes almost necessary) values.
+Where, an `options` variable is an instance of `Hash`, which has optional (or sometimes almost necessary) values.
+
+#### Logging
+
+__IMPORTANT__: DEBUG log level outputs all communications between local and remote in human-readable plain-text including password and any secret. Be careful to use logging.
+
+The library provides logging functionality. To enable logging of the library, you are to initialize `HrrRbSsh::Logger` class.
+
+```ruby
+HrrRbSsh::Logger.initialize logger
+```
+
+Where, the `logger` variable can be an instance of standard Logger class or user-defined logger class. What `HrrRbSsh::Logger` class requires for `logger` variable is that the `logger` instance responds to `#fatal`, `#error`, `#warn`, `#info` and `#debug`.
+
+For instance, `logger` variable can be prepared like below.
+
+```ruby
+logger = Logger.new STDOUT
+logger.level = Logger::INFO
+```
+
+To disable logging, you can un-initialize `HrrRbSsh::Logger`.
+
+```ruby
+HrrRbSsh::Logger.uninitialize
+```
 
 #### Defining authentications
 
@@ -133,31 +158,6 @@ options['authentication_none_authenticator'] = auth_none
 ```
 
 In none authentication context, `context` variable provides the `#username` method.
-
-#### Logging
-
-__IMPORTANT__: DEBUG log level outputs all communications between local and remote in human-readable plain-text including password and any secret. Be careful to use logging.
-
-The library provides logging functionality. To enable logging of the library, you are to initialize `HrrRbSsh::Logger` class.
-
-```ruby
-HrrRbSsh::Logger.initialize logger
-```
-
-Where, the `logger` variable can be an instance of standard Logger class or user-defined logger class. What `HrrRbSsh::Logger` class requires for `logger` variable is that the `logger` instance responds to `#fatal`, `#error`, `#warn`, `#info` and `#debug`.
-
-For instance, `logger` variable can be prepared like below.
-
-```ruby
-logger = Logger.new STDOUT
-logger.level = Logger::INFO
-```
-
-To disable logging, you can un-initialize `HrrRbSsh::Logger`.
-
-```ruby
-HrrRbSsh::Logger.uninitialize
-```
 
 #### Handling session channel requests
 
