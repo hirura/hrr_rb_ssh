@@ -185,30 +185,32 @@ Outputs of `#list_preferred` method are ordered as preferred; i.e. the name list
 p HrrRbSsh::Transport::EncryptionAlgorithm.list_supported
 # => ["none", "3des-cbc", "blowfish-cbc", "aes128-cbc", "aes192-cbc", "aes256-cbc", "arcfour", "cast128-cbc", "aes128-ctr", "aes192-ctr", "aes256-ctr"]
 p HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-=> ["aes128-ctr", "aes192-ctr", "aes256-ctr", "aes128-cbc", "3des-cbc", "blowfish-cbc", "cast128-cbc", "aes192-cbc", "aes256-cbc", "arcfour"]
+# => ["aes128-ctr", "aes192-ctr", "aes256-ctr", "aes128-cbc", "3des-cbc", "blowfish-cbc", "cast128-cbc", "aes192-cbc", "aes256-cbc", "arcfour"]
 
 p HrrRbSsh::Transport::EncryptionAlgorithm.list_supported
-=> ["none", "3des-cbc", "blowfish-cbc", "aes128-cbc", "aes192-cbc", "aes256-cbc", "arcfour", "cast128-cbc", "aes128-ctr", "aes192-ctr", "aes256-ctr"]
+# => ["none", "3des-cbc", "blowfish-cbc", "aes128-cbc", "aes192-cbc", "aes256-cbc", "arcfour", "cast128-cbc", "aes128-ctr", "aes192-ctr", "aes256-ctr"]
 HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
-=> ["ecdsa-sha2-nistp521", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp256", "ssh-rsa", "ssh-dss"]
+# => ["ecdsa-sha2-nistp521", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp256", "ssh-rsa", "ssh-dss"]
 
 p HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported
-=> ["ssh-dss", "ssh-rsa", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521"]
+# => ["ssh-dss", "ssh-rsa", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521"]
 p HrrRbSsh::Transport::KexAlgorithm.list_preferred
-=> ["ecdh-sha2-nistp521", "ecdh-sha2-nistp384", "ecdh-sha2-nistp256", "diffie-hellman-group18-sha512", "diffie-hellman-group17-sha512", "diffie-hellman-group16-sha512", "diffie-hellman-group15-sha512", "diffie-hellman-group14-sha256", "diffie-hellman-group-exchange-sha256", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"]
+# => ["ecdh-sha2-nistp521", "ecdh-sha2-nistp384", "ecdh-sha2-nistp256", "diffie-hellman-group18-sha512", "diffie-hellman-group17-sha512", "diffie-hellman-group16-sha512", "diffie-hellman-group15-sha512", "diffie-hellman-group14-sha256", "diffie-hellman-group-exchange-sha256", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"]
  
 p HrrRbSsh::Transport::KexAlgorithm.list_supported
-=> ["diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group-exchange-sha256", "diffie-hellman-group14-sha256", "diffie-hellman-group15-sha512", "diffie-hellman-group16-sha512", "diffie-hellman-group17-sha512", "diffie-hellman-group18-sha512", "ecdh-sha2-nistp256", "ecdh-sha2-nistp384", "ecdh-sha2-nistp521"]
+# => ["diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group-exchange-sha256", "diffie-hellman-group14-sha256", "diffie-hellman-group15-sha512", "diffie-hellman-group16-sha512", "diffie-hellman-group17-sha512", "diffie-hellman-group18-sha512", "ecdh-sha2-nistp256", "ecdh-sha2-nistp384", "ecdh-sha2-nistp521"]
+p HrrRbSsh::Transport::KexAlgorithm.list_preferred
+# => ["ecdh-sha2-nistp521", "ecdh-sha2-nistp384", "ecdh-sha2-nistp256", "diffie-hellman-group18-sha512", "diffie-hellman-group17-sha512", "diffie-hellman-group16-sha512", "diffie-hellman-group15-sha512", "diffie-hellman-group14-sha256", "diffie-hellman-group-exchange-sha256", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"]
 
 p HrrRbSsh::Transport::MacAlgorithm.list_supported
-=> ["none", "hmac-sha1", "hmac-sha1-96", "hmac-md5", "hmac-md5-96", "hmac-sha2-256", "hmac-sha2-512"]
+# => ["none", "hmac-sha1", "hmac-sha1-96", "hmac-md5", "hmac-md5-96", "hmac-sha2-256", "hmac-sha2-512"]
 p HrrRbSsh::Transport::MacAlgorithm.list_preferred
-=> ["hmac-sha2-512", "hmac-sha2-256", "hmac-sha1", "hmac-md5", "hmac-sha1-96", "hmac-md5-96"]
+# => ["hmac-sha2-512", "hmac-sha2-256", "hmac-sha1", "hmac-md5", "hmac-sha1-96", "hmac-md5-96"]
 
 p HrrRbSsh::Transport::CompressionAlgorithm.list_supported
-=> ["none", "zlib"]
+# => ["none", "zlib"]
 p HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
-=> ["none", "zlib"]
+# => ["none", "zlib"]
 ```
 
 ### Demo
@@ -222,9 +224,9 @@ The following features are currently supported.
 ### Connection layer
 
 - Session channel
- - Shell (PTY-req, env, shell, window-change) request
- - Exec request
- - Subsystem request
+    - Shell (PTY-req, env, shell, window-change) request
+    - Exec request
+    - Subsystem request
 - Local port forwarding (direct-tcpip channel)
 - Remote port forwarding (tcpip-forward global request and forwarded-tcpip channel)
 
@@ -233,56 +235,56 @@ The following features are currently supported.
 - None authentication
 - Password authentication
 - Public key authentication
- - ssh-dss
- - ssh-rsa
- - ecdsa-sha2-nistp256
- - ecdsa-sha2-nistp384
- - ecdsa-sha2-nistp521
+    - ssh-dss
+    - ssh-rsa
+    - ecdsa-sha2-nistp256
+    - ecdsa-sha2-nistp384
+    - ecdsa-sha2-nistp521
 
 ### Transport layer
 
 - Encryption algorithm
- - none
- - 3des-cbc
- - blowfish-cbc
- - aes128-cbc
- - aes192-cbc
- - aes256-cbc
- - arcfour
- - cast128-cbc
- - aes128-ctr
- - aes192-ctr
- - aes256-ctr
+    - none
+    - 3des-cbc
+    - blowfish-cbc
+    - aes128-cbc
+    - aes192-cbc
+    - aes256-cbc
+    - arcfour
+    - cast128-cbc
+    - aes128-ctr
+    - aes192-ctr
+    - aes256-ctr
 - Server host key algorithm
- - ssh-dss
- - ssh-rsa
- - ecdsa-sha2-nistp256
- - ecdsa-sha2-nistp384
- - ecdsa-sha2-nistp521
+    - ssh-dss
+    - ssh-rsa
+    - ecdsa-sha2-nistp256
+    - ecdsa-sha2-nistp384
+    - ecdsa-sha2-nistp521
 - Kex algorithm
- - diffie-hellman-group1-sha1
- - diffie-hellman-group14-sha1
- - diffie-hellman-group-exchange-sha1
- - diffie-hellman-group-exchange-sha256
- - diffie-hellman-group14-sha256
- - diffie-hellman-group15-sha512
- - diffie-hellman-group16-sha512
- - diffie-hellman-group17-sha512
- - diffie-hellman-group18-sha512
- - ecdh-sha2-nistp256
- - ecdh-sha2-nistp384
- - ecdh-sha2-nistp521
+    - diffie-hellman-group1-sha1
+    - diffie-hellman-group14-sha1
+    - diffie-hellman-group-exchange-sha1
+    - diffie-hellman-group-exchange-sha256
+    - diffie-hellman-group14-sha256
+    - diffie-hellman-group15-sha512
+    - diffie-hellman-group16-sha512
+    - diffie-hellman-group17-sha512
+    - diffie-hellman-group18-sha512
+    - ecdh-sha2-nistp256
+    - ecdh-sha2-nistp384
+    - ecdh-sha2-nistp521
 - Mac algorithm
- - none
- - hmac-sha1
- - hmac-sha1-96
- - hmac-md5
- - hmac-md5-96
- - hmac-sha2-256
- - hmac-sha2-512
+    - none
+    - hmac-sha1
+    - hmac-sha1-96
+    - hmac-md5
+    - hmac-md5-96
+    - hmac-sha2-256
+    - hmac-sha2-512
 - Compression algorithm
- - none
- - zlib
+    - none
+    - zlib
 
 ## Contributing
 
