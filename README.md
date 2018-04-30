@@ -159,6 +159,56 @@ To disable logging, you can un-initialize `HrrRbSsh::Logger`.
 HrrRbSsh::Logger.uninitialize
 ```
 
+#### Handling session channel requests
+
+By default, any channel requests belonging to session channel are implicitly ignored. To handle the requests, defining request handlers are required.
+
+##### Reference request handlers
+
+There are pre-implemented request handlers available for reference as below.
+
+```ruby
+options['connection_channel_request_pty_req']       = HrrRbSsh::Connection::RequestHandler::ReferencePtyReqRequestHandler.new
+options['connection_channel_request_env']           = HrrRbSsh::Connection::RequestHandler::ReferenceEnvRequestHandler.new
+options['connection_channel_request_shell']         = HrrRbSsh::Connection::RequestHandler::ReferenceShellRequestHandler.new
+options['connection_channel_request_exec']          = HrrRbSsh::Connection::RequestHandler::ReferenceExecRequestHandler.new
+options['connection_channel_request_window_change'] = HrrRbSsh::Connection::RequestHandler::ReferenceWindowChangeRequestHandler.new
+```
+
+##### Custom request handlers
+
+It is also possible to define customized request handlers. For instance, echo server can be implemented very easily as below. In this case, echo server works instead of shell and PTY-req and env requests are undefined.
+
+```ruby
+conn_echo = HrrRbSsh::Connection::RequestHandler.new { |context|
+  context.io[2].close
+  context.chain_proc { |chain|
+    begin
+      loop do
+        buf = context.io[0].readpartial(10240)
+        break if buf.include?(0x04.chr) # break if ^D
+        context.io[1].write buf
+      end
+      exitstatus = 0
+    rescue => e
+      logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+      exitstatus = 1
+    ensure
+      context.io[1].close
+    end
+    exitstatus
+  }
+}
+options['connection_channel_request_shell'] = conn_echo
+```
+
+In `HrrRbSsh::Connection::RequestHandler.new` block, context variable basically provides the followings.
+
+- `#io => [in, out, err]` : `in` is readable and read data is sent by remote. `out` and `err` are writable. `out` is for standard output and written data is sent as channel data. `err` is for standard error and written data is sent as channel extended data.
+- `#chain_proc => {|chain| ... }` : When a session channel is opened, a background thread is started and is waitng for a chaned block registered. This `#chain_proc` is used to define how to handle subsequent communications between local and remote. The `chain` variable provides `#call_next` method. In `#proc_chain` block, it is possible to call subsequent block that is defined in another request handler. For instance, shell request must called after pty-req request. The `chain` in pty-req request handler's `#chain_proc` calls `#next_proc` and then subsequent shell request handler's `#chain_proc` will be called.
+
+And request handler's `context` variable also provides additional methods based on request type. See `lib/hrr_rb_ssh/connection/channel/channel_type/session/request_type/<request type>/context.rb`.
+
 #### Defining preferred algorithms (optional)
 
 Preferred encryption, server-host-key, KEX and compression algorithms can be selected and defined.
