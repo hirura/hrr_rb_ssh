@@ -44,8 +44,18 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::ForwardedTcpip do
     after :example do
       channel_type_instance.instance_variable_get('@sender_thread').exit
       channel_type_instance.instance_variable_get('@receiver_thread').exit
-      channel_type_instance.instance_variable_get('@socket').close
-      socket_pair.each(&:close)
+      begin
+        channel_type_instance.instance_variable_get('@socket').close
+      rescue IOError # for compatibility for Ruby version < 2.3
+        Thread.pass
+      end
+      socket_pair.each{ |s|
+        begin
+          s.close
+        rescue IOError # for compatibility for Ruby version < 2.3
+          Thread.pass
+        end
+      }
     end
 
     it "starts sender and receiver threads" do
@@ -69,8 +79,18 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::ForwardedTcpip do
     after :example do
       channel_type_instance.instance_variable_get('@sender_thread').exit
       channel_type_instance.instance_variable_get('@receiver_thread').exit
-      channel_type_instance.instance_variable_get('@socket').close
-      socket_pair.each(&:close)
+      begin
+        channel_type_instance.instance_variable_get('@socket').close
+      rescue IOError # for compatibility for Ruby version < 2.3
+        Thread.pass
+      end
+      socket_pair.each{ |s|
+        begin
+          s.close
+        rescue IOError # for compatibility for Ruby version < 2.3
+          Thread.pass
+        end
+      }
     end
 
     it "finishes the threads and the socket, and calls channel#close" do

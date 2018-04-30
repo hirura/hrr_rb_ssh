@@ -20,7 +20,13 @@ module HrrRbSsh
       def close
         @logger.info("closing tcpip-forward")
         @tcpip_forward_threads.values.each(&:exit)
-        @tcpip_forward_servers.values.each(&:close)
+        @tcpip_forward_servers.values.each{ |s|
+          begin
+            s.close
+          rescue IOError # for compatibility for Ruby version < 2.3
+            Thread.pass
+          end
+        }
         @tcpip_forward_threads.clear
         @tcpip_forward_servers.clear
         @logger.info("tcpip-forward closed")
@@ -70,7 +76,11 @@ module HrrRbSsh
         port_number_to_bind = message[:'port number to bind']
         id = "#{address_to_bind}:#{port_number_to_bind}"
         @tcpip_forward_threads[id].exit
-        @tcpip_forward_servers[id].close
+        begin
+          @tcpip_forward_servers[id].close
+        rescue IOError # for compatibility for Ruby version < 2.3
+          Thread.pass
+        end
         @tcpip_forward_threads.delete id
         @tcpip_forward_servers.delete id
         @logger.info("tcpip-forward canceled")
