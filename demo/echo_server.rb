@@ -2,7 +2,6 @@
 # vim: et ts=2 sw=2
 
 require 'logger'
-require 'pty'
 require 'socket'
 
 begin
@@ -19,27 +18,24 @@ HrrRbSsh::Logger.initialize logger
 
 
 auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
-  user_and_pass = [
-    ['user1',  'password1'],
-    ['user2',  'password2'],
-  ]
-  user_and_pass.any? { |user, pass|
-    context.verify user, pass
-  }
+  true # accept any user and password
 }
 
 conn_echo = HrrRbSsh::Connection::RequestHandler.new { |context|
+  context.io[2].close
   context.chain_proc { |chain|
     begin
       loop do
-        buf = context.io.readpartial(10240)
+        buf = context.io[0].readpartial(10240)
         break if buf.include?(0x04.chr) # break if ^D
-        context.io.write buf
+        context.io[1].write buf
       end
       exitstatus = 0
     rescue => e
       logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
       exitstatus = 1
+    ensure
+      context.io[1].close
     end
     exitstatus
   }
