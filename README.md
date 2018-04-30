@@ -217,7 +217,72 @@ The `demo/server.rb` shows a good example on how to use the hrr_rb_ssh library i
 
 ## Supported Features
 
-Now only server mode and login shell is working.
+The following features are currently supported.
+
+### Connection layer
+
+- Session channel
+ - Shell (PTY-req, env, shell, window-change) request
+ - Exec request
+ - Subsystem request
+- Local port forwarding (direct-tcpip channel)
+- Remote port forwarding (tcpip-forward global request and forwarded-tcpip channel)
+
+### Authentication layer
+
+- None authentication
+- Password authentication
+- Public key authentication
+ - ssh-dss
+ - ssh-rsa
+ - ecdsa-sha2-nistp256
+ - ecdsa-sha2-nistp384
+ - ecdsa-sha2-nistp521
+
+### Transport layer
+
+- Encryption algorithm
+ - none
+ - 3des-cbc
+ - blowfish-cbc
+ - aes128-cbc
+ - aes192-cbc
+ - aes256-cbc
+ - arcfour
+ - cast128-cbc
+ - aes128-ctr
+ - aes192-ctr
+ - aes256-ctr
+- Server host key algorithm
+ - ssh-dss
+ - ssh-rsa
+ - ecdsa-sha2-nistp256
+ - ecdsa-sha2-nistp384
+ - ecdsa-sha2-nistp521
+- Kex algorithm
+ - diffie-hellman-group1-sha1
+ - diffie-hellman-group14-sha1
+ - diffie-hellman-group-exchange-sha1
+ - diffie-hellman-group-exchange-sha256
+ - diffie-hellman-group14-sha256
+ - diffie-hellman-group15-sha512
+ - diffie-hellman-group16-sha512
+ - diffie-hellman-group17-sha512
+ - diffie-hellman-group18-sha512
+ - ecdh-sha2-nistp256
+ - ecdh-sha2-nistp384
+ - ecdh-sha2-nistp521
+- Mac algorithm
+ - none
+ - hmac-sha1
+ - hmac-sha1-96
+ - hmac-md5
+ - hmac-md5-96
+ - hmac-sha2-256
+ - hmac-sha2-512
+- Compression algorithm
+ - none
+ - zlib
 
 ## Contributing
 
