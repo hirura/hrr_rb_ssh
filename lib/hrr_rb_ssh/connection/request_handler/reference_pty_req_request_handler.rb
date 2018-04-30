@@ -1,6 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'pty'
 require 'io/console'
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/request_handler'
