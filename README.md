@@ -214,17 +214,11 @@ And request handler's `context` variable also provides additional methods based 
 Preferred encryption, server-host-key, KEX and compression algorithms can be selected and defined.
 
 ```ruby
-tran_preferred_encryption_algorithms      = %w(aes256-ctr aes128-cbc)
-tran_preferred_server_host_key_algorithms = %w(ecdsa-sha2-nistp256 ssh-rsa)
-tran_preferred_kex_algorithms             = %w(ecdh-sha2-nistp256 diffie-hellman-group14-sha1)
-tran_preferred_mac_algorithms             = %w(hmac-sha2-256 hmac-sha1)
-tran_preferred_compression_algorithms     = %w(none)
-
-options['transport_preferred_encryption_algorithms']      = tran_preferred_encryption_algorithms
-options['transport_preferred_server_host_key_algorithms'] = tran_preferred_server_host_key_algorithms
-options['transport_preferred_kex_algorithms']             = tran_preferred_kex_algorithms
-options['transport_preferred_mac_algorithms']             = tran_preferred_mac_algorithms
-options['transport_preferred_compression_algorithms']     = tran_preferred_compression_algorithms
+options['transport_preferred_encryption_algorithms']      = %w(aes256-ctr aes128-cbc)
+options['transport_preferred_server_host_key_algorithms'] = %w(ecdsa-sha2-nistp256 ssh-rsa)
+options['transport_preferred_kex_algorithms']             = %w(ecdh-sha2-nistp256 diffie-hellman-group14-sha1)
+options['transport_preferred_mac_algorithms']             = %w(hmac-sha2-256 hmac-sha1)
+options['transport_preferred_compression_algorithms']     = %w(none)
 ```
 
 Supported algorithms can be got with each algorithm class's `#list_supported` method, and default preferred algorithms can be got with each algorithm class's `#list_preferred` method.
