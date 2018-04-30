@@ -21,20 +21,20 @@ module HrrRbSsh
         :remote_maximum_packet_size,
         :receive_message_queue
 
-      def initialize connection, message
+      def initialize connection, message, socket=nil
         @logger = HrrRbSsh::Logger.new self.class.name
 
         @connection = connection
 
         @channel_type = message[:'channel type']
-        @local_channel  = message[:'sender channel']
+        @local_channel  = connection.assign_channel
         @remote_channel = message[:'sender channel']
         @local_window_size          = INITIAL_WINDOW_SIZE
         @local_maximum_packet_size  = MAXIMUM_PACKET_SIZE
         @remote_window_size         = message[:'initial window size']
         @remote_maximum_packet_size = message[:'maximum packet size']
 
-        @channel_type_instance = ChannelType[@channel_type].new connection, self, message
+        @channel_type_instance = ChannelType[@channel_type].new connection, self, message, socket
 
         @receive_message_queue = Queue.new
         @receive_data_queue = Queue.new
@@ -44,6 +44,12 @@ module HrrRbSsh
         @r_io_err, @w_io_err = IO.pipe
 
         @closed = nil
+      end
+
+      def set_remote_parameters message
+        @remote_channel = message[:'sender channel']
+        @remote_window_size         = message[:'initial window size']
+        @remote_maximum_packet_size = message[:'maximum packet size']
       end
 
       def io

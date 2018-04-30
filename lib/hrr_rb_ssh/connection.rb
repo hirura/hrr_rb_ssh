@@ -3,6 +3,7 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/closed_connection_error'
+require 'hrr_rb_ssh/connection/global_request_handler'
 require 'hrr_rb_ssh/connection/channel'
 
 module HrrRbSsh
@@ -17,6 +18,7 @@ module HrrRbSsh
       @authentication = authentication
       @options = options
 
+      @global_request_handler = GlobalRequestHandler.new self
       @channels = Hash.new
       @username = nil
       @closed = nil
@@ -29,6 +31,16 @@ module HrrRbSsh
       rescue ClosedAuthenticationError
         raise ClosedConnectionError
       end
+    end
+
+    def assign_channel
+      i = 0
+      res = nil
+      loop do
+        break unless @channels.keys.include?(i)
+        i += 1
+      end
+      i
     end
 
     def start
@@ -47,6 +59,7 @@ module HrrRbSsh
         end
       end
       @channels.clear
+      @global_request_handler.close
     end
 
     def closed?
@@ -68,6 +81,8 @@ module HrrRbSsh
           global_request payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE
           channel_open payload
+        when HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE
+          channel_open_confirmation payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
           channel_request payload
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
@@ -90,10 +105,36 @@ module HrrRbSsh
     def global_request payload
       @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::ID)
       message = HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.decode payload
-      if message[:'want reply']
-        # returns always failure because global request is not supported so far
-        send_request_failure
+      begin
+        @global_request_handler.request message
+      rescue
+        if message[:'want reply']
+          send_request_failure
+        end
+      else
+        if message[:'want reply']
+          send_request_success
+        end
       end
+    end
+
+    def channel_open_start address, port, socket
+      @logger.info('channel open start')
+      channel = Channel.new self, {:'channel type' => "forwarded-tcpip"}, socket
+      @channels[channel.local_channel] = channel
+      @logger.info('channel opened')
+      message = {
+        :'message number'             => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+        :'channel type'               => "forwarded-tcpip",
+        :'sender channel'             => channel.local_channel,
+        :'initial window size'        => channel.local_window_size,
+        :'maximum packet size'        => channel.local_maximum_packet_size,
+        :'address that was connected' => address,
+        :'port that was connected'    => port,
+        :'originator IP address'      => socket.remote_address.ip_address,
+        :'originator port'            => socket.remote_address.ip_port,
+      }
+      send_channel_open message
     end
 
     def channel_open payload
@@ -103,6 +144,14 @@ module HrrRbSsh
       @channels[channel.local_channel] = channel
       channel.start
       send_channel_open_confirmation channel
+    end
+
+    def channel_open_confirmation payload
+      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::ID)
+      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.decode payload
+      channel = @channels[message[:'recipient channel']]
+      channel.set_remote_parameters message
+      channel.start
     end
 
     def channel_request payload
@@ -158,6 +207,11 @@ module HrrRbSsh
         :'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
       }
       payload = HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE.encode message
+      @authentication.send payload
+    end
+
+    def send_channel_open message
+      payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.encode message
       @authentication.send payload
     end
 

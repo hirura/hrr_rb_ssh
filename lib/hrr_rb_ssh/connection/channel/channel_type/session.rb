@@ -10,7 +10,7 @@ module HrrRbSsh
         class Session < ChannelType
           NAME = 'session'
 
-          def initialize connection, channel, message
+          def initialize connection, channel, message, socket=nil
             @logger = HrrRbSsh::Logger.new self.class.name
             @connection = connection
             @channel = channel

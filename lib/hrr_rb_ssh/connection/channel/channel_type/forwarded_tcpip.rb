@@ -7,21 +7,17 @@ module HrrRbSsh
   class Connection
     class Channel
       class ChannelType
-        class DirectTcpip < ChannelType
-          NAME = 'direct-tcpip'
+        class ForwardedTcpip < ChannelType
+          NAME = 'forwarded-tcpip'
 
-          def initialize connection, channel, message, socket=nil
+          def initialize connection, channel, message, socket
             @logger = HrrRbSsh::Logger.new self.class.name
             @connection = connection
             @channel = channel
-            @host_to_connect       = message[:'host to connect']
-            @port_to_connect       = message[:'port to connect']
-            @originator_IP_address = message[:'originator IP address']
-            @originator_port       = message[:'originator port']
+            @socket = socket
           end
 
           def start
-            @socket = TCPSocket.new @host_to_connect, @port_to_connect
             @sender_thread = sender_thread
             @receiver_thread = receiver_thread
           end
@@ -29,10 +25,10 @@ module HrrRbSsh
           def close
             begin
               if @sender_thread_finished && @receiver_thread_finished
-                @logger.info("closing direct-tcpip")
+                @logger.info("closing forwarded-tcpip")
                 @socket.close
                 @channel.close from=:channel_type_instance
-                @logger.info("direct-tcpip closed")
+                @logger.info("forwarded-tcpip closed")
               end
             rescue => e
               @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
