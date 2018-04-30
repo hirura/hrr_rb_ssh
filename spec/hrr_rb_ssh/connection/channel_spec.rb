@@ -240,57 +240,115 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
   describe '#channel_loop_thread' do
     context "when channel receives channel request" do
-      let(:channel_request_message){
-        {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
-          :'recipient channel' => 0,
-          :'request type'      => 'shell',
-          :'want reply'        => want_reply,
+      context "when request is supported" do
+        let(:channel_request_message){
+          {
+            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+            :'recipient channel' => 0,
+            :'request type'      => 'shell',
+            :'want reply'        => want_reply,
+          }
         }
-      }
 
-      let(:channel_success_message){
-        {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
-          :'recipient channel' => 0,
+        let(:channel_success_message){
+          {
+            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
+            :'recipient channel' => 0,
+          }
         }
-      }
-      let(:channel_success_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS.encode channel_success_message
-      }
+        let(:channel_success_payload){
+          HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS.encode channel_success_message
+        }
 
-      context "with want reply true" do
-        let(:want_reply){ true }
+        context "with want reply true" do
+          let(:want_reply){ true }
 
-        before :example do
-          channel.receive_message_queue.enq channel_request_message
+          before :example do
+            channel.receive_message_queue.enq channel_request_message
+          end
+
+          it "calls #request and returns channel success" do
+            expect(channel.instance_variable_get('@channel_type_instance')).to receive(:request).with(channel_request_message).once
+            expect(connection).to receive(:send).with(channel_success_payload).once
+            allow(connection).to receive(:send).with(any_args)
+            t = channel.channel_loop_thread
+            channel.receive_message_queue.close
+            channel.close
+            t.join
+          end
         end
 
-        it "calls #request and returns channel success" do
-          expect(channel.instance_variable_get('@channel_type_instance')).to receive(:request).with(channel_request_message).once
-          expect(connection).to receive(:send).with(channel_success_payload).once
-          allow(connection).to receive(:send).with(any_args)
-          t = channel.channel_loop_thread
-          channel.receive_message_queue.close
-          channel.close
-          t.join
+        context "with want reply false" do
+          let(:want_reply){ false }
+
+          before :example do
+            channel.receive_message_queue.enq channel_request_message
+          end
+
+          it "calls #request and returns channel success" do
+            expect(channel.instance_variable_get('@channel_type_instance')).to receive(:request).with(channel_request_message).once
+            allow(connection).to receive(:send).with(any_args)
+            t = channel.channel_loop_thread
+            channel.receive_message_queue.close
+            channel.close
+            t.join
+          end
         end
       end
 
-      context "with want reply false" do
-        let(:want_reply){ false }
+      context "when request is not supported" do
+        let(:channel_request_message){
+          {
+            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+            :'recipient channel' => 0,
+            :'request type'      => 'unsupported',
+            :'want reply'        => want_reply,
+          }
+        }
 
-        before :example do
-          channel.receive_message_queue.enq channel_request_message
+        let(:channel_failure_message){
+          {
+            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_FAILURE::VALUE,
+            :'recipient channel' => 0,
+          }
+        }
+        let(:channel_failure_payload){
+          HrrRbSsh::Message::SSH_MSG_CHANNEL_FAILURE.encode channel_failure_message
+        }
+
+        context "with want reply true" do
+          let(:want_reply){ true }
+
+          before :example do
+            channel.receive_message_queue.enq channel_request_message
+          end
+
+          it "calls #request and returns channel failure" do
+            expect(channel.instance_variable_get('@channel_type_instance')).to receive(:request).with(channel_request_message).and_raise(NoMethodError, "undefined method `new' for nil:NilClass").once
+            expect(connection).to receive(:send).with(channel_failure_payload).once
+            allow(connection).to receive(:send).with(any_args)
+            t = channel.channel_loop_thread
+            channel.receive_message_queue.close
+            channel.close
+            t.join
+          end
         end
 
-        it "calls #request and returns channel success" do
-          expect(channel.instance_variable_get('@channel_type_instance')).to receive(:request).with(channel_request_message).once
-          allow(connection).to receive(:send).with(any_args)
-          t = channel.channel_loop_thread
-          channel.receive_message_queue.close
-          channel.close
-          t.join
+        context "with want reply false" do
+          let(:want_reply){ false }
+
+          before :example do
+            channel.receive_message_queue.enq channel_request_message
+          end
+
+          it "calls #request and returns channel success" do
+            expect(channel.instance_variable_get('@channel_type_instance')).to receive(:request).with(channel_request_message).once
+            allow(connection).to receive(:send).with(any_args)
+            t = channel.channel_loop_thread
+            channel.receive_message_queue.close
+            channel.close
+            t.join
+          end
         end
       end
     end

@@ -122,9 +122,17 @@ module HrrRbSsh
               case message[:'message number']
               when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
                 @logger.info("received channel request: #{message[:'request type']}")
-                @channel_type_instance.request message
-                if message[:'want reply']
-                  send_channel_success
+                begin
+                  @channel_type_instance.request message
+                rescue => e
+                  @logger.warn("request failed: #{e.message}")
+                  if message[:'want reply']
+                    send_channel_failure
+                  end
+                else
+                  if message[:'want reply']
+                    send_channel_success
+                  end
                 end
               when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
                 @logger.info("received channel data")
@@ -250,6 +258,15 @@ module HrrRbSsh
           :'recipient channel' => @remote_channel,
         }
         payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS.encode message
+        @connection.send payload
+      end
+
+      def send_channel_failure
+        message = {
+          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_FAILURE::VALUE,
+          :'recipient channel' => @remote_channel,
+        }
+        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_FAILURE.encode message
         @connection.send payload
       end
 
