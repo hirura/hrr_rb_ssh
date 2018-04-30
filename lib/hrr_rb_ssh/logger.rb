@@ -3,6 +3,8 @@
 
 module HrrRbSsh
   class Logger
+    @@logger = nil
+
     def self.initialize logger
       @@logger = logger
     end
