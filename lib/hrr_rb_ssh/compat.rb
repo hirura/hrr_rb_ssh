@@ -1,6 +1,8 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'hrr_rb_ssh/compat/openssh'
+
 if RUBY_VERSION < "2.1"
   class Array
     def to_h
