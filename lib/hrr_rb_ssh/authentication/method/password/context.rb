@@ -18,8 +18,8 @@ module HrrRbSsh
           end
 
           def verify username, password
-            @logger.info("verify username and password")
-            @logger.debug("username is #{username}, @username is #{@username}, and password is #{password}, @password is #{@password}")
+            @logger.info { "verify username and password" }
+            @logger.debug { "username is #{username}, @username is #{@username}, and password is #{password}, @password is #{@password}" }
             username == @username and password == @password
           end
         end

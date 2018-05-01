@@ -71,7 +71,7 @@ module HrrRbSsh
 
       def close from=:outside, exitstatus=0
         return if @closed
-        @logger.info("close channel")
+        @logger.info { "close channel" }
         @closed = true
         unless from == :channel_type_instance
           @channel_type_instance.close
@@ -92,16 +92,16 @@ module HrrRbSsh
             when Integer
               send_channel_request_exit_status exitstatus
             else
-              @logger.warn("skip sending exit-status because exitstatus is not an instance of Integer")
+              @logger.warn { "skip sending exit-status because exitstatus is not an instance of Integer" }
             end
           end
           send_channel_close
         rescue HrrRbSsh::ClosedConnectionError => e
           Thread.pass
         rescue => e
-          @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+          @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         end
-        @logger.info("channel closed")
+        @logger.info { "channel closed" }
       end
 
       def closed?
@@ -110,22 +110,22 @@ module HrrRbSsh
 
       def channel_loop_thread
         Thread.start do
-          @logger.info("start channel loop thread")
+          @logger.info { "start channel loop thread" }
           loop do
             begin
               message = @receive_message_queue.deq
               if message.nil? && @receive_message_queue.closed?
                 @receive_data_queue.close
-                @logger.info("closing channel loop thread")
+                @logger.info { "closing channel loop thread" }
                 break
               end
               case message[:'message number']
               when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
-                @logger.info("received channel request: #{message[:'request type']}")
+                @logger.info { "received channel request: #{message[:'request type']}" }
                 begin
                   @channel_type_instance.request message
                 rescue => e
-                  @logger.warn("request failed: #{e.message}")
+                  @logger.warn { "request failed: #{e.message}" }
                   if message[:'want reply']
                     send_channel_failure
                   end
@@ -135,31 +135,31 @@ module HrrRbSsh
                   end
                 end
               when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
-                @logger.info("received channel data")
+                @logger.info { "received channel data" }
                 local_channel = message[:'recipient channel']
                 @receive_data_queue.enq message[:'data']
               when HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
-                @logger.debug("received channel window adjust")
+                @logger.debug { "received channel window adjust" }
                 @remote_window_size = [@remote_window_size + message[:'bytes to add'], 0xffff_ffff].min
               else
-                @logger.warn("received unsupported message: #{message.inspect}")
+                @logger.warn { "received unsupported message: #{message.inspect}" }
               end
             rescue => e
-              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
               close from=:channel_loop_thread
               break
             end
           end
-          @logger.info("channel loop thread closed")
+          @logger.info { "channel loop thread closed" }
         end
       end
 
       def out_sender_thread
         Thread.start {
-          @logger.info("start out sender thread")
+          @logger.info { "start out sender thread" }
           loop do
             if @r_io_out.closed?
-              @logger.info("closing out sender thread")
+              @logger.info { "closing out sender thread" }
               break
             end
             begin
@@ -175,23 +175,23 @@ module HrrRbSsh
                 Thread.pass
               end
             rescue IOError => e
-              @logger.warn("channel IO is closed")
+              @logger.warn { "channel IO is closed" }
               close
             rescue => e
-              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
               close
             end
           end
-          @logger.info("out sender thread closed")
+          @logger.info { "out sender thread closed" }
         }
       end
 
       def err_sender_thread
         Thread.start {
-          @logger.info("start err sender thread")
+          @logger.info { "start err sender thread" }
           loop do
             if @r_io_err.closed?
-              @logger.info("closing err sender thread")
+              @logger.info { "closing err sender thread" }
               break
             end
             begin
@@ -207,48 +207,48 @@ module HrrRbSsh
                 Thread.pass
               end
             rescue IOError => e
-              @logger.warn("channel IO is closed")
+              @logger.warn { "channel IO is closed" }
               close
             rescue => e
-              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
               close
             end
           end
-          @logger.info("err sender thread closed")
+          @logger.info { "err sender thread closed" }
         }
       end
 
       def receiver_thread
         Thread.start {
-          @logger.info("start receiver thread")
+          @logger.info { "start receiver thread" }
           loop do
             begin
               data = @receive_data_queue.deq
               if data.nil? && @receive_data_queue.closed?
-                @logger.info("closing receiver thread")
-                @logger.info("closing channel IO write")
+                @logger.info { "closing receiver thread" }
+                @logger.info { "closing channel IO write" }
                 @w_io_in.close_write
-                @logger.info("channel IO write closed")
+                @logger.info { "channel IO write closed" }
                 break
               end
               @w_io_in.write data
               @local_window_size -= data.size
               if @local_window_size < INITIAL_WINDOW_SIZE/2
-                @logger.info("send channel window adjust")
+                @logger.info { "send channel window adjust" }
                 send_channel_window_adjust
                 @local_window_size += INITIAL_WINDOW_SIZE
               end
             rescue IOError => e
-              @logger.warn("channel IO is closed")
+              @logger.warn { "channel IO is closed" }
               close
               break
             rescue => e
-              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
               close
               break
             end
           end
-          @logger.info("receiver thread closed")
+          @logger.info { "receiver thread closed" }
         }
       end
 

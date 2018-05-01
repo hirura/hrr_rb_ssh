@@ -90,11 +90,11 @@ module HrrRbSsh
         begin
           @sender.send self, payload
         rescue Errno::EPIPE => e
-          @logger.warn("IO is Broken PIPE")
+          @logger.warn { "IO is Broken PIPE" }
           close
           raise HrrRbSsh::ClosedTransportError
         rescue => e
-          @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+          @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           close
           raise HrrRbSsh::ClosedTransportError
         end
@@ -109,24 +109,24 @@ module HrrRbSsh
           case payload[0,1].unpack("C")[0]
           when HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE
             message = HrrRbSsh::Message::SSH_MSG_DISCONNECT.decode payload
-            @logger.debug("received disconnect message: #{message.inspect}")
+            @logger.debug { "received disconnect message: #{message.inspect}" }
             @disconnected = true
             close
             raise ClosedTransportError
           when HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE
             message = HrrRbSsh::Message::SSH_MSG_IGNORE.decode payload
-            @logger.debug("received ignore message: #{message.inspect}")
+            @logger.debug { "received ignore message: #{message.inspect}" }
             receive
           when HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE
             message = HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.decode payload
-            @logger.debug("received unimplemented message: #{message.inspect}")
+            @logger.debug { "received unimplemented message: #{message.inspect}" }
             receive
           when HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE
             message = HrrRbSsh::Message::SSH_MSG_DEBUG.decode payload
-            @logger.debug("received debug message: #{message.inspect}")
+            @logger.debug { "received debug message: #{message.inspect}" }
             receive
           when HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE
-            @logger.debug("received kexinit message")
+            @logger.debug { "received kexinit message" }
             if @in_kex
               payload
             else
@@ -142,15 +142,15 @@ module HrrRbSsh
           close
           raise ClosedTransportError
         rescue IOError => e
-          @logger.warn("IO is closed")
+          @logger.warn { "IO is closed" }
           close
           raise ClosedTransportError
         rescue Errno::ECONNRESET => e
-          @logger.warn("IO is RESET")
+          @logger.warn { "IO is RESET" }
           close
           raise ClosedTransportError
         rescue => e
-          @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+          @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           close
           raise ClosedTransportError
         end
@@ -158,7 +158,7 @@ module HrrRbSsh
     end
 
     def start
-      @logger.info("start transport")
+      @logger.info { "start transport" }
 
       begin
         exchange_version
@@ -173,19 +173,19 @@ module HrrRbSsh
       rescue EOFError => e
         close
       rescue => e
-        @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         close
       else
-        @logger.info("transport started")
+        @logger.info { "transport started" }
       end
     end
 
     def close
       return if @closed
-      @logger.info("close transport")
+      @logger.info { "close transport" }
       @closed = true
       disconnect
-      @logger.info("transport closed")
+      @logger.info { "transport closed" }
     end
 
     def closed?
@@ -194,16 +194,16 @@ module HrrRbSsh
 
     def disconnect
       return if @disconnected
-      @logger.info("disconnect transport")
+      @logger.info { "disconnect transport" }
       @disconnected = true
       begin
         send_disconnect
       rescue IOError
-        @logger.warn("IO is closed")
+        @logger.warn { "IO is closed" }
       rescue => e
-        @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
       end
-      @logger.info("transport disconnected")
+      @logger.info { "transport disconnected" }
     end
 
     def exchange_version

@@ -3,16 +3,24 @@
 
 RSpec.describe HrrRbSsh::Logger do
   let(:name){ 'spec' }
-  let(:l_mock){ double('logger') }
-  let(:logger){ HrrRbSsh::Logger.new name }
+  let(:internal_logger){
+    Class.new{
+      def fatal; yield; end
+      def error; yield; end
+      def warn;  yield; end
+      def info;  yield; end
+      def debug; yield; end
+    }.new
+  }
+  let(:logger){ described_class.new name }
 
   describe '.initialize' do
     it "takes one argument" do
-      expect { HrrRbSsh::Logger.initialize l_mock }.not_to raise_error
+      expect { HrrRbSsh::Logger.initialize internal_logger }.not_to raise_error
     end
 
     it "initialize HrrRbSsh::Logger" do
-      HrrRbSsh::Logger.initialize l_mock
+      HrrRbSsh::Logger.initialize internal_logger
       expect(HrrRbSsh::Logger.initialized?).to be true
     end
   end
@@ -23,7 +31,7 @@ RSpec.describe HrrRbSsh::Logger do
     end
 
     it "uninitialize HrrRbSsh::Logger" do
-      HrrRbSsh::Logger.initialize l_mock
+      HrrRbSsh::Logger.initialize internal_logger
       HrrRbSsh::Logger.uninitialize
       expect(HrrRbSsh::Logger.initialized?).to be false
     end
@@ -31,13 +39,13 @@ RSpec.describe HrrRbSsh::Logger do
 
   describe '.initialized?' do
     it "is false when uninitialized" do
-      HrrRbSsh::Logger.initialize l_mock
+      HrrRbSsh::Logger.initialize internal_logger
       HrrRbSsh::Logger.uninitialize
       expect(HrrRbSsh::Logger.initialized?).to be false
     end
 
     it "is true when initialized" do
-      HrrRbSsh::Logger.initialize l_mock
+      HrrRbSsh::Logger.initialize internal_logger
       expect(HrrRbSsh::Logger.initialized?).to be true
     end
   end
@@ -52,21 +60,20 @@ RSpec.describe HrrRbSsh::Logger do
     let(:method){ :fatal }
 
     context 'HrrRbSsh::Logger is not initialized' do
-      before do
+      before :example do
         HrrRbSsh::Logger.uninitialize
       end
       it "does not call #fatal method of @@logger" do
-        expect { logger.send method, method }.not_to raise_error
+        expect { logger.send(method){ method } }.not_to raise_error
       end
     end
 
     context 'HrrRbSsh::Logger is initialized' do
-      before do
-        HrrRbSsh::Logger.initialize l_mock
+      before :example do
+        HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #fatal method of @@logger with '#\{name\}: ' prefix" do
-        expect(l_mock).to receive(method).with("#{name}: #{method}").and_return("#{name}: #{method}").once
-        expect(logger.send method, method).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
       end
     end
   end
@@ -75,21 +82,20 @@ RSpec.describe HrrRbSsh::Logger do
     let(:method){ :error }
 
     context 'HrrRbSsh::Logger is not initialized' do
-      before do
+      before :example do
         HrrRbSsh::Logger.uninitialize
       end
       it "does not call #error method of @@logger" do
-        expect { logger.send method, method }.not_to raise_error
+        expect { logger.send(method){ method } }.not_to raise_error
       end
     end
 
     context 'HrrRbSsh::Logger is initialized' do
-      before do
-        HrrRbSsh::Logger.initialize l_mock
+      before :example do
+        HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #error method of @@logger with '#\{name\}: ' prefix" do
-        expect(l_mock).to receive(method).with("#{name}: #{method}").and_return("#{name}: #{method}").once
-        expect(logger.send method, method).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
       end
     end
   end
@@ -98,21 +104,20 @@ RSpec.describe HrrRbSsh::Logger do
     let(:method){ :warn }
 
     context 'HrrRbSsh::Logger is not initialized' do
-      before do
+      before :example do
         HrrRbSsh::Logger.uninitialize
       end
       it "does not call #warn method of @@logger" do
-        expect { logger.send method, method }.not_to raise_error
+        expect { logger.send(method){ method } }.not_to raise_error
       end
     end
 
     context 'HrrRbSsh::Logger is initialized' do
-      before do
-        HrrRbSsh::Logger.initialize l_mock
+      before :example do
+        HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #warn method of @@logger with '#\{name\}: ' prefix" do
-        expect(l_mock).to receive(method).with("#{name}: #{method}").and_return("#{name}: #{method}").once
-        expect(logger.send method, method).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
       end
     end
   end
@@ -121,21 +126,20 @@ RSpec.describe HrrRbSsh::Logger do
     let(:method){ :info }
 
     context 'HrrRbSsh::Logger is not initialized' do
-      before do
+      before :example do
         HrrRbSsh::Logger.uninitialize
       end
       it "does not call #info method of @@logger" do
-        expect { logger.send method, method }.not_to raise_error
+        expect { logger.send(method){ method } }.not_to raise_error
       end
     end
 
     context 'HrrRbSsh::Logger is initialized' do
-      before do
-        HrrRbSsh::Logger.initialize l_mock
+      before :example do
+        HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #info method of @@logger with '#\{name\}: ' prefix" do
-        expect(l_mock).to receive(method).with("#{name}: #{method}").and_return("#{name}: #{method}").once
-        expect(logger.send method, method).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
       end
     end
   end
@@ -144,21 +148,20 @@ RSpec.describe HrrRbSsh::Logger do
     let(:method){ :debug }
 
     context 'HrrRbSsh::Logger is not initialized' do
-      before do
+      before :example do
         HrrRbSsh::Logger.uninitialize
       end
       it "does not call #debug method of @@logger" do
-        expect { logger.send method, method }.not_to raise_error
+        expect { logger.send(method){ method } }.not_to raise_error
       end
     end
 
     context 'HrrRbSsh::Logger is initialized' do
-      before do
-        HrrRbSsh::Logger.initialize l_mock
+      before :example do
+        HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #debug method of @@logger with '#\{name\}: ' prefix" do
-        expect(l_mock).to receive(method).with("#{name}: #{method}").and_return("#{name}: #{method}").once
-        expect(logger.send method, method).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
       end
     end
   end

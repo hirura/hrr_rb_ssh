@@ -35,19 +35,19 @@ module HrrRbSsh
 
           def proc_chain_thread
             Thread.start {
-              @logger.info("start proc chain thread")
+              @logger.info { "start proc chain thread" }
               begin
                 exitstatus = @proc_chain.call_next
               rescue => e
-                @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+                @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                 exitstatus = 1
               ensure
-                @logger.info("closing proc chain thread")
-                @logger.info("wait for sending output")
+                @logger.info { "closing proc chain thread" }
+                @logger.info { "wait for sending output" }
                 @channel.wait_until_senders_closed
-                @logger.info("sending output finished")
+                @logger.info { "sending output finished" }
                 @channel.close from=:channel_type_instance, exitstatus=exitstatus
-                @logger.info("proc chain thread closed")
+                @logger.info { "proc chain thread closed" }
               end
             }
           end

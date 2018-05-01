@@ -19,15 +19,15 @@ module HrrRbSsh
         def authenticate userauth_request_message
           public_key_algorithm_name = userauth_request_message[:'public key algorithm name']
           unless Algorithm.list_preferred.include?(public_key_algorithm_name)
-            @logger.info("unsupported public key algorithm: #{public_key_algorithm_name}")
+            @logger.info { "unsupported public key algorithm: #{public_key_algorithm_name}" }
             return false
           end
           unless userauth_request_message[:'with signature']
-            @logger.info("public key algorithm is ok, require signature")
+            @logger.info { "public key algorithm is ok, require signature" }
             public_key_blob = userauth_request_message[:'public key blob']
             userauth_pk_ok_message public_key_algorithm_name, public_key_blob
           else
-            @logger.info("verify signature")
+            @logger.info { "verify signature" }
             username = userauth_request_message[:'user name']
             algorithm = Algorithm[public_key_algorithm_name].new
             context = Context.new(username, algorithm, @session_id, userauth_request_message)

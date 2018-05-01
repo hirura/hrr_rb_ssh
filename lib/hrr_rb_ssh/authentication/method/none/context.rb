@@ -17,8 +17,8 @@ module HrrRbSsh
           end
 
           def verify username
-            @logger.info("verify username")
-            @logger.debug("username is #{username}, @username is #{@username}")
+            @logger.info { "verify username" }
+            @logger.debug { "username is #{username}, @username is #{@username}" }
             username == @username
           end
         end

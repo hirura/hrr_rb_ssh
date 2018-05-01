@@ -22,14 +22,14 @@ module HrrRbSsh
     end
 
     def encode message, complementary_message={}
-      logger.debug('encoding message: ' + message.inspect)
+      logger.debug { 'encoding message: ' + message.inspect }
       definition = common_definition + conditional_definition(message.merge complementary_message)
       definition.map{ |data_type, field_name|
         begin
           field_value = if message[field_name].instance_of? ::Proc then message[field_name].call else message[field_name] end
           data_type.encode( field_value )
         rescue => e
-          logger.debug("'field_name', 'field_value': #{field_name.inspect}, #{field_value.inspect}")
+          logger.debug { "'field_name', 'field_value': #{field_name.inspect}, #{field_value.inspect}" }
           raise e
         end
       }.join
@@ -62,7 +62,7 @@ module HrrRbSsh
       if complementary_message.any?
         decoded_message.merge! decode_recursively(payload_io, complementary_message.to_a).to_h
       end
-      logger.debug('decoded message: ' + decoded_message.inspect)
+      logger.debug { 'decoded message: ' + decoded_message.inspect }
       decoded_message
     end
   end

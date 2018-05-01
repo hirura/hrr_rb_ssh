@@ -55,7 +55,7 @@ module HrrRbSsh
         begin
           channel.close
         rescue => e
-          @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+          @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         end
       end
       @channels.clear
@@ -67,12 +67,12 @@ module HrrRbSsh
     end
 
     def connection_loop
-      @logger.info("start connection")
+      @logger.info { "start connection" }
       loop do
         begin
           payload = @authentication.receive
         rescue HrrRbSsh::ClosedAuthenticationError => e
-          @logger.info("closing connection loop")
+          @logger.info { "closing connection loop" }
           break
         end
         @username ||= @authentication.username
@@ -94,16 +94,16 @@ module HrrRbSsh
         when HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE
           channel_close payload
         else
-          @logger.warn("received unsupported message: id: #{payload[0,1].unpack("C")[0]}")
+          @logger.warn { "received unsupported message: id: #{payload[0,1].unpack("C")[0]}" }
         end
       end
-      @logger.info("closing connection")
+      @logger.info { "closing connection" }
       close
-      @logger.info("connection closed")
+      @logger.info { "connection closed" }
     end
 
     def global_request payload
-      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::ID)
+      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::ID }
       message = HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.decode payload
       begin
         @global_request_handler.request message
@@ -119,10 +119,10 @@ module HrrRbSsh
     end
 
     def channel_open_start address, port, socket
-      @logger.info('channel open start')
+      @logger.info { 'channel open start' }
       channel = Channel.new self, {:'channel type' => "forwarded-tcpip"}, socket
       @channels[channel.local_channel] = channel
-      @logger.info('channel opened')
+      @logger.info { 'channel opened' }
       message = {
         :'message number'             => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
         :'channel type'               => "forwarded-tcpip",
@@ -138,7 +138,7 @@ module HrrRbSsh
     end
 
     def channel_open payload
-      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::ID)
+      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::ID }
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.decode payload
       begin
         channel = Channel.new self, message
@@ -152,7 +152,7 @@ module HrrRbSsh
     end
 
     def channel_open_confirmation payload
-      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::ID)
+      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::ID }
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.decode payload
       channel = @channels[message[:'recipient channel']]
       channel.set_remote_parameters message
@@ -160,28 +160,28 @@ module HrrRbSsh
     end
 
     def channel_request payload
-      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID)
+      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID }
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.decode payload
       local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_window_adjust payload
-      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID)
+      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID }
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.decode payload
       local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_data payload
-      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::ID)
+      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::ID }
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.decode payload
       local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_eof payload
-      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::ID)
+      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::ID }
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.decode payload
       local_channel = message[:'recipient channel']
       channel = @channels[local_channel]
@@ -189,14 +189,14 @@ module HrrRbSsh
     end
 
     def channel_close payload
-      @logger.info('received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::ID)
+      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::ID }
       message = HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.decode payload
       local_channel = message[:'recipient channel']
       channel = @channels[local_channel]
       channel.close
-      @logger.info("deleting channel")
+      @logger.info { "deleting channel" }
       @channels.delete local_channel
-      @logger.info("channel deleted")
+      @logger.info { "channel deleted" }
     end
 
     def send_request_success

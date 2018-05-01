@@ -18,7 +18,7 @@ module HrrRbSsh
       end
 
       def close
-        @logger.info("closing tcpip-forward")
+        @logger.info { "closing tcpip-forward" }
         @tcpip_forward_threads.values.each(&:exit)
         @tcpip_forward_servers.values.each{ |s|
           begin
@@ -29,7 +29,7 @@ module HrrRbSsh
         }
         @tcpip_forward_threads.clear
         @tcpip_forward_servers.clear
-        @logger.info("tcpip-forward closed")
+        @logger.info { "tcpip-forward closed" }
       end
 
       def request message
@@ -39,13 +39,13 @@ module HrrRbSsh
         when "cancel-tcpip-forward"
           cancel_tcpip_forward message
         else
-          @logger.warn("unsupported request name: #{message[:'request name']}")
+          @logger.warn { "unsupported request name: #{message[:'request name']}" }
           raise
         end
       end
 
       def tcpip_forward message
-        @logger.info("starting tcpip-forward")
+        @logger.info { "starting tcpip-forward" }
         begin
           address_to_bind     = message[:'address to bind']
           port_number_to_bind = message[:'port number to bind']
@@ -60,18 +60,18 @@ module HrrRbSsh
                 }
               end
             rescue => e
-              @logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
+              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
             end
           }
-          @logger.info("tcpip-forward started")
+          @logger.info { "tcpip-forward started" }
         rescue => e
-          @logger.warn("starting tcpip-forward failed: #{e.message}")
+          @logger.warn { "starting tcpip-forward failed: #{e.message}" }
           raise e
         end
       end
 
       def cancel_tcpip_forward message
-        @logger.info("canceling tcpip-forward")
+        @logger.info { "canceling tcpip-forward" }
         address_to_bind     = message[:'address to bind']
         port_number_to_bind = message[:'port number to bind']
         id = "#{address_to_bind}:#{port_number_to_bind}"
@@ -83,7 +83,7 @@ module HrrRbSsh
         end
         @tcpip_forward_threads.delete id
         @tcpip_forward_servers.delete id
-        @logger.info("tcpip-forward canceled")
+        @logger.info { "tcpip-forward canceled" }
       end
     end
   end

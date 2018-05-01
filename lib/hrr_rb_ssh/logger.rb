@@ -5,49 +5,51 @@ module HrrRbSsh
   class Logger
     @@logger = nil
 
-    def self.initialize logger
-      @@logger = logger
-    end
+    class << self
+      def initialize logger
+        @@logger = logger
+      end
 
-    def self.uninitialize
-      @@logger = nil
-    end
+      def uninitialize
+        @@logger = nil
+      end
 
-    def self.initialized?
-      @@logger != nil
+      def initialized?
+        @@logger != nil
+      end
     end
 
     def initialize name
       @name = name
     end
 
-    def fatal message
-      if self.class.initialized?
-        @@logger.fatal "#{@name}: #{message}"
+    def fatal
+      if @@logger
+        @@logger.fatal { "#{@name}: #{yield}" }
       end
     end
 
-    def error message
-      if self.class.initialized?
-        @@logger.error "#{@name}: #{message}"
+    def error
+      if @@logger
+        @@logger.error { "#{@name}: #{yield}" }
       end
     end
 
-    def warn message
-      if self.class.initialized?
-        @@logger.warn "#{@name}: #{message}"
+    def warn
+      if @@logger
+        @@logger.warn { "#{@name}: #{yield}" }
       end
     end
 
-    def info message
-      if self.class.initialized?
-        @@logger.info "#{@name}: #{message}"
+    def info
+      if @@logger
+        @@logger.info { "#{@name}: #{yield}" }
       end
     end
 
-    def debug message
-      if self.class.initialized?
-        @@logger.debug "#{@name}: #{message}"
+    def debug
+      if @@logger
+        @@logger.debug { "#{@name}: #{yield}" }
       end
     end
   end

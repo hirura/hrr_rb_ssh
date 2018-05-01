@@ -37,13 +37,13 @@ module HrrRbSsh
                   begin
                     context.io[1].write ptm.readpartial(1024)
                   rescue EOFError => e
-                    context.logger.info("ptm is EOF")
+                    context.logger.info { "ptm is EOF" }
                     break
                   rescue IOError => e
-                    context.logger.warn("IO is closed")
+                    context.logger.warn { "IO is closed" }
                     break
                   rescue => e
-                    context.logger.error(e.full_message)
+                    context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                     break
                   end
                 end
@@ -54,13 +54,13 @@ module HrrRbSsh
                   begin
                     ptm.write context.io[0].readpartial(1024)
                   rescue EOFError => e
-                    context.logger.info("IO is EOF")
+                    context.logger.info { "IO is EOF" }
                     break
                   rescue IOError => e
-                    context.logger.warn("IO is closed")
+                    context.logger.warn { "IO is closed" }
                     break
                   rescue => e
-                    context.logger.error(e.full_message)
+                    context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                     break
                   end
                 end
@@ -69,32 +69,32 @@ module HrrRbSsh
 
               begin
                 pid, status = Process.waitpid2 pid
-                context.logger.info "shell exited with status #{status.inspect}"
+                context.logger.info { "shell exited with status #{status.inspect}" }
                 status.exitstatus
               ensure
                 unless status
-                  context.logger.info "exiting shell"
+                  context.logger.info { "exiting shell" }
                   Process.kill :TERM, pid
                   begin
                     Timeout.timeout(1) do
                       pid, status = Process.waitpid2 pid
                     end
                   rescue Timeout::Error
-                    context.logger.warn "force exiting shell"
+                    context.logger.warn { "force exiting shell" }
                     Process.kill :KILL, pid
                     pid, status = Process.waitpid2 pid
                   end
-                  context.logger.info "shell exited with status #{status.inspect}"
+                  context.logger.info { "shell exited with status #{status.inspect}" }
                 end
                 threads.each do |t|
                   begin
                     t.exit
                     t.join
                   rescue => e
-                    context.logger.error(e.full_message)
+                    context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                   end
                 end
-                context.logger.info "proc chain finished"
+                context.logger.info { "proc chain finished" }
               end
             }
           }

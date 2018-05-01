@@ -73,16 +73,16 @@ module HrrRbSsh
           result = method.authenticate(userauth_request_message)
           case result
           when TrueClass
-            @logger.info("verified")
+            @logger.info { "verified" }
             send_userauth_success
             @username = userauth_request_message[:'user name']
             @closed = false
             break
           when FalseClass
-            @logger.info("verify failed")
+            @logger.info { "verify failed" }
             send_userauth_failure
           when String
-            @logger.info("send method specific message to continue")
+            @logger.info { "send method specific message to continue" }
             send_method_specific_message result
           end
         else
