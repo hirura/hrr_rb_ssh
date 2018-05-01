@@ -121,24 +121,18 @@ To define a public key authentication, the `HrrRbSsh::Authentication::Authentica
 
 ```ruby
 auth_publickey = HrrRbSsh::Authentication::Authenticator.new { |context|
-  username = 'user1'
-  ecdsa_sha2_nistp256_public_key_algorithm_name = 'ecdsa-sha2-nistp256'
-  ecdsa_sha2_nistp256_public_key = <<-'EOB'
------BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE9DPmu6CIA5VCBaN9wpUP2UUZQ+dw
-77mTZ7lD+z5cjzF7OL/cPL1/zklAsYaH7z7OcPYRbe24QCG5YfJQZjevJQ==
------END PUBLIC KEY-----
-  EOB
-  [
-    [username, ecdsa_sha2_nistp256_public_key_algorithm_name, ecdsa_sha2_nistp256_public_key],
-  ].any? { |username, public_key_algorithm_name, public_key|
-    context.verify username, public_key_algorithm_name, public_key
+  username = ENV['USER']
+  authorized_keys = HrrRbSsh::Compat::OpenSSH::AuthorizedKeys.new(File.read(File.join(Dir.home, '.ssh', 'authorized_keys')))
+  authorized_keys.any?{ |public_key|
+    context.verify username, public_key.algorithm_name, public_key.to_pem
   }
 }
 options['authentication_publickey_authenticator'] = auth_publickey
 ```
 
 The `context` variable in public key authentication context provides the `#verify` method. The `#verify` method takes three arguments; username, public key algorithm name and PEM or DER formed public key.
+
+And public keys that is in OpenSSH public key format is now available. To use OpenSSH public keys, it is easy to use $USER_HOME/.ssh/authorized_keys file.
 
 ##### None authentication (NOT recomended)
 
