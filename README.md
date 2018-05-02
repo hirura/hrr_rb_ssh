@@ -7,6 +7,32 @@
 
 hrr_rb_ssh is a pure Ruby SSH 2.0 server implementation.
 
+## Table of Contents
+
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Writing standard SSH server](#writing-standard-ssh-server)
+        - [Requiring hrr\_rb\_ssh library](#requiring-hrr_rb_ssh-library)
+        - [Starting server application](#starting-server-application)
+        - [Logging](#logging)
+        - [Registering pre\-generated secret keys for server host key](#registering-pre-generated-secret-keys-for-server-host-key)
+        - [Defining authentications](#defining-authentications)
+            - [Password authentication](#password-authentication)
+            - [Publickey authentication](#publickey-authentication)
+            - [None authentication (NOT recomended)](#none-authentication-not-recomended)
+        - [Handling session channel requests](#handling-session-channel-requests)
+            - [Reference request handlers](#reference-request-handlers)
+            - [Custom request handlers](#custom-request-handlers)
+        - [Defining preferred algorithms (optional)](#defining-preferred-algorithms-optional)
+    - [Demo](#demo)
+- [Supported Features](#supported-features)
+    - [Connection layer](#connection-layer)
+    - [Authentication layer](#authentication-layer)
+    - [Transport layer](#transport-layer)
+- [Contributing](#contributing)
+- [Code of Conduct](#code-of-conduct)
+- [License](#license)
+
 ## Installation
 
 Add this line to your application's Gemfile:
