@@ -52,6 +52,15 @@ options['transport_preferred_kex_algorithms']             = tran_preferred_kex_a
 options['transport_preferred_mac_algorithms']             = tran_preferred_mac_algorithms
 options['transport_preferred_compression_algorithms']     = tran_preferred_compression_algorithms
 
+options['transport_server_secret_host_keys'] = {}
+options['transport_server_secret_host_keys']['ecdsa-sha2-nistp256'] = <<-'EOB'
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIFFtGZHk6A8anZkLCJan9YBlB63uCIN/ZcQNCaJout8loAoGCCqGSM49
+AwEHoUQDQgAEk8m548Xga+XGEmRx7P71xGlxCfgjPj3XVOw+fXPXRgA03a5yDJEp
+OfeosJOO9twerD7pPhmXREkygblPsEXaVA==
+-----END EC PRIVATE KEY-----
+EOB
+
 options['authentication_none_authenticator']      = auth_none
 options['authentication_publickey_authenticator'] = auth_publickey
 options['authentication_password_authenticator']  = auth_password
