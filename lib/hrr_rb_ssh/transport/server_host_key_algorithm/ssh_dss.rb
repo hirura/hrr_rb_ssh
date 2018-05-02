@@ -26,9 +26,9 @@ MRl/p42OrQzL/chRPvRf
 -----END DSA PRIVATE KEY-----
         EOB
 
-        def initialize
+        def initialize secret_key=nil
           @logger = HrrRbSsh::Logger.new(self.class.name)
-          @dss = OpenSSL::PKey::DSA.new SECRET_KEY
+          @dss = OpenSSL::PKey::DSA.new (secret_key || self.class::SECRET_KEY)
         end
 
         def server_public_host_key

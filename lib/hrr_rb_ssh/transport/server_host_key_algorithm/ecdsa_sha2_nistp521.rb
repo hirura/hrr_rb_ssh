@@ -21,9 +21,9 @@ V5O4BMNxGfYj+0ceKABJ4MgfUXQ3a1cXn8Dk2Q2uibbfVi7tQ7ET4k/A6B9f/Zwq
 -----END EC PRIVATE KEY-----
         EOB
 
-        def initialize
+        def initialize secret_key=nil
           @logger = HrrRbSsh::Logger.new(self.class.name)
-          @algorithm = OpenSSL::PKey::EC.new SECRET_KEY
+          @algorithm = OpenSSL::PKey::EC.new (secret_key || self.class::SECRET_KEY)
         end
 
         def server_public_host_key

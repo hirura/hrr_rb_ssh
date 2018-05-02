@@ -19,9 +19,9 @@ SpNC6qrqdhUfVAjsF9y5O/3Z/LGh/lNTig==
 -----END EC PRIVATE KEY-----
         EOB
 
-        def initialize
+        def initialize secret_key=nil
           @logger = HrrRbSsh::Logger.new(self.class.name)
-          @algorithm = OpenSSL::PKey::EC.new SECRET_KEY
+          @algorithm = OpenSSL::PKey::EC.new (secret_key || self.class::SECRET_KEY)
         end
 
         def server_public_host_key

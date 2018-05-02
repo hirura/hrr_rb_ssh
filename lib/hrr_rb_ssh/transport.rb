@@ -53,6 +53,7 @@ module HrrRbSsh
     def initialize io, mode, options={}
       @io = io
       @mode = mode
+      @options = options
 
       @logger = HrrRbSsh::Logger.new self.class.name
 
@@ -76,7 +77,7 @@ module HrrRbSsh
       @acceptable_services = Array.new
 
       update_supported_algorithms
-      update_preferred_algorithms options
+      update_preferred_algorithms
       initialize_local_algorithms
       initialize_algorithms
     end
@@ -254,12 +255,12 @@ module HrrRbSsh
       @supported_compression_algorithms     = HrrRbSsh::Transport::CompressionAlgorithm.list_supported
     end
 
-    def update_preferred_algorithms options
-      @preferred_kex_algorithms             = options['transport_preferred_kex_algorithms']             || HrrRbSsh::Transport::KexAlgorithm.list_preferred
-      @preferred_server_host_key_algorithms = options['transport_preferred_server_host_key_algorithms'] || HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
-      @preferred_encryption_algorithms      = options['transport_preferred_encryption_algorithms']      || HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-      @preferred_mac_algorithms             = options['transport_preferred_mac_algorithms']             || HrrRbSsh::Transport::MacAlgorithm.list_preferred
-      @preferred_compression_algorithms     = options['transport_preferred_compression_algorithms']     || HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+    def update_preferred_algorithms
+      @preferred_kex_algorithms             = @options['transport_preferred_kex_algorithms']             || HrrRbSsh::Transport::KexAlgorithm.list_preferred
+      @preferred_server_host_key_algorithms = @options['transport_preferred_server_host_key_algorithms'] || HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
+      @preferred_encryption_algorithms      = @options['transport_preferred_encryption_algorithms']      || HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
+      @preferred_mac_algorithms             = @options['transport_preferred_mac_algorithms']             || HrrRbSsh::Transport::MacAlgorithm.list_preferred
+      @preferred_compression_algorithms     = @options['transport_preferred_compression_algorithms']     || HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
 
       check_if_preferred_algorithms_are_supported
     end
@@ -430,8 +431,9 @@ module HrrRbSsh
         server_host_key_algorithm_name = @local_server_host_key_algorithms.find{ |a| @remote_server_host_key_algorithms.include? a } or raise
       end
 
+      server_secret_host_key = @options.fetch('transport_server_secret_host_keys', {}).fetch(server_host_key_algorithm_name, nil)
       @kex_algorithm             = HrrRbSsh::Transport::KexAlgorithm[kex_algorithm_name].new
-      @server_host_key_algorithm = HrrRbSsh::Transport::ServerHostKeyAlgorithm[server_host_key_algorithm_name].new
+      @server_host_key_algorithm = HrrRbSsh::Transport::ServerHostKeyAlgorithm[server_host_key_algorithm_name].new server_secret_host_key
     end
 
     def update_encryption_mac_compression_algorithms

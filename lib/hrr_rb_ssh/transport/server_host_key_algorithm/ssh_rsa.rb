@@ -40,9 +40,9 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
 -----END RSA PRIVATE KEY-----
         EOB
 
-        def initialize
+        def initialize secret_key=nil
           @logger = HrrRbSsh::Logger.new(self.class.name)
-          @rsa = OpenSSL::PKey::RSA.new SECRET_KEY
+          @rsa = OpenSSL::PKey::RSA.new (secret_key || self.class::SECRET_KEY)
         end
 
         def server_public_host_key
