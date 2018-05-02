@@ -35,28 +35,27 @@ module HrrRbSsh
       }.join
     end
 
-    def decode payload, complementary_message={}
-      def decode_recursively payload_io, message=nil
-        if message.class == Array and message.size == 0
-          []
-        else
-          definition = case message
-                       when nil
-                         common_definition
-                       when Array
-                         conditional_definition(message)
-                       end
-          decoded_message = definition.map{ |data_type, field_name|
-            [
-              field_name,
-              data_type.decode( payload_io )
-            ]
-          }
-
-          decoded_message + decode_recursively(payload_io, decoded_message)
-        end
+    def decode_recursively payload_io, message=nil
+      if message.class == Array and message.size == 0
+        []
+      else
+        definition = case message
+                     when nil
+                       common_definition
+                     when Array
+                       conditional_definition(message)
+                     end
+        decoded_message = definition.map{ |data_type, field_name|
+          [
+            field_name,
+            data_type.decode( payload_io )
+          ]
+        }
+        decoded_message + decode_recursively(payload_io, decoded_message)
       end
+    end
 
+    def decode payload, complementary_message={}
       payload_io = StringIO.new payload
       decoded_message = decode_recursively(payload_io).to_h
       if complementary_message.any?
