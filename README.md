@@ -84,6 +84,21 @@ To disable logging, you can un-initialize `HrrRbSsh::Logger`.
 HrrRbSsh::Logger.uninitialize
 ```
 
+#### Registering pre-generated secret keys for server host key
+
+By default, hard-coded secret keys are used for server host key. To update them with pre-generated keys, it is possible to register the keys in HrrRbSsh::Transport through `options` variable. The secret key value must be PEM or DER format string. The below is an example of registering ecdsa-sha2-nistp256 secret key. The supported server host key algorithms are listed later in this document.
+
+```ruby
+options['transport_server_secret_host_keys'] = {}
+options['transport_server_secret_host_keys']['ecdsa-sha2-nistp256'] = <<-'EOB'
+-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIFFtGZHk6A8anZkLCJan9YBlB63uCIN/ZcQNCaJout8loAoGCCqGSM49
+AwEHoUQDQgAEk8m548Xga+XGEmRx7P71xGlxCfgjPj3XVOw+fXPXRgA03a5yDJEp
+OfeosJOO9twerD7pPhmXREkygblPsEXaVA==
+-----END EC PRIVATE KEY-----
+EOB
+```
+
 #### Defining authentications
 
 By default, any authentications get failed. To allow users to login to the SSH service, at least one of the authentication methods must be defined and registered into the instance of HrrRbSsh::Authentication through `options` variable.
