@@ -13,20 +13,35 @@ module HrrRbSsh
         def initialize
           @logger = HrrRbSsh::Logger.new self.class.name
           @proc = Proc.new { |context|
-            ptm, pts = PTY.open
-            ptm.winsize = [context.terminal_height_rows, context.terminal_width_characters]
-            context.vars[:ptm] = ptm
-            context.vars[:pts] = pts
-            context.vars[:env] ||= Hash.new
-            context.vars[:env]['TERM'] = context.term_environment_variable_value
-            context.chain_proc { |chain|
+            begin
+              ptm, pts = PTY.open
+              ptm.winsize = [context.terminal_height_rows, context.terminal_width_characters, context.terminal_width_pixels, context.terminal_height_pixels]
+              context.vars[:ptm] = ptm
+              context.vars[:pts] = pts
+              context.vars[:env] ||= Hash.new
+              context.vars[:env]['TERM'] = context.term_environment_variable_value
+              context.chain_proc { |chain|
+                begin
+                  chain.call_next
+                ensure
+                  context.vars[:ptm].close
+                  context.vars[:pts].close
+                end
+              }
+            rescue => e
               begin
-                chain.call_next
-              ensure
-                context.vars[:ptm].close
-                context.vars[:pts].close
+                ptm.close
+              rescue
               end
-            }
+              begin
+                pts.close
+              rescue
+              end
+              context.chain_proc{ |chain|
+                exitstatus = 1
+              }
+              raise e
+            end
           }
         end
       end
