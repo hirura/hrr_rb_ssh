@@ -2,6 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/openssl_secure_random'
 
 module HrrRbSsh
   class Transport
@@ -11,14 +12,7 @@ module HrrRbSsh
         PREFERENCE = 40
         DIGEST = 'sha384'
         IDENTIFIER = 'nistp384'
-        SECRET_KEY = <<-EOB
------BEGIN EC PRIVATE KEY-----
-MIGkAgEBBDCKZ6ulBka9rUw+gqKiQdVBG6fzH1klswyMrxrzCcfwRfoc5CGnj8e7
-emk+IHyUsd6gBwYFK4EEACKhZANiAATnWMWRgfp3DFiBmdT7LunyBk9YIBYqPsrk
-Zil+AWvlISusiW2JcZVB+Hz79tyrgzfwp6n6k9r5s31EIGTGf/n7UMwISrUCfcx+
-xVrnYV8pOoy+dcUiGb9okf1jc41bLHc=
------END EC PRIVATE KEY-----
-        EOB
+        SECRET_KEY = OpenSSL::PKey::EC.new('secp384r1').generate_key.to_pem
 
         def initialize secret_key=nil
           @logger = HrrRbSsh::Logger.new(self.class.name)

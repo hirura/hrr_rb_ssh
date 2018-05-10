@@ -112,7 +112,7 @@ HrrRbSsh::Logger.uninitialize
 
 #### Registering pre-generated secret keys for server host key
 
-By default, hard-coded secret keys are used for server host key. To update them with pre-generated keys, it is possible to register the keys in HrrRbSsh::Transport through `options` variable. The secret key value must be PEM or DER format string. The below is an example of registering ecdsa-sha2-nistp256 secret key. The supported server host key algorithms are listed later in this document.
+By default, server host keys are generated everytime the gem is loaded. To use pre-generated keys, it is possible to register the keys in HrrRbSsh::Transport through `options` variable. The secret key value must be PEM or DER format string. The below is an example of registering ecdsa-sha2-nistp256 secret key. The supported server host key algorithms are listed later in this document.
 
 ```ruby
 options['transport_server_secret_host_keys'] = {}
