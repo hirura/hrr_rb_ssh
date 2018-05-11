@@ -18,6 +18,10 @@ module HrrRbSsh
         def inflate data
           data
         end
+
+        def close
+          nil
+        end
       end
     end
   end

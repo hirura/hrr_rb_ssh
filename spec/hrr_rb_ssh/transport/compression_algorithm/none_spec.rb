@@ -18,15 +18,27 @@ RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::None do
     expect( HrrRbSsh::Transport::CompressionAlgorithm.list_preferred ).to include name
   end
 
-  describe '#deflate' do
-    it "returns data without deflate" do
-      expect( compression_algorithm.deflate test_data ).to eq test_data
+  context "when direction is not set" do
+    after :example do
+      compression_algorithm.close
     end
-  end
 
-  describe '#inflate' do
-    it "returns data without inflate" do
-      expect( compression_algorithm.inflate test_data ).to eq test_data
+    describe '#deflate' do
+      it "returns data without deflate" do
+        expect( compression_algorithm.deflate test_data ).to eq test_data
+      end
+    end
+
+    describe '#inflate' do
+      it "returns data without inflate" do
+        expect( compression_algorithm.inflate test_data ).to eq test_data
+      end
+    end
+
+    describe '#close' do
+      it "does nothing and returns nil" do
+        expect( compression_algorithm.close ).to be nil
+      end
     end
   end
 end

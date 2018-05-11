@@ -20,6 +20,10 @@ RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::Zlib do
   context "when direction is outgoing" do
     let(:direction){ HrrRbSsh::Transport::Direction::OUTGOING }
 
+    after :example do
+      compression_algorithm.close
+    end
+
     describe '#deflate' do
       context "deflate once" do
         let(:test_data){ "test data" }
@@ -45,10 +49,21 @@ RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::Zlib do
         end
       end
     end
+
+    describe '#close' do
+      it "closes deflator" do
+        compression_algorithm.close
+        expect(compression_algorithm.instance_variable_get('@deflator').closed?).to be true
+      end
+    end
   end
 
   context "when direction is incoming" do
     let(:direction){ HrrRbSsh::Transport::Direction::INCOMING }
+
+    after :example do
+      compression_algorithm.close
+    end
 
     describe '#inflate' do
       context "inflate once" do
@@ -73,6 +88,13 @@ RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::Zlib do
           expect( compression_algorithm.inflate third_deflated  ).to eq test_data
           expect( compression_algorithm.inflate fourth_deflated ).to eq test_data
         end
+      end
+    end
+
+    describe '#close' do
+      it "closes inflator" do
+        compression_algorithm.close
+        expect(compression_algorithm.instance_variable_get('@inflator').closed?).to be true
       end
     end
   end

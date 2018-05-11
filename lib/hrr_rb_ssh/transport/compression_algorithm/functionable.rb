@@ -25,6 +25,11 @@ module HrrRbSsh
         def inflate data
           @inflator.inflate(data)
         end
+
+        def close
+          @deflator.close if @deflator && @deflator.closed?.!
+          @inflator.close if @inflator && @inflator.closed?.!
+        end
       end
     end
   end

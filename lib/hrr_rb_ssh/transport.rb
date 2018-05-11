@@ -186,6 +186,8 @@ module HrrRbSsh
       @logger.info { "close transport" }
       @closed = true
       disconnect
+      @incoming_compression_algorithm.close
+      @outgoing_compression_algorithm.close
       @logger.info { "transport closed" }
     end
 
@@ -481,6 +483,8 @@ module HrrRbSsh
         incoming_compression_algorithm_name = compression_algorithm_c_to_s_name
         outgoing_compression_algorithm_name = compression_algorithm_s_to_c_name
       end
+      @incoming_compression_algorithm.close
+      @outgoing_compression_algorithm.close
       @incoming_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[incoming_compression_algorithm_name].new Direction::INCOMING
       @outgoing_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[outgoing_compression_algorithm_name].new Direction::OUTGOING
     end
