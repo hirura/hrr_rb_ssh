@@ -59,6 +59,9 @@ module HrrRbSsh
                   rescue IOError => e
                     context.logger.warn { "IO Error in ptm_read_thread" }
                     break
+                  rescue Errno::EIO => e
+                    context.logger.info { "EIO Error in ptm_read_thread" }
+                    break
                   rescue => e
                     context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                     break
@@ -74,6 +77,9 @@ module HrrRbSsh
                     break
                   rescue IOError => e
                     context.logger.warn { "IO Error in ptm_write_thread" }
+                    break
+                  rescue Errno::EIO => e
+                    context.logger.info { "EIO Error in ptm_read_thread" }
                     break
                   rescue => e
                     context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
