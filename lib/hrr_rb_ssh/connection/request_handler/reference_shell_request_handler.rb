@@ -15,8 +15,6 @@ module HrrRbSsh
             ptm = context.vars[:ptm]
             pts = context.vars[:pts]
 
-            context.io[2].close # never use err output in shell handler
-
             context.chain_proc { |chain|
               pid = fork do
                 ptm.close
@@ -31,40 +29,37 @@ module HrrRbSsh
 
               pts.close
 
-              threads = []
-              threads.push Thread.start {
+              ptm_read_thread = Thread.start {
                 loop do
                   begin
                     context.io[1].write ptm.readpartial(10240)
                   rescue EOFError => e
-                    context.logger.info { "ptm is EOF" }
+                    context.logger.info { "ptm is EOF in ptm_read_thread" }
                     break
                   rescue IOError => e
-                    context.logger.warn { "IO is closed" }
+                    context.logger.warn { "IO Error in ptm_read_thread" }
                     break
                   rescue => e
                     context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                     break
                   end
                 end
-                context.io[1].close
               }
-              threads.push Thread.start {
+              ptm_write_thread = Thread.start {
                 loop do
                   begin
                     ptm.write context.io[0].readpartial(10240)
                   rescue EOFError => e
-                    context.logger.info { "IO is EOF" }
+                    context.logger.info { "IO is EOF in ptm_write_thread" }
                     break
                   rescue IOError => e
-                    context.logger.warn { "IO is closed" }
+                    context.logger.warn { "IO Error in ptm_write_thread" }
                     break
                   rescue => e
                     context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                     break
                   end
                 end
-                ptm.close
               }
 
               begin
@@ -86,13 +81,16 @@ module HrrRbSsh
                   end
                   context.logger.info { "shell exited with status #{status.inspect}" }
                 end
-                threads.each do |t|
-                  begin
-                    t.exit
-                    t.join
-                  rescue => e
-                    context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                  end
+                begin
+                  ptm_read_thread.join
+                rescue => e
+                  context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+                end
+                begin
+                  ptm_write_thread.exit
+                  ptm_write_thread.join
+                rescue => e
+                  context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                 end
                 context.logger.info { "proc chain finished" }
               end

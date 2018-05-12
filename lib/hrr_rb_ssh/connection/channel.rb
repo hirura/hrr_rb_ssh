@@ -66,6 +66,13 @@ module HrrRbSsh
       end
 
       def wait_until_senders_closed
+        [@w_io_out, @w_io_err].each{ |io|
+          begin
+            io.close
+          rescue IOError # for compatibility for Ruby version < 2.3
+            Thread.pass
+          end
+        }
         [@out_sender_thread, @err_sender_thread].select{ |t| t.instance_of? Thread }.each(&:join)
       end
 
