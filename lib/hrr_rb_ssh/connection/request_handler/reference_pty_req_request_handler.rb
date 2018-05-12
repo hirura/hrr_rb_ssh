@@ -24,8 +24,14 @@ module HrrRbSsh
                 begin
                   chain.call_next
                 ensure
-                  context.vars[:ptm].close
-                  context.vars[:pts].close
+                  begin
+                    context.vars[:ptm].close
+                  rescue
+                  end
+                  begin
+                    context.vars[:pts].close
+                  rescue
+                  end
                 end
               }
             rescue => e
