@@ -163,7 +163,7 @@ module HrrRbSsh
               break
             end
             begin
-              data = @r_io_out.readpartial(1024)
+              data = @r_io_out.readpartial(10240)
               sendable_size = [data.size, @remote_window_size].min
               sending_data = data[0, sendable_size]
               send_channel_data sending_data if sendable_size > 0
@@ -195,7 +195,7 @@ module HrrRbSsh
               break
             end
             begin
-              data = @r_io_err.readpartial(1024)
+              data = @r_io_err.readpartial(10240)
               sendable_size = [data.size, @remote_window_size].min
               sending_data = data[0, sendable_size]
               send_channel_extended_data sending_data if sendable_size > 0

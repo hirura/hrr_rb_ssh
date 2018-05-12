@@ -35,7 +35,7 @@ module HrrRbSsh
               threads.push Thread.start {
                 loop do
                   begin
-                    context.io[1].write ptm.readpartial(1024)
+                    context.io[1].write ptm.readpartial(10240)
                   rescue EOFError => e
                     context.logger.info { "ptm is EOF" }
                     break
@@ -52,7 +52,7 @@ module HrrRbSsh
               threads.push Thread.start {
                 loop do
                   begin
-                    ptm.write context.io[0].readpartial(1024)
+                    ptm.write context.io[0].readpartial(10240)
                   rescue EOFError => e
                     context.logger.info { "IO is EOF" }
                     break
