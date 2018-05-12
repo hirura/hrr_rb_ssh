@@ -24,7 +24,7 @@ module HrrRbSsh
               env['HOME']  = passwd.dir
               env['SHELL'] = passwd.shell
 
-              program = [passwd.shell, passwd.shell]
+              program = [passwd.shell, passwd.shell.split('/').last.sub(/^/,'-')]
 
               args = Array.new
 
