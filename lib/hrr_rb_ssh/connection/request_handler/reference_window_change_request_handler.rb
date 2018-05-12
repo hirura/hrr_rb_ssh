@@ -12,7 +12,7 @@ module HrrRbSsh
         def initialize
           @logger = HrrRbSsh::Logger.new self.class.name
           @proc = Proc.new { |context|
-            context.vars[:ptm].winsize = [context.terminal_height_rows, context.terminal_width_columns]
+            context.vars[:ptm].winsize = [context.terminal_height_rows, context.terminal_width_columns, context.terminal_width_pixels, context.terminal_height_pixels]
           }
         end
       end
