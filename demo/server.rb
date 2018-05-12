@@ -1,6 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'etc'
 require 'logger'
 require 'socket'
 
@@ -27,10 +28,14 @@ auth_none = HrrRbSsh::Authentication::Authenticator.new { |context|
   false
 }
 auth_publickey = HrrRbSsh::Authentication::Authenticator.new { |context|
-  username = ENV['USER']
-  authorized_keys = HrrRbSsh::Compat::OpenSSH::AuthorizedKeys.new(File.read(File.join(Dir.home, '.ssh', 'authorized_keys')))
-  authorized_keys.any?{ |public_key|
-    context.verify username, public_key.algorithm_name, public_key.to_pem
+  users = ['user1', 'user2']
+  users.any?{ |username|
+    passwd = Etc.getpwnam(username)
+    homedir = passwd.dir
+    authorized_keys = HrrRbSsh::Compat::OpenSSH::AuthorizedKeys.new(File.read(File.join(homedir, '.ssh', 'authorized_keys')))
+    authorized_keys.any?{ |public_key|
+      context.verify username, public_key.algorithm_name, public_key.to_pem
+    }
   }
 }
 auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
