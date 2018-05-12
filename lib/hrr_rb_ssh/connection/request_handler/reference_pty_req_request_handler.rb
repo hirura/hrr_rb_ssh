@@ -1,6 +1,8 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'etc'
+require 'fileutils'
 require 'pty'
 require 'io/console'
 require 'hrr_rb_ssh/logger'
@@ -15,6 +17,9 @@ module HrrRbSsh
           @proc = Proc.new { |context|
             begin
               ptm, pts = PTY.open
+              passwd = Etc.getpwnam(context.username)
+              FileUtils.chown passwd.uid, -1, pts
+              FileUtils.chmod 'u+rw,g+w', pts
               ptm.winsize = [context.terminal_height_rows, context.terminal_width_characters, context.terminal_width_pixels, context.terminal_height_pixels]
               context.vars[:ptm] = ptm
               context.vars[:pts] = pts

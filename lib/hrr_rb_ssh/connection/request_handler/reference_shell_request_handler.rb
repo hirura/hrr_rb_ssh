@@ -1,6 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
+require 'etc'
 require 'timeout'
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/request_handler'
@@ -16,15 +17,34 @@ module HrrRbSsh
             pts = context.vars[:pts]
 
             context.chain_proc { |chain|
+              passwd = Etc.getpwnam(context.username)
+
+              env = context.vars.fetch(:env, Hash.new)
+              env['USER']  = passwd.name
+              env['HOME']  = passwd.dir
+              env['SHELL'] = passwd.shell
+
+              program = [passwd.shell, passwd.shell]
+
+              args = Array.new
+
+              options = Hash.new
+              options[:unsetenv_others] = true
+              options[:close_others] = true
+
               pid = fork do
                 ptm.close
                 Process.setsid
+                Dir.chdir passwd.dir
+                Process.gid  = passwd.gid
+                Process.egid = passwd.gid
+                Process.uid  = passwd.uid
+                Process.euid = passwd.uid
                 STDIN.reopen  pts, 'r'
                 STDOUT.reopen pts, 'w'
                 STDERR.reopen pts, 'w'
                 pts.close
-                context.vars[:env] ||= Hash.new
-                exec context.vars[:env], 'login', '-pf', context.username
+                exec env, program, *args, options
               end
 
               pts.close
