@@ -17,7 +17,7 @@ module HrrRbSsh
             CURVE_NAME = 'secp521r1'
 
             def initialize
-              @logger = HrrRbSsh::Logger.new(self.class.name)
+              @logger = Logger.new(self.class.name)
             end
 
             def verify_public_key public_key_algorithm_name, public_key, public_key_blob

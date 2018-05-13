@@ -14,7 +14,7 @@ module HrrRbSsh
               NAME = 'pty-req'
 
               def self.run proc_chain, username, io, variables, message, options
-                logger = HrrRbSsh::Logger.new self.class.name
+                logger = Logger.new self.class.name
 
                 context = Context.new proc_chain, username, io, variables, message
                 handler = options.fetch('connection_channel_request_pty_req', RequestHandler.new {})

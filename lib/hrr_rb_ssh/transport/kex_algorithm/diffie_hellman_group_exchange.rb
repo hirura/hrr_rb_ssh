@@ -10,12 +10,12 @@ module HrrRbSsh
     class KexAlgorithm
       module DiffieHellmanGroupExchange
         def initialize
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
         end
 
         def start transport, mode
           case mode
-          when HrrRbSsh::Transport::Mode::SERVER
+          when Mode::SERVER
             receive_kex_dh_gex_request transport.receive
             set_dh
             send_kex_dh_gex_group transport
@@ -101,37 +101,37 @@ module HrrRbSsh
         end
 
         def iv_c_to_s transport, encryption_algorithm_c_to_s_name
-          key_length = HrrRbSsh::Transport::EncryptionAlgorithm[encryption_algorithm_c_to_s_name]::IV_LENGTH
+          key_length = EncryptionAlgorithm[encryption_algorithm_c_to_s_name]::IV_LENGTH
           build_key(shared_secret, hash(transport), 'A'.ord, transport.session_id, key_length)
         end
 
         def iv_s_to_c transport, encryption_algorithm_s_to_c_name
-          key_length = HrrRbSsh::Transport::EncryptionAlgorithm[encryption_algorithm_s_to_c_name]::IV_LENGTH
+          key_length = EncryptionAlgorithm[encryption_algorithm_s_to_c_name]::IV_LENGTH
           build_key(shared_secret, hash(transport), 'B'.ord, transport.session_id, key_length)
         end
 
         def key_c_to_s transport, encryption_algorithm_c_to_s_name
-          key_length = HrrRbSsh::Transport::EncryptionAlgorithm[encryption_algorithm_c_to_s_name]::KEY_LENGTH
+          key_length = EncryptionAlgorithm[encryption_algorithm_c_to_s_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'C'.ord, transport.session_id, key_length)
         end
 
         def key_s_to_c transport, encryption_algorithm_s_to_c_name
-          key_length = HrrRbSsh::Transport::EncryptionAlgorithm[encryption_algorithm_s_to_c_name]::KEY_LENGTH
+          key_length = EncryptionAlgorithm[encryption_algorithm_s_to_c_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'D'.ord, transport.session_id, key_length)
         end
 
         def mac_c_to_s transport, mac_algorithm_c_to_s_name
-          key_length = HrrRbSsh::Transport::MacAlgorithm[mac_algorithm_c_to_s_name]::KEY_LENGTH
+          key_length = MacAlgorithm[mac_algorithm_c_to_s_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'E'.ord, transport.session_id, key_length)
         end
 
         def mac_s_to_c transport, mac_algorithm_s_to_c_name
-          key_length = HrrRbSsh::Transport::MacAlgorithm[mac_algorithm_s_to_c_name]::KEY_LENGTH
+          key_length = MacAlgorithm[mac_algorithm_s_to_c_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'F'.ord, transport.session_id, key_length)
         end
 
         def receive_kex_dh_gex_request payload
-          message = HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST.decode payload
+          message = Message::SSH_MSG_KEX_DH_GEX_REQUEST.decode payload
           @min = message[:'min']
           @n   = message[:'n']
           @max = message[:'max']
@@ -139,27 +139,27 @@ module HrrRbSsh
 
         def send_kex_dh_gex_group transport
           message = {
-            :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
+            :'message number' => Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
             :'p'              => @dh.p.to_i,
             :'g'              => @dh.g.to_i,
           }
-          payload = HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP.encode message
+          payload = Message::SSH_MSG_KEX_DH_GEX_GROUP.encode message
           transport.send payload
         end
 
         def receive_kex_dh_gex_init payload
-          message = HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_INIT.decode payload
+          message = Message::SSH_MSG_KEX_DH_GEX_INIT.decode payload
           set_e message[:'e']
         end
 
         def send_kex_dh_gex_reply transport
           message = {
-            :'message number'                                => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
+            :'message number'                                => Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
             :'server public host key and certificates (K_S)' => transport.server_host_key_algorithm.server_public_host_key,
             :'f'                                             => pub_key,
             :'signature of H'                                => sign(transport),
           }
-          payload = HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY.encode message
+          payload = Message::SSH_MSG_KEX_DH_GEX_REPLY.encode message
           transport.send payload
         end
       end

@@ -11,7 +11,7 @@ module HrrRbSsh
         :accepted
 
       def initialize connection
-        @logger = HrrRbSsh::Logger.new self.class.name
+        @logger = Logger.new self.class.name
         @connection = connection
         @tcpip_forward_servers = Hash.new
         @tcpip_forward_threads = Hash.new

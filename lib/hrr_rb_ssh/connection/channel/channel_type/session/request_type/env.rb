@@ -14,7 +14,7 @@ module HrrRbSsh
               NAME = 'env'
 
               def self.run proc_chain, username, io, variables, message, options
-                logger = HrrRbSsh::Logger.new self.class.name
+                logger = Logger.new self.class.name
 
                 context = Context.new proc_chain, username, io, variables, message
                 handler = options.fetch('connection_channel_request_env', RequestHandler.new {})

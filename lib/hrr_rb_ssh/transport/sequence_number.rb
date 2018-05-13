@@ -11,7 +11,7 @@ module HrrRbSsh
       def initialize
         @sequence_number = 0
 
-        @logger = HrrRbSsh::Logger.new self.class.name
+        @logger = Logger.new self.class.name
       end
 
       def increment

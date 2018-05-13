@@ -14,7 +14,7 @@ module HrrRbSsh
             @username = username
             @password = password
 
-            @logger = HrrRbSsh::Logger.new self.class.name
+            @logger = Logger.new self.class.name
           end
 
           def verify username, password

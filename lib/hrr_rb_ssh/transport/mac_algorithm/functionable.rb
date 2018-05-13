@@ -8,7 +8,7 @@ module HrrRbSsh
     class MacAlgorithm
       module Functionable
         def initialize key
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
           @key = key
         end
 
@@ -21,7 +21,7 @@ module HrrRbSsh
         end
 
         def compute sequence_number, unencrypted_packet
-          data = HrrRbSsh::DataType::Uint32.encode(sequence_number) + unencrypted_packet
+          data = DataType::Uint32.encode(sequence_number) + unencrypted_packet
           digest = OpenSSL::HMAC.digest self.class::DIGEST, @key, data
           digest[0, digest_length]
         end

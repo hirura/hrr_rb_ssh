@@ -15,7 +15,7 @@ module HrrRbSsh
         SECRET_KEY = OpenSSL::PKey::DSA.new(1024).to_pem
 
         def initialize secret_key=nil
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
           @dss = OpenSSL::PKey::DSA.new (secret_key || self.class::SECRET_KEY)
         end
 

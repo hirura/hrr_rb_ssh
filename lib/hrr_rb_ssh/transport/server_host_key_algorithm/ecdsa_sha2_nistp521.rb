@@ -15,7 +15,7 @@ module HrrRbSsh
         SECRET_KEY = OpenSSL::PKey::EC.new('secp521r1').generate_key.to_pem
 
         def initialize secret_key=nil
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
           @algorithm = OpenSSL::PKey::EC.new (secret_key || self.class::SECRET_KEY)
         end
 

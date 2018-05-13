@@ -14,12 +14,12 @@ module HrrRbSsh
         end
 
         def initialize direction, iv, key
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
           @cipher = OpenSSL::Cipher.new(self.class::CIPHER_NAME)
           case direction
-          when HrrRbSsh::Transport::Direction::OUTGOING
+          when Direction::OUTGOING
             @cipher.encrypt
-          when HrrRbSsh::Transport::Direction::INCOMING
+          when Direction::INCOMING
             @cipher.decrypt
           end
           @cipher.padding = 0

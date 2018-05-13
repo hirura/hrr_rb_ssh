@@ -13,7 +13,7 @@ module HrrRbSsh
     class RequestHandler
       class ReferencePtyReqRequestHandler < RequestHandler
         def initialize
-          @logger = HrrRbSsh::Logger.new self.class.name
+          @logger = Logger.new self.class.name
           @proc = Proc.new { |context|
             begin
               ptm, pts = PTY.open

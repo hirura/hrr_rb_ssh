@@ -11,7 +11,7 @@ module HrrRbSsh
           NAME = 'forwarded-tcpip'
 
           def initialize connection, channel, message, socket
-            @logger = HrrRbSsh::Logger.new self.class.name
+            @logger = Logger.new self.class.name
             @connection = connection
             @channel = channel
             @socket = socket

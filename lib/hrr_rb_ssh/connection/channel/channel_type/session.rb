@@ -11,7 +11,7 @@ module HrrRbSsh
           NAME = 'session'
 
           def initialize connection, channel, message, socket=nil
-            @logger = HrrRbSsh::Logger.new self.class.name
+            @logger = Logger.new self.class.name
             @connection = connection
             @channel = channel
             @variables = {}

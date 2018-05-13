@@ -9,7 +9,7 @@ module HrrRbSsh
     class RequestHandler
       class ReferenceEnvRequestHandler < RequestHandler
         def initialize
-          @logger = HrrRbSsh::Logger.new self.class.name
+          @logger = Logger.new self.class.name
           @proc = Proc.new { |context|
             context.vars[:env] ||= Hash.new
             context.vars[:env][context.variable_name] = context.variable_value

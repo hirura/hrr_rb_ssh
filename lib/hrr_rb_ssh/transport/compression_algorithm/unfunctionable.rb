@@ -8,7 +8,7 @@ module HrrRbSsh
     class CompressionAlgorithm
       module Unfunctionable
         def initialize direction=nil
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
         end
 
         def deflate data

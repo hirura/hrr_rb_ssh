@@ -13,7 +13,7 @@ module HrrRbSsh
         end
 
         def initialize direction=nil, iv=nil, key=nil
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
         end
 
         def block_size

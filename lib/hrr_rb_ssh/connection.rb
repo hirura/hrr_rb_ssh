@@ -13,7 +13,7 @@ module HrrRbSsh
       :options
 
     def initialize authentication, options={}
-      @logger = HrrRbSsh::Logger.new self.class.name
+      @logger = Logger.new self.class.name
 
       @authentication = authentication
       @options = options
@@ -71,27 +71,27 @@ module HrrRbSsh
       loop do
         begin
           payload = @authentication.receive
-        rescue HrrRbSsh::ClosedAuthenticationError => e
+        rescue ClosedAuthenticationError => e
           @logger.info { "closing connection loop" }
           break
         end
         @username ||= @authentication.username
         case payload[0,1].unpack("C")[0]
-        when HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE
+        when Message::SSH_MSG_GLOBAL_REQUEST::VALUE
           global_request payload
-        when HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE
+        when Message::SSH_MSG_CHANNEL_OPEN::VALUE
           channel_open payload
-        when HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE
+        when Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE
           channel_open_confirmation payload
-        when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
+        when Message::SSH_MSG_CHANNEL_REQUEST::VALUE
           channel_request payload
-        when HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
+        when Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
           channel_window_adjust payload
-        when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
+        when Message::SSH_MSG_CHANNEL_DATA::VALUE
           channel_data payload
-        when HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE
+        when Message::SSH_MSG_CHANNEL_EOF::VALUE
           channel_eof payload
-        when HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE
+        when Message::SSH_MSG_CHANNEL_CLOSE::VALUE
           channel_close payload
         else
           @logger.warn { "received unsupported message: id: #{payload[0,1].unpack("C")[0]}" }
@@ -103,8 +103,8 @@ module HrrRbSsh
     end
 
     def global_request payload
-      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::ID }
-      message = HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.decode payload
+      @logger.info { 'received ' + Message::SSH_MSG_GLOBAL_REQUEST::ID }
+      message = Message::SSH_MSG_GLOBAL_REQUEST.decode payload
       begin
         @global_request_handler.request message
       rescue
@@ -124,7 +124,7 @@ module HrrRbSsh
       @channels[channel.local_channel] = channel
       @logger.info { 'channel opened' }
       message = {
-        :'message number'             => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+        :'message number'             => Message::SSH_MSG_CHANNEL_OPEN::VALUE,
         :'channel type'               => "forwarded-tcpip",
         :'sender channel'             => channel.local_channel,
         :'initial window size'        => channel.local_window_size,
@@ -138,8 +138,8 @@ module HrrRbSsh
     end
 
     def channel_open payload
-      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::ID }
-      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.decode payload
+      @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_OPEN::ID }
+      message = Message::SSH_MSG_CHANNEL_OPEN.decode payload
       begin
         channel = Channel.new self, message
         @channels[channel.local_channel] = channel
@@ -152,45 +152,45 @@ module HrrRbSsh
     end
 
     def channel_open_confirmation payload
-      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::ID }
-      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.decode payload
+      @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::ID }
+      message = Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.decode payload
       channel = @channels[message[:'recipient channel']]
       channel.set_remote_parameters message
       channel.start
     end
 
     def channel_request payload
-      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::ID }
-      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.decode payload
+      @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_REQUEST::ID }
+      message = Message::SSH_MSG_CHANNEL_REQUEST.decode payload
       local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_window_adjust payload
-      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID }
-      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.decode payload
+      @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID }
+      message = Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.decode payload
       local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_data payload
-      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::ID }
-      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.decode payload
+      @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_DATA::ID }
+      message = Message::SSH_MSG_CHANNEL_DATA.decode payload
       local_channel = message[:'recipient channel']
       @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_eof payload
-      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::ID }
-      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.decode payload
+      @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_EOF::ID }
+      message = Message::SSH_MSG_CHANNEL_EOF.decode payload
       local_channel = message[:'recipient channel']
       channel = @channels[local_channel]
       channel.receive_message_queue.close
     end
 
     def channel_close payload
-      @logger.info { 'received ' + HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::ID }
-      message = HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.decode payload
+      @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_CLOSE::ID }
+      message = Message::SSH_MSG_CHANNEL_CLOSE.decode payload
       local_channel = message[:'recipient channel']
       channel = @channels[local_channel]
       channel.close
@@ -201,47 +201,47 @@ module HrrRbSsh
 
     def send_request_success
       message = {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
+        :'message number' => Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
       }
-      payload = HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS.encode message
+      payload = Message::SSH_MSG_REQUEST_SUCCESS.encode message
       @authentication.send payload
     end
 
     def send_request_failure
       message = {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
+        :'message number' => Message::SSH_MSG_REQUEST_FAILURE::VALUE,
       }
-      payload = HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE.encode message
+      payload = Message::SSH_MSG_REQUEST_FAILURE.encode message
       @authentication.send payload
     end
 
     def send_channel_open message
-      payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.encode message
+      payload = Message::SSH_MSG_CHANNEL_OPEN.encode message
       @authentication.send payload
     end
 
     def send_channel_open_confirmation channel
       message = {
-        :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
+        :'message number'      => Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
         :'channel type'        => channel.channel_type,
         :'recipient channel'   => channel.remote_channel,
         :'sender channel'      => channel.local_channel,
         :'initial window size' => channel.local_window_size,
         :'maximum packet size' => channel.local_maximum_packet_size,
       }
-      payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.encode message
+      payload = Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.encode message
       @authentication.send payload
     end
 
     def send_channel_open_failure recipient_channel, reason_code, description
       message = {
-        :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE::VALUE,
+        :'message number'      => Message::SSH_MSG_CHANNEL_OPEN_FAILURE::VALUE,
         :'recipient channel'   => recipient_channel,
         :'reason code'         => reason_code,
         :'description'         => description,
         :'language tag'        => "",
       }
-      payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE.encode message
+      payload = Message::SSH_MSG_CHANNEL_OPEN_FAILURE.encode message
       @authentication.send payload
     end
   end

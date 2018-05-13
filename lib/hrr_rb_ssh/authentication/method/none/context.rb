@@ -13,7 +13,7 @@ module HrrRbSsh
           def initialize username
             @username = username
 
-            @logger = HrrRbSsh::Logger.new self.class.name
+            @logger = Logger.new self.class.name
           end
 
           def verify username

@@ -22,7 +22,7 @@ module HrrRbSsh
         :receive_message_queue
 
       def initialize connection, message, socket=nil
-        @logger = HrrRbSsh::Logger.new self.class.name
+        @logger = Logger.new self.class.name
 
         @connection = connection
 
@@ -103,7 +103,7 @@ module HrrRbSsh
             end
           end
           send_channel_close
-        rescue HrrRbSsh::ClosedConnectionError => e
+        rescue ClosedConnectionError => e
           Thread.pass
         rescue => e
           @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
@@ -127,7 +127,7 @@ module HrrRbSsh
                 break
               end
               case message[:'message number']
-              when HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE
+              when Message::SSH_MSG_CHANNEL_REQUEST::VALUE
                 @logger.info { "received channel request: #{message[:'request type']}" }
                 begin
                   @channel_type_instance.request message
@@ -141,11 +141,11 @@ module HrrRbSsh
                     send_channel_success
                   end
                 end
-              when HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE
+              when Message::SSH_MSG_CHANNEL_DATA::VALUE
                 @logger.info { "received channel data" }
                 local_channel = message[:'recipient channel']
                 @receive_data_queue.enq message[:'data']
-              when HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
+              when Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
                 @logger.debug { "received channel window adjust" }
                 @remote_window_size = [@remote_window_size + message[:'bytes to add'], 0xffff_ffff].min
               else
@@ -261,80 +261,80 @@ module HrrRbSsh
 
       def send_channel_success
         message = {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
+          :'message number'    => Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
           :'recipient channel' => @remote_channel,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS.encode message
+        payload = Message::SSH_MSG_CHANNEL_SUCCESS.encode message
         @connection.send payload
       end
 
       def send_channel_failure
         message = {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_FAILURE::VALUE,
+          :'message number'    => Message::SSH_MSG_CHANNEL_FAILURE::VALUE,
           :'recipient channel' => @remote_channel,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_FAILURE.encode message
+        payload = Message::SSH_MSG_CHANNEL_FAILURE.encode message
         @connection.send payload
       end
 
       def send_channel_window_adjust
         message = {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          :'message number'    => Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
           :'recipient channel' => @remote_channel,
           :'bytes to add'      => INITIAL_WINDOW_SIZE,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.encode message
+        payload = Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.encode message
         @connection.send payload
       end
 
       def send_channel_data data
         message = {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          :'message number'    => Message::SSH_MSG_CHANNEL_DATA::VALUE,
           :'recipient channel' => @remote_channel,
           :'data'              => data,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.encode message
+        payload = Message::SSH_MSG_CHANNEL_DATA.encode message
         @connection.send payload
       end
 
-      def send_channel_extended_data data, code=HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypeCode::SSH_EXTENDED_DATA_STDERR
+      def send_channel_extended_data data, code=Message::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypeCode::SSH_EXTENDED_DATA_STDERR
         message = {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE,
+          :'message number'    => Message::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE,
           :'recipient channel' => @remote_channel,
           :'data type code'    => code,
           :'data'              => data,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA.encode message
+        payload = Message::SSH_MSG_CHANNEL_EXTENDED_DATA.encode message
         @connection.send payload
       end
 
       def send_channel_request_exit_status exitstatus
         message = {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'message number'    => Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
           :'recipient channel' => @remote_channel,
           :'request type'      => "exit-status",
           :'want reply'        => false,
           :'exit status'       => exitstatus,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.encode message
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message
         @connection.send payload
       end
 
       def send_channel_eof
         message = {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+          :'message number'    => Message::SSH_MSG_CHANNEL_EOF::VALUE,
           :'recipient channel' => @remote_channel,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.encode message
+        payload = Message::SSH_MSG_CHANNEL_EOF.encode message
         @connection.send payload
       end
 
       def send_channel_close
         message = {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+          :'message number'    => Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
           :'recipient channel' => @remote_channel,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.encode message
+        payload = Message::SSH_MSG_CHANNEL_CLOSE.encode message
         @connection.send payload
       end
     end

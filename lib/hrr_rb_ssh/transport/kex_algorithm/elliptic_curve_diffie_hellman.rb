@@ -10,14 +10,14 @@ module HrrRbSsh
     class KexAlgorithm
       module EllipticCurveDiffieHellman
         def initialize
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
           @dh = OpenSSL::PKey::EC.new(self.class::CURVE_NAME)
           @dh.generate_key
         end
 
         def start transport, mode
           case mode
-          when HrrRbSsh::Transport::Mode::SERVER
+          when Mode::SERVER
             receive_kexecdh_init transport.receive
             send_kexecdh_reply transport
           else
@@ -80,48 +80,48 @@ module HrrRbSsh
         end
 
         def iv_c_to_s transport, encryption_algorithm_c_to_s_name
-          key_length = HrrRbSsh::Transport::EncryptionAlgorithm[encryption_algorithm_c_to_s_name]::IV_LENGTH
+          key_length = EncryptionAlgorithm[encryption_algorithm_c_to_s_name]::IV_LENGTH
           build_key(shared_secret, hash(transport), 'A'.ord, transport.session_id, key_length)
         end
 
         def iv_s_to_c transport, encryption_algorithm_s_to_c_name
-          key_length = HrrRbSsh::Transport::EncryptionAlgorithm[encryption_algorithm_s_to_c_name]::IV_LENGTH
+          key_length = EncryptionAlgorithm[encryption_algorithm_s_to_c_name]::IV_LENGTH
           build_key(shared_secret, hash(transport), 'B'.ord, transport.session_id, key_length)
         end
 
         def key_c_to_s transport, encryption_algorithm_c_to_s_name
-          key_length = HrrRbSsh::Transport::EncryptionAlgorithm[encryption_algorithm_c_to_s_name]::KEY_LENGTH
+          key_length = EncryptionAlgorithm[encryption_algorithm_c_to_s_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'C'.ord, transport.session_id, key_length)
         end
 
         def key_s_to_c transport, encryption_algorithm_s_to_c_name
-          key_length = HrrRbSsh::Transport::EncryptionAlgorithm[encryption_algorithm_s_to_c_name]::KEY_LENGTH
+          key_length = EncryptionAlgorithm[encryption_algorithm_s_to_c_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'D'.ord, transport.session_id, key_length)
         end
 
         def mac_c_to_s transport, mac_algorithm_c_to_s_name
-          key_length = HrrRbSsh::Transport::MacAlgorithm[mac_algorithm_c_to_s_name]::KEY_LENGTH
+          key_length = MacAlgorithm[mac_algorithm_c_to_s_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'E'.ord, transport.session_id, key_length)
         end
 
         def mac_s_to_c transport, mac_algorithm_s_to_c_name
-          key_length = HrrRbSsh::Transport::MacAlgorithm[mac_algorithm_s_to_c_name]::KEY_LENGTH
+          key_length = MacAlgorithm[mac_algorithm_s_to_c_name]::KEY_LENGTH
           build_key(shared_secret, hash(transport), 'F'.ord, transport.session_id, key_length)
         end
 
         def receive_kexecdh_init payload
-          message = HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT.decode payload
+          message = Message::SSH_MSG_KEXECDH_INIT.decode payload
           set_q_c message[:'Q_C']
         end
 
         def send_kexecdh_reply transport
           message = {
-            :'message number' => HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY::VALUE,
+            :'message number' => Message::SSH_MSG_KEXECDH_REPLY::VALUE,
             :'K_S'            => transport.server_host_key_algorithm.server_public_host_key,
             :'Q_S'            => public_key,
             :'signature of H' => sign(transport),
           }
-          payload = HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY.encode message
+          payload = Message::SSH_MSG_KEXECDH_REPLY.encode message
           transport.send payload
         end
       end

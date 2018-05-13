@@ -8,7 +8,7 @@ module HrrRbSsh
   class Transport
     class Receiver
       def initialize
-        @logger = HrrRbSsh::Logger.new self.class.name
+        @logger = Logger.new self.class.name
       end
 
       def depacketize transport, packet

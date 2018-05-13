@@ -11,7 +11,7 @@ module HrrRbSsh
         PREFERENCE = 20
 
         def initialize options
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
           @session_id = options['session id']
           @authenticator = options.fetch( 'authentication_publickey_authenticator', Authenticator.new { false } )
         end
@@ -37,11 +37,11 @@ module HrrRbSsh
 
         def userauth_pk_ok_message public_key_algorithm_name, public_key_blob
           message = {
-            :'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
+            :'message number'                             => Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
             :'public key algorithm name from the request' => public_key_algorithm_name,
             :'public key blob from the request'           => public_key_blob,
           }
-          payload = HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.encode message
+          payload = Message::SSH_MSG_USERAUTH_PK_OK.encode message
         end
       end
     end

@@ -11,7 +11,7 @@ module HrrRbSsh
         class Session
           class ProcChain
             def initialize
-              @logger = HrrRbSsh::Logger.new self.class.name
+              @logger = Logger.new self.class.name
               @q = Queue.new
             end
             def connect next_proc

@@ -55,24 +55,24 @@ module HrrRbSsh
       @mode = mode
       @options = options
 
-      @logger = HrrRbSsh::Logger.new self.class.name
+      @logger = Logger.new self.class.name
 
       @closed = nil
       @disconnected = nil
 
       @in_kex = false
 
-      @sender   = HrrRbSsh::Transport::Sender.new
-      @receiver = HrrRbSsh::Transport::Receiver.new
+      @sender   = Sender.new
+      @receiver = Receiver.new
 
       @sender_monitor   = Monitor.new
       @receiver_monitor = Monitor.new
 
-      @local_version  = "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}".force_encoding(Encoding::ASCII_8BIT)
+      @local_version  = "SSH-2.0-HrrRbSsh-#{VERSION}".force_encoding(Encoding::ASCII_8BIT)
       @remote_version = "".force_encoding(Encoding::ASCII_8BIT)
 
-      @incoming_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
-      @outgoing_sequence_number = HrrRbSsh::Transport::SequenceNumber.new
+      @incoming_sequence_number = SequenceNumber.new
+      @outgoing_sequence_number = SequenceNumber.new
 
       @acceptable_services = Array.new
 
@@ -93,11 +93,11 @@ module HrrRbSsh
         rescue Errno::EPIPE => e
           @logger.warn { "IO is Broken PIPE" }
           close
-          raise HrrRbSsh::ClosedTransportError
+          raise ClosedTransportError
         rescue => e
           @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           close
-          raise HrrRbSsh::ClosedTransportError
+          raise ClosedTransportError
         end
       end
     end
@@ -108,25 +108,25 @@ module HrrRbSsh
         begin
           payload = @receiver.receive self
           case payload[0,1].unpack("C")[0]
-          when HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE
-            message = HrrRbSsh::Message::SSH_MSG_DISCONNECT.decode payload
+          when Message::SSH_MSG_DISCONNECT::VALUE
+            message = Message::SSH_MSG_DISCONNECT.decode payload
             @logger.debug { "received disconnect message: #{message.inspect}" }
             @disconnected = true
             close
             raise ClosedTransportError
-          when HrrRbSsh::Message::SSH_MSG_IGNORE::VALUE
-            message = HrrRbSsh::Message::SSH_MSG_IGNORE.decode payload
+          when Message::SSH_MSG_IGNORE::VALUE
+            message = Message::SSH_MSG_IGNORE.decode payload
             @logger.debug { "received ignore message: #{message.inspect}" }
             receive
-          when HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED::VALUE
-            message = HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.decode payload
+          when Message::SSH_MSG_UNIMPLEMENTED::VALUE
+            message = Message::SSH_MSG_UNIMPLEMENTED.decode payload
             @logger.debug { "received unimplemented message: #{message.inspect}" }
             receive
-          when HrrRbSsh::Message::SSH_MSG_DEBUG::VALUE
-            message = HrrRbSsh::Message::SSH_MSG_DEBUG.decode payload
+          when Message::SSH_MSG_DEBUG::VALUE
+            message = Message::SSH_MSG_DEBUG.decode payload
             @logger.debug { "received debug message: #{message.inspect}" }
             receive
-          when HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE
+          when Message::SSH_MSG_KEXINIT::VALUE
             @logger.debug { "received kexinit message" }
             if @in_kex
               payload
@@ -166,7 +166,7 @@ module HrrRbSsh
         exchange_key
 
         case @mode
-        when HrrRbSsh::Transport::Mode::SERVER
+        when Mode::SERVER
           verify_service_request
         end
 
@@ -250,19 +250,19 @@ module HrrRbSsh
     end
 
     def update_supported_algorithms
-      @supported_kex_algorithms             = HrrRbSsh::Transport::KexAlgorithm.list_supported
-      @supported_server_host_key_algorithms = HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported
-      @supported_encryption_algorithms      = HrrRbSsh::Transport::EncryptionAlgorithm.list_supported
-      @supported_mac_algorithms             = HrrRbSsh::Transport::MacAlgorithm.list_supported
-      @supported_compression_algorithms     = HrrRbSsh::Transport::CompressionAlgorithm.list_supported
+      @supported_kex_algorithms             = KexAlgorithm.list_supported
+      @supported_server_host_key_algorithms = ServerHostKeyAlgorithm.list_supported
+      @supported_encryption_algorithms      = EncryptionAlgorithm.list_supported
+      @supported_mac_algorithms             = MacAlgorithm.list_supported
+      @supported_compression_algorithms     = CompressionAlgorithm.list_supported
     end
 
     def update_preferred_algorithms
-      @preferred_kex_algorithms             = @options['transport_preferred_kex_algorithms']             || HrrRbSsh::Transport::KexAlgorithm.list_preferred
-      @preferred_server_host_key_algorithms = @options['transport_preferred_server_host_key_algorithms'] || HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
-      @preferred_encryption_algorithms      = @options['transport_preferred_encryption_algorithms']      || HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-      @preferred_mac_algorithms             = @options['transport_preferred_mac_algorithms']             || HrrRbSsh::Transport::MacAlgorithm.list_preferred
-      @preferred_compression_algorithms     = @options['transport_preferred_compression_algorithms']     || HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+      @preferred_kex_algorithms             = @options['transport_preferred_kex_algorithms']             || KexAlgorithm.list_preferred
+      @preferred_server_host_key_algorithms = @options['transport_preferred_server_host_key_algorithms'] || ServerHostKeyAlgorithm.list_preferred
+      @preferred_encryption_algorithms      = @options['transport_preferred_encryption_algorithms']      || EncryptionAlgorithm.list_preferred
+      @preferred_mac_algorithms             = @options['transport_preferred_mac_algorithms']             || MacAlgorithm.list_preferred
+      @preferred_compression_algorithms     = @options['transport_preferred_compression_algorithms']     || CompressionAlgorithm.list_preferred
 
       check_if_preferred_algorithms_are_supported
     end
@@ -295,13 +295,13 @@ module HrrRbSsh
     end
 
     def initialize_algorithms
-      @incoming_encryption_algorithm  = HrrRbSsh::Transport::EncryptionAlgorithm['none'].new
-      @incoming_mac_algorithm         = HrrRbSsh::Transport::MacAlgorithm['none'].new
-      @incoming_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm['none'].new
+      @incoming_encryption_algorithm  = EncryptionAlgorithm['none'].new
+      @incoming_mac_algorithm         = MacAlgorithm['none'].new
+      @incoming_compression_algorithm = CompressionAlgorithm['none'].new
 
-      @outgoing_encryption_algorithm  = HrrRbSsh::Transport::EncryptionAlgorithm['none'].new
-      @outgoing_mac_algorithm         = HrrRbSsh::Transport::MacAlgorithm['none'].new
-      @outgoing_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm['none'].new
+      @outgoing_encryption_algorithm  = EncryptionAlgorithm['none'].new
+      @outgoing_mac_algorithm         = MacAlgorithm['none'].new
+      @outgoing_compression_algorithm = CompressionAlgorithm['none'].new
     end
 
     def send_version
@@ -325,10 +325,10 @@ module HrrRbSsh
 
     def update_version_strings
       case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
+      when Mode::SERVER
         @v_c = @remote_version
         @v_s = @local_version
-      when HrrRbSsh::Transport::Mode::CLIENT
+      when Mode::CLIENT
         @v_c = @local_version
         @v_s = @remote_version
       end
@@ -336,18 +336,18 @@ module HrrRbSsh
 
     def send_disconnect
       message = {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
-        :'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+        :'message number' => Message::SSH_MSG_DISCONNECT::VALUE,
+        :'reason code'    => Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
         :'description'    => "disconnected by user",
         :'language tag'   => ""
       }
-      payload = HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode message
+      payload = Message::SSH_MSG_DISCONNECT.encode message
       send payload
     end
 
     def send_kexinit
       message = {
-        :'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
+        :'message number'                          => Message::SSH_MSG_KEXINIT::VALUE,
         :'cookie (random byte)'                    => lambda { rand(0x01_00) },
         :'kex_algorithms'                          => @local_kex_algorithms,
         :'server_host_key_algorithms'              => @local_server_host_key_algorithms,
@@ -362,53 +362,53 @@ module HrrRbSsh
         :'first_kex_packet_follows'                => false,
         :'0 (reserved for future extension)'       => 0,
       }
-      payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode message
+      payload = Message::SSH_MSG_KEXINIT.encode message
       send payload
 
       case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
+      when Mode::SERVER
         @i_s = payload
-      when HrrRbSsh::Transport::Mode::CLIENT
+      when Mode::CLIENT
         @i_c = payload
       end
     end
 
     def receive_kexinit payload
       case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
+      when Mode::SERVER
         @i_c = payload
-      when HrrRbSsh::Transport::Mode::CLIENT
+      when Mode::CLIENT
         @i_s = payload
       end
-      message = HrrRbSsh::Message::SSH_MSG_KEXINIT.decode payload
+      message = Message::SSH_MSG_KEXINIT.decode payload
       update_remote_algorithms message
     end
 
     def send_newkeys
         message = {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
+          :'message number' => Message::SSH_MSG_NEWKEYS::VALUE,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode message
+        payload = Message::SSH_MSG_NEWKEYS.encode message
         send payload
     end
 
     def receive_newkeys payload
-      message = HrrRbSsh::Message::SSH_MSG_NEWKEYS.decode payload
+      message = Message::SSH_MSG_NEWKEYS.decode payload
     end
 
     def receive_service_request
       payload = @receiver.receive self
-      message = HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.decode payload
+      message = Message::SSH_MSG_SERVICE_REQUEST.decode payload
 
       message
     end
 
     def send_service_accept service_name
         message = {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
+          :'message number' => Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
           :'service name'   => service_name,
         }
-        payload = HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode message
+        payload = Message::SSH_MSG_SERVICE_ACCEPT.encode message
         send payload
     end
 
@@ -425,17 +425,17 @@ module HrrRbSsh
 
     def update_kex_and_server_host_key_algorithms
       case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
+      when Mode::SERVER
         kex_algorithm_name             = @remote_kex_algorithms.find{ |a| @local_kex_algorithms.include? a } or raise
         server_host_key_algorithm_name = @remote_server_host_key_algorithms.find{ |a| @local_server_host_key_algorithms.include? a } or raise
-      when HrrRbSsh::Transport::Mode::CLIENT
+      when Mode::CLIENT
         kex_algorithm_name             = @local_kex_algorithms.find{ |a| @remote_kex_algorithms.include? a } or raise
         server_host_key_algorithm_name = @local_server_host_key_algorithms.find{ |a| @remote_server_host_key_algorithms.include? a } or raise
       end
 
       server_secret_host_key = @options.fetch('transport_server_secret_host_keys', {}).fetch(server_host_key_algorithm_name, nil)
-      @kex_algorithm             = HrrRbSsh::Transport::KexAlgorithm[kex_algorithm_name].new
-      @server_host_key_algorithm = HrrRbSsh::Transport::ServerHostKeyAlgorithm[server_host_key_algorithm_name].new server_secret_host_key
+      @kex_algorithm             = KexAlgorithm[kex_algorithm_name].new
+      @server_host_key_algorithm = ServerHostKeyAlgorithm[server_host_key_algorithm_name].new server_secret_host_key
     end
 
     def update_encryption_mac_compression_algorithms
@@ -447,7 +447,7 @@ module HrrRbSsh
 
     def update_encryption_algorithm
       case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
+      when Mode::SERVER
         encryption_algorithm_c_to_s_name = @remote_encryption_algorithms_client_to_server.find{ |a| @local_encryption_algorithms_client_to_server.include? a } or raise
         encryption_algorithm_s_to_c_name = @remote_encryption_algorithms_server_to_client.find{ |a| @local_encryption_algorithms_server_to_client.include? a } or raise
         incoming_encryption_algorithm_name = encryption_algorithm_c_to_s_name
@@ -457,13 +457,13 @@ module HrrRbSsh
         incoming_crpt_key = @kex_algorithm.key_c_to_s self, incoming_encryption_algorithm_name
         outgoing_crpt_key = @kex_algorithm.key_s_to_c self, outgoing_encryption_algorithm_name
       end
-      @incoming_encryption_algorithm = HrrRbSsh::Transport::EncryptionAlgorithm[incoming_encryption_algorithm_name].new Direction::INCOMING, incoming_crpt_iv, incoming_crpt_key
-      @outgoing_encryption_algorithm = HrrRbSsh::Transport::EncryptionAlgorithm[outgoing_encryption_algorithm_name].new Direction::OUTGOING, outgoing_crpt_iv, outgoing_crpt_key
+      @incoming_encryption_algorithm = EncryptionAlgorithm[incoming_encryption_algorithm_name].new Direction::INCOMING, incoming_crpt_iv, incoming_crpt_key
+      @outgoing_encryption_algorithm = EncryptionAlgorithm[outgoing_encryption_algorithm_name].new Direction::OUTGOING, outgoing_crpt_iv, outgoing_crpt_key
     end
 
     def update_mac_algorithm
       case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
+      when Mode::SERVER
         mac_algorithm_c_to_s_name = @remote_mac_algorithms_client_to_server.find{ |a| @local_mac_algorithms_client_to_server.include? a } or raise
         mac_algorithm_s_to_c_name = @remote_mac_algorithms_server_to_client.find{ |a| @local_mac_algorithms_server_to_client.include? a } or raise
         incoming_mac_algorithm_name = mac_algorithm_c_to_s_name
@@ -471,13 +471,13 @@ module HrrRbSsh
         incoming_mac_key = @kex_algorithm.mac_c_to_s self, incoming_mac_algorithm_name
         outgoing_mac_key = @kex_algorithm.mac_s_to_c self, outgoing_mac_algorithm_name
       end
-      @incoming_mac_algorithm = HrrRbSsh::Transport::MacAlgorithm[incoming_mac_algorithm_name].new incoming_mac_key
-      @outgoing_mac_algorithm = HrrRbSsh::Transport::MacAlgorithm[outgoing_mac_algorithm_name].new outgoing_mac_key
+      @incoming_mac_algorithm = MacAlgorithm[incoming_mac_algorithm_name].new incoming_mac_key
+      @outgoing_mac_algorithm = MacAlgorithm[outgoing_mac_algorithm_name].new outgoing_mac_key
     end
 
     def update_compression_algorithm
       case @mode
-      when HrrRbSsh::Transport::Mode::SERVER
+      when Mode::SERVER
         compression_algorithm_c_to_s_name = @remote_compression_algorithms_client_to_server.find{ |a| @local_compression_algorithms_client_to_server.include? a } or raise
         compression_algorithm_s_to_c_name = @remote_compression_algorithms_server_to_client.find{ |a| @local_compression_algorithms_server_to_client.include? a } or raise
         incoming_compression_algorithm_name = compression_algorithm_c_to_s_name
@@ -485,8 +485,8 @@ module HrrRbSsh
       end
       @incoming_compression_algorithm.close
       @outgoing_compression_algorithm.close
-      @incoming_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[incoming_compression_algorithm_name].new Direction::INCOMING
-      @outgoing_compression_algorithm = HrrRbSsh::Transport::CompressionAlgorithm[outgoing_compression_algorithm_name].new Direction::OUTGOING
+      @incoming_compression_algorithm = CompressionAlgorithm[incoming_compression_algorithm_name].new Direction::INCOMING
+      @outgoing_compression_algorithm = CompressionAlgorithm[outgoing_compression_algorithm_name].new Direction::OUTGOING
     end
   end
 end

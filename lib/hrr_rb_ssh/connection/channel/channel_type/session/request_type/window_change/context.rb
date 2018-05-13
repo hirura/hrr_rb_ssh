@@ -23,7 +23,7 @@ module HrrRbSsh
                   :terminal_height_pixels
 
                 def initialize proc_chain, username, io, variables, message
-                  @logger = HrrRbSsh::Logger.new self.class.name
+                  @logger = Logger.new self.class.name
 
                   @proc_chain = proc_chain
                   @username   = username

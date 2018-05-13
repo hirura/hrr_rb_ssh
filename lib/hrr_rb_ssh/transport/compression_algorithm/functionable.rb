@@ -9,7 +9,7 @@ module HrrRbSsh
     class CompressionAlgorithm
       module Functionable
         def initialize direction
-          @logger = HrrRbSsh::Logger.new(self.class.name)
+          @logger = Logger.new(self.class.name)
           case direction
           when Direction::OUTGOING
             @deflator = ::Zlib::Deflate.new

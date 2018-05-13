@@ -10,7 +10,7 @@ module HrrRbSsh
     class RequestHandler
       class ReferenceExecRequestHandler < RequestHandler
         def initialize
-          @logger = HrrRbSsh::Logger.new self.class.name
+          @logger = Logger.new self.class.name
           @proc = Proc.new { |context|
             ptm = context.vars[:ptm]
             pts = context.vars[:pts]

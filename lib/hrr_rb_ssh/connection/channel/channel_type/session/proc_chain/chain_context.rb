@@ -11,7 +11,7 @@ module HrrRbSsh
           class ProcChain
             class ChainContext
               def initialize proc_chain
-                @logger = HrrRbSsh::Logger.new self.class.name
+                @logger = Logger.new self.class.name
                 @proc_chain = proc_chain
               end
               def call_next *args

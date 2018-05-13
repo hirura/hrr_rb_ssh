@@ -6,7 +6,7 @@ require 'hrr_rb_ssh/logger'
 module HrrRbSsh
   module Codable
     def logger
-      @logger ||= HrrRbSsh::Logger.new self.name
+      @logger ||= Logger.new self.name
     end
 
     def common_definition
