@@ -74,7 +74,7 @@ options = Hash.new
 server = TCPServer.new 10022
 while true
   t = Thread.new(server.accept) do |io|
-    tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Transport::Mode::SERVER, options
+    tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, options
     auth = HrrRbSsh::Authentication.new tran, options
     conn = HrrRbSsh::Connection.new     auth, options
     conn.start

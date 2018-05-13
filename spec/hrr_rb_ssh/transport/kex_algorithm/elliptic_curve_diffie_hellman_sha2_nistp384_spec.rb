@@ -81,7 +81,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
         expect(server_host_key_algorithm).to receive(:server_public_host_key).with(no_args).and_return(server_public_host_key).once
         expect(kex_algorithm).to receive(:sign).with(mock_t).and_return(sign).once
 
-        kex_algorithm.start mock_t, HrrRbSsh::Transport::Mode::SERVER
+        kex_algorithm.start mock_t, HrrRbSsh::Mode::SERVER
 
         expect(kex_algorithm.shared_secret).to eq OpenSSL::BN.new(remote_dh.dh_compute_key(OpenSSL::PKey::EC::Point.new(OpenSSL::PKey::EC.new(curve_name).group, OpenSSL::BN.new(kex_algorithm.public_key))), 2).to_i
       end

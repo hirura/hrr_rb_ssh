@@ -8,7 +8,7 @@ RSpec.describe HrrRbSsh::Transport::Sender do
 
   context "with initial transport" do
     let(:io){ StringIO.new String.new, 'r+' }
-    let(:mode){ HrrRbSsh::Transport::Mode::SERVER }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
 
     describe "#send" do

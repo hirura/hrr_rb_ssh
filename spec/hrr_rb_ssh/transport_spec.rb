@@ -385,7 +385,7 @@ RSpec.describe HrrRbSsh::Transport do
 
   context "when mode is server" do
     let(:io){ MockSocket.new }
-    let(:mode){ HrrRbSsh::Transport::Mode::SERVER }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
 
     describe "#start" do
       let(:transport){ described_class.new io, mode }
@@ -747,7 +747,7 @@ RSpec.describe HrrRbSsh::Transport do
 
   context "when mode is client" do
     let(:io){ MockSocket.new }
-    let(:mode){ HrrRbSsh::Transport::Mode::CLIENT }
+    let(:mode){ HrrRbSsh::Mode::CLIENT }
 
     describe "#exchange_version" do
       let(:transport){ described_class.new io, mode }

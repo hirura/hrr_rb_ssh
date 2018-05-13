@@ -50,7 +50,7 @@ server = TCPServer.new 10022
 while true
   t = Thread.new(server.accept) do |io|
     begin
-      tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Transport::Mode::SERVER
+      tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER
       auth = HrrRbSsh::Authentication.new tran, options
       conn = HrrRbSsh::Connection.new     auth, options
       conn.start
