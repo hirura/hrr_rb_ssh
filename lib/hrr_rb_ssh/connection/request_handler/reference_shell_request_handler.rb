@@ -49,45 +49,6 @@ module HrrRbSsh
 
               pts.close
 
-              ptm_read_thread = Thread.start {
-                loop do
-                  begin
-                    context.io[1].write ptm.readpartial(10240)
-                  rescue EOFError => e
-                    context.logger.info { "ptm is EOF in ptm_read_thread" }
-                    break
-                  rescue IOError => e
-                    context.logger.warn { "IO Error in ptm_read_thread" }
-                    break
-                  rescue Errno::EIO => e
-                    context.logger.info { "EIO Error in ptm_read_thread" }
-                    break
-                  rescue => e
-                    context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                    break
-                  end
-                end
-              }
-              ptm_write_thread = Thread.start {
-                loop do
-                  begin
-                    ptm.write context.io[0].readpartial(10240)
-                  rescue EOFError => e
-                    context.logger.info { "IO is EOF in ptm_write_thread" }
-                    break
-                  rescue IOError => e
-                    context.logger.warn { "IO Error in ptm_write_thread" }
-                    break
-                  rescue Errno::EIO => e
-                    context.logger.info { "EIO Error in ptm_read_thread" }
-                    break
-                  rescue => e
-                    context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                    break
-                  end
-                end
-              }
-
               begin
                 pid, status = Process.waitpid2 pid
                 context.logger.info { "shell exited with status #{status.inspect}" }
@@ -107,18 +68,6 @@ module HrrRbSsh
                   end
                   context.logger.info { "shell exited with status #{status.inspect}" }
                 end
-                begin
-                  ptm_read_thread.join
-                rescue => e
-                  context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                end
-                begin
-                  ptm_write_thread.exit
-                  ptm_write_thread.join
-                rescue => e
-                  context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                end
-                context.logger.info { "proc chain finished" }
               end
             }
           }
