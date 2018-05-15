@@ -22,7 +22,6 @@ auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
 }
 
 conn_echo = HrrRbSsh::Connection::RequestHandler.new { |context|
-  context.io[2].close
   context.chain_proc { |chain|
     case context.subsystem_name
     when 'echo'
@@ -39,11 +38,8 @@ conn_echo = HrrRbSsh::Connection::RequestHandler.new { |context|
       rescue => e
         logger.error([e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join)
         exitstatus = 1
-      ensure
-        context.io[1].close
       end
     else
-      context.io[1].close
       exitstatus = 0
     end
     exitstatus
