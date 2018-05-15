@@ -36,10 +36,8 @@ module HrrRbSsh
                 ptm.close
                 Process.setsid
                 Dir.chdir passwd.dir
-                Process.gid  = passwd.gid
-                Process.egid = passwd.gid
-                Process.uid  = passwd.uid
-                Process.euid = passwd.uid
+                Process::GID.change_privilege passwd.gid
+                Process::UID.change_privilege passwd.uid
                 STDIN.reopen  pts, 'r'
                 STDOUT.reopen pts, 'w'
                 STDERR.reopen pts, 'w'
