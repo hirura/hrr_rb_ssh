@@ -308,15 +308,18 @@ module HrrRbSsh
     end
 
     def receive_version
-      tmp_str = String.new
+      str_io = StringIO.new
       loop do
-        tmp_str << @io.read(1)
-        if tmp_str =~ /#{CR}#{LF}/
-          if tmp_str =~ /^SSH-/
-            @remote_version = tmp_str.match( /(:?SSH-.+)#{CR}#{LF}/ )[1]
+        str_io.write @io.read(1)
+        if str_io.string[-2..-1] == "#{CR}#{LF}"
+          if str_io.string[0..3] == "SSH-"
+            @remote_version = str_io.string[0..-3]
+            @logger.info { "received remote version string: #{@remote_version}" }
             break
           else
-            tmp_str.clear
+            @logger.info { "received message before remote version string: #{str_io.string}" }
+            str_io.rewind
+            str_io.truncate(0)
           end
         end
       end
