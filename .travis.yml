@@ -10,7 +10,10 @@ rvm:
   - 2.3
   - 2.4
   - 2.5
-install: bundle install --path vendor/bundle
+before_install:
+  - gem update --system --no-document
+install:
+  - bundle install --path vendor/bundle
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
