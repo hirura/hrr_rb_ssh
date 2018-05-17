@@ -72,13 +72,17 @@ The library is to run on a socket IO. To start SSH server, running a server IO a
 ```ruby
 options = Hash.new
 server = TCPServer.new 10022
-while true
-  t = Thread.new(server.accept) do |io|
-    tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, options
-    auth = HrrRbSsh::Authentication.new tran, options
-    conn = HrrRbSsh::Connection.new     auth, options
-    conn.start
+loop do
+  Thread.new(server.accept) do |io|
+    pid = fork do
+      tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, options
+      auth = HrrRbSsh::Authentication.new tran, options
+      conn = HrrRbSsh::Connection.new     auth, options
+      conn.start
+      io.close
+    end
     io.close
+    Process.waitpid pid
   end
 end
 ```
