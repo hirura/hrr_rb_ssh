@@ -93,9 +93,6 @@ module HrrRbSsh
         unless arg.kind_of? ::Integer
           raise ArgumentError, "must be a kind of Integer, but got #{arg.inspect}"
         end
-        if arg.size > 0xffff_ffff
-          raise ArgumentError, "must be shorter than or equal to #{0xffff_ffff}, but got length #{arg.size}"
-        end
         bn = ::OpenSSL::BN.new(arg)
         if bn < 0
           # get 2's complement

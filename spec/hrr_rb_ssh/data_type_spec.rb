@@ -301,9 +301,11 @@ RSpec.describe HrrRbSsh::DataType do
         end
       end
 
-      context "when arg is not within mpint value" do
-        it "encodes (1 << ((8 * 0xffff_ffff) + 1)); requires 0xffff_ffff + 1 bytes; with error" do
-          #expect { HrrRbSsh::DataType::Mpint.encode (1 << ((8 * 0xffff_ffff) + 1)) }.to raise_error ArgumentError
+      context "when arg is not Integer value" do
+        let(:arg){ "string value" }
+
+        it "raises ArgumentError" do
+          expect { HrrRbSsh::DataType::Mpint.encode arg }.to raise_error ArgumentError
         end
       end
     end
