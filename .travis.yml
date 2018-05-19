@@ -11,7 +11,7 @@ rvm:
   - 2.4
   - 2.5
   - ruby-head
-  - rbx
+  - rubinius-3
 os:
   - linux
   - osx
