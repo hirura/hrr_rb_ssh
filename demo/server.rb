@@ -75,10 +75,8 @@ OfeosJOO9twerD7pPhmXREkygblPsEXaVA==
   options['connection_channel_request_exec']          = HrrRbSsh::Connection::RequestHandler::ReferenceExecRequestHandler.new
   options['connection_channel_request_window_change'] = HrrRbSsh::Connection::RequestHandler::ReferenceWindowChangeRequestHandler.new
 
-  tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, options
-  auth = HrrRbSsh::Authentication.new tran, options
-  conn = HrrRbSsh::Connection.new     auth, options
-  conn.start
+  server = HrrRbSsh::Server.new io, options
+  server.start
 end
 
 

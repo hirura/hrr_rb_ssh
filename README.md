@@ -75,11 +75,12 @@ server = TCPServer.new 10022
 loop do
   Thread.new(server.accept) do |io|
     pid = fork do
-      tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, options
-      auth = HrrRbSsh::Authentication.new tran, options
-      conn = HrrRbSsh::Connection.new     auth, options
-      conn.start
-      io.close
+      begin
+        server = HrrRbSsh::Server.new io, options
+        server.start
+      ensure
+        io.close
+      end
     end
     io.close
     Process.waitpid pid

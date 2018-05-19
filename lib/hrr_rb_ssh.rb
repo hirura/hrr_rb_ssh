@@ -10,6 +10,7 @@ require "hrr_rb_ssh/error"
 require "hrr_rb_ssh/transport"
 require "hrr_rb_ssh/authentication"
 require "hrr_rb_ssh/connection"
+require "hrr_rb_ssh/server"
 
 module HrrRbSsh
   # Your code goes here...

@@ -39,10 +39,8 @@ def start_service io, logger=nil
   options['authentication_password_authenticator'] = auth_password
   options['connection_channel_request_shell']      = conn_echo
 
-  tran = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, options
-  auth = HrrRbSsh::Authentication.new tran, options
-  conn = HrrRbSsh::Connection.new     auth, options
-  conn.start
+  server = HrrRbSsh::Server.new io, options
+  server.start
 end
 
 logger = Logger.new STDOUT
