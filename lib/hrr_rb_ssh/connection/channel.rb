@@ -103,7 +103,7 @@ module HrrRbSsh
             end
           end
           send_channel_close
-        rescue ClosedConnectionError => e
+        rescue Error::ClosedConnection => e
           Thread.pass
         rescue => e
           @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }

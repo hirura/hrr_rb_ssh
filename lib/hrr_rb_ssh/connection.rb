@@ -2,7 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/logger'
-require 'hrr_rb_ssh/closed_connection_error'
+require 'hrr_rb_ssh/error/closed_connection'
 require 'hrr_rb_ssh/connection/global_request_handler'
 require 'hrr_rb_ssh/connection/channel'
 
@@ -25,11 +25,11 @@ module HrrRbSsh
     end
 
     def send payload
-      raise ClosedConnectionError if @closed
+      raise Error::ClosedConnection if @closed
       begin
         @authentication.send payload
-      rescue ClosedAuthenticationError
-        raise ClosedConnectionError
+      rescue Error::ClosedAuthentication
+        raise Error::ClosedConnection
       end
     end
 
@@ -71,7 +71,7 @@ module HrrRbSsh
       loop do
         begin
           payload = @authentication.receive
-        rescue ClosedAuthenticationError => e
+        rescue Error::ClosedAuthentication => e
           @logger.info { "closing connection loop" }
           break
         end

@@ -32,8 +32,8 @@ RSpec.describe HrrRbSsh::Connection do
         connection.instance_variable_set('@closed', true)
       end
 
-      it "raises ClosedConnectionError" do
-        expect { connection.send payload }.to raise_error HrrRbSsh::ClosedConnectionError
+      it "raises Error::ClosedConnection" do
+        expect { connection.send payload }.to raise_error HrrRbSsh::Error::ClosedConnection
       end
     end
 
@@ -43,8 +43,8 @@ RSpec.describe HrrRbSsh::Connection do
         authentication.instance_variable_set('@closed', true)
       end
 
-      it "raises ClosedConnectionError" do
-        expect { connection.send payload }.to raise_error HrrRbSsh::ClosedConnectionError
+      it "raises Error::ClosedConnection" do
+        expect { connection.send payload }.to raise_error HrrRbSsh::Error::ClosedConnection
       end
     end
 
@@ -208,7 +208,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "calls global_request and sends resuest failure" do
         expect(authentication).to receive(:receive).with(no_args).and_return(global_request_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:global_request).with(global_request_payload).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
@@ -231,7 +231,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "calls channel_open" do
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_open_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_open).with(channel_open_payload).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
@@ -255,7 +255,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "calls channel_open_confirmation" do
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_open_confirmation_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_open_confirmation).with(channel_open_confirmation_payload).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
@@ -277,7 +277,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "calls channel_request" do
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_request_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_request).with(channel_request_payload).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
@@ -298,7 +298,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "calls channel_window_adjust" do
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_window_adjust_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_window_adjust).with(channel_window_adjust_payload).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
@@ -319,7 +319,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "calls channel_data" do
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_data_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_data).with(channel_data_payload).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
@@ -346,7 +346,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "calls channel_eof" do
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_eof_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_eof).with(channel_eof_payload).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
@@ -366,7 +366,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "calls channel_close" do
         expect(authentication).to receive(:receive).with(no_args).and_return(channel_close_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_close).with(channel_close_payload).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
@@ -389,7 +389,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "does nothing" do
         expect(authentication).to receive(:receive).with(no_args).and_return(unknown_payload).once
-        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::ClosedAuthenticationError).once
+        expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:close).with(no_args).once
         connection.connection_loop
       end

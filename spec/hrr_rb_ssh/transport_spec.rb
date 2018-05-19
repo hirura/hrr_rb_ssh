@@ -214,18 +214,18 @@ RSpec.describe HrrRbSsh::Transport do
     end
 
     context "when sender raises Errno::EPIPE error" do
-      it "closes transport and raises HrrRbSsh::ClosedTransportError" do
+      it "closes transport and raises HrrRbSsh::Error::ClosedTransport" do
         expect(mock_sender).to receive(:send).with(transport, payload).and_raise(Errno::EPIPE)
         expect(transport).to receive(:close).with(no_args)
-        expect { transport.send payload }.to raise_error HrrRbSsh::ClosedTransportError
+        expect { transport.send payload }.to raise_error HrrRbSsh::Error::ClosedTransport
       end
     end
 
     context "when sender raises unexpected error" do
-      it "closes transport and raises HrrRbSsh::ClosedTransportError" do
+      it "closes transport and raises HrrRbSsh::Error::ClosedTransport" do
         expect(mock_sender).to receive(:send).with(transport, payload).and_raise(RuntimeError)
         expect(transport).to receive(:close).with(no_args)
-        expect { transport.send payload }.to raise_error HrrRbSsh::ClosedTransportError
+        expect { transport.send payload }.to raise_error HrrRbSsh::Error::ClosedTransport
       end
     end
   end
@@ -246,8 +246,8 @@ RSpec.describe HrrRbSsh::Transport do
         transport.instance_variable_set('@closed', true)
       end
 
-      it "raises HrrRbSsh::ClosedTransportError" do
-        expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+      it "raises HrrRbSsh::Error::ClosedTransport" do
+        expect { transport.receive }.to raise_error HrrRbSsh::Error::ClosedTransport
       end
     end
 
@@ -269,10 +269,10 @@ RSpec.describe HrrRbSsh::Transport do
           HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
         }
 
-        it "closes transport and raises ClosedTransportError" do
+        it "closes transport and raises Error::ClosedTransport" do
           expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
           expect(transport).to receive(:close).with(no_args)
-          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+          expect { transport.receive }.to raise_error HrrRbSsh::Error::ClosedTransport
         end
       end
 
@@ -353,7 +353,7 @@ RSpec.describe HrrRbSsh::Transport do
         it "closes transport" do
           expect(mock_receiver).to receive(:receive).with(transport).and_raise(EOFError).once
           expect(transport).to receive(:close).with(no_args)
-          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+          expect { transport.receive }.to raise_error HrrRbSsh::Error::ClosedTransport
         end
       end
 
@@ -361,7 +361,7 @@ RSpec.describe HrrRbSsh::Transport do
         it "closes transport" do
           expect(mock_receiver).to receive(:receive).with(transport).and_raise(IOError).once
           expect(transport).to receive(:close).with(no_args)
-          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+          expect { transport.receive }.to raise_error HrrRbSsh::Error::ClosedTransport
         end
       end
 
@@ -369,7 +369,7 @@ RSpec.describe HrrRbSsh::Transport do
         it "closes transport" do
           expect(mock_receiver).to receive(:receive).with(transport).and_raise(Errno::ECONNRESET).once
           expect(transport).to receive(:close).with(no_args)
-          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+          expect { transport.receive }.to raise_error HrrRbSsh::Error::ClosedTransport
         end
       end
 
@@ -377,7 +377,7 @@ RSpec.describe HrrRbSsh::Transport do
         it "closes transport" do
           expect(mock_receiver).to receive(:receive).with(transport).and_raise(RuntimeError).once
           expect(transport).to receive(:close).with(no_args)
-          expect { transport.receive }.to raise_error HrrRbSsh::ClosedTransportError
+          expect { transport.receive }.to raise_error HrrRbSsh::Error::ClosedTransport
         end
       end
     end

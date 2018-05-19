@@ -158,7 +158,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
         context "when connection is closed" do
           it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
-            expect(channel).to receive(:send_channel_eof).with(no_args).and_raise(HrrRbSsh::ClosedConnectionError).once
+            expect(channel).to receive(:send_channel_eof).with(no_args).and_raise(HrrRbSsh::Error::ClosedConnection).once
             expect { channel.close from=:channel_type_instance }.not_to raise_error
             expect(channel.instance_variable_get('@closed')).to be true
             expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true

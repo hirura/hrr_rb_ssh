@@ -6,7 +6,7 @@ require 'hrr_rb_ssh/version'
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/message'
-require 'hrr_rb_ssh/closed_transport_error'
+require 'hrr_rb_ssh/error/closed_transport'
 require 'hrr_rb_ssh/transport/constant'
 require 'hrr_rb_ssh/transport/direction'
 require 'hrr_rb_ssh/transport/sequence_number'
@@ -92,17 +92,17 @@ module HrrRbSsh
         rescue Errno::EPIPE => e
           @logger.warn { "IO is Broken PIPE" }
           close
-          raise ClosedTransportError
+          raise Error::ClosedTransport
         rescue => e
           @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           close
-          raise ClosedTransportError
+          raise Error::ClosedTransport
         end
       end
     end
 
     def receive
-      raise ClosedTransportError if @closed
+      raise Error::ClosedTransport if @closed
       @receiver_monitor.synchronize do
         begin
           payload = @receiver.receive self
@@ -112,7 +112,7 @@ module HrrRbSsh
             @logger.debug { "received disconnect message: #{message.inspect}" }
             @disconnected = true
             close
-            raise ClosedTransportError
+            raise Error::ClosedTransport
           when Message::SSH_MSG_IGNORE::VALUE
             message = Message::SSH_MSG_IGNORE.decode payload
             @logger.debug { "received ignore message: #{message.inspect}" }
@@ -136,23 +136,23 @@ module HrrRbSsh
           else
             payload
           end
-        rescue ClosedTransportError
-          raise ClosedTransportError
+        rescue Error::ClosedTransport
+          raise Error::ClosedTransport
         rescue EOFError => e
           close
-          raise ClosedTransportError
+          raise Error::ClosedTransport
         rescue IOError => e
           @logger.warn { "IO is closed" }
           close
-          raise ClosedTransportError
+          raise Error::ClosedTransport
         rescue Errno::ECONNRESET => e
           @logger.warn { "IO is RESET" }
           close
-          raise ClosedTransportError
+          raise Error::ClosedTransport
         rescue => e
           @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           close
-          raise ClosedTransportError
+          raise Error::ClosedTransport
         end
       end
     end

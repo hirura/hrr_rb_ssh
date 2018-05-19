@@ -2,6 +2,8 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
-  class ClosedAuthenticationError < StandardError
+  class Error
+    class ClosedConnection < Error
+    end
   end
 end

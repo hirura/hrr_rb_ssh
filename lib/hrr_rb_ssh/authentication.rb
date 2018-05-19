@@ -3,7 +3,7 @@
 
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/message'
-require 'hrr_rb_ssh/closed_authentication_error'
+require 'hrr_rb_ssh/error/closed_authentication'
 require 'hrr_rb_ssh/authentication/authenticator'
 require 'hrr_rb_ssh/authentication/method'
 
@@ -25,20 +25,20 @@ module HrrRbSsh
     end
 
     def send payload
-      raise ClosedAuthenticationError if @closed
+      raise Error::ClosedAuthentication if @closed
       begin
         @transport.send payload
-      rescue ClosedTransportError
-        raise ClosedAuthenticationError
+      rescue Error::ClosedTransport
+        raise Error::ClosedAuthentication
       end
     end
 
     def receive
-      raise ClosedAuthenticationError if @closed
+      raise Error::ClosedAuthentication if @closed
       begin
         @transport.receive
-      rescue ClosedTransportError
-        raise ClosedAuthenticationError
+      rescue Error::ClosedTransport
+        raise Error::ClosedAuthentication
       end
     end
 
@@ -58,7 +58,7 @@ module HrrRbSsh
     end
 
     def username
-      raise ClosedAuthenticationError if @closed
+      raise Error::ClosedAuthentication if @closed
       @username
     end
 
