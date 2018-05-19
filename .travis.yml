@@ -11,14 +11,11 @@ rvm:
   - 2.4
   - 2.5
   - ruby-head
-  - rubinius-3
 os:
   - linux
-  - osx
 matrix:
   allow_failures:
     - rvm: ruby-head
-    - rvm: rbx
 before_install:
   - gem update --system --no-document
   - gem update --no-document
@@ -26,18 +23,10 @@ install:
   - gem install bundler --no-document
   - bundle install --path vendor/bundle
 before_script:
-  - |
-    if [ "$TRAVIS_OS_NAME" = "linux" ]
-    then
-      curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-      chmod +x ./cc-test-reporter
-      ./cc-test-reporter before-build
-    fi
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 script:
   - bundle exec rake spec
 after_script:
-  - |
-    if [ "$TRAVIS_OS_NAME" = "linux" ]
-    then
-      ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-    fi
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
