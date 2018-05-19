@@ -24,12 +24,6 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Algorithm::SshDss do
     end
   end
 
-  describe "::DIGEST" do
-    it "is available" do
-      expect( described_class::DIGEST ).to eq digest
-    end
-  end
-
   describe '#verify_public_key' do
     let(:public_key_algorithm_name){ name }
     let(:public_key_str){
@@ -67,12 +61,6 @@ IB56R9izS1t636kxnJTYNGQY+XvjAeuP7nC2WVNHNz7vXprT4Sq+hQaNkaKPu/3/
           expect(algorithm.verify_public_key public_key_algorithm_name, public_key_str, public_key_blob).to be true
         end
       end
-
-      context "when public_key is an instance of OpenSSL::PKey::DSA" do
-        it "returns true" do
-          expect(algorithm.verify_public_key public_key_algorithm_name, public_key, public_key_blob).to be true
-        end
-      end
     end
 
     context "with incorrect arguments" do
@@ -80,7 +68,7 @@ IB56R9izS1t636kxnJTYNGQY+XvjAeuP7nC2WVNHNz7vXprT4Sq+hQaNkaKPu/3/
         let(:incorrect_public_key_algorithm_name){ 'incorrect' }
 
         it "returns false" do
-          expect(algorithm.verify_public_key incorrect_public_key_algorithm_name, public_key, public_key_blob).to be false
+          expect(algorithm.verify_public_key incorrect_public_key_algorithm_name, public_key_str, public_key_blob).to be false
         end
       end
 
@@ -96,7 +84,7 @@ IB56R9izS1t636kxnJTYNGQY+XvjAeuP7nC2WVNHNz7vXprT4Sq+hQaNkaKPu/3/
         let(:incorrect_public_key_blob){ String.new }
 
         it "returns false" do
-          expect(algorithm.verify_public_key public_key_algorithm_name, public_key, incorrect_public_key_blob).to be false
+          expect(algorithm.verify_public_key public_key_algorithm_name, public_key_str, incorrect_public_key_blob).to be false
         end
       end
     end

@@ -26,24 +26,6 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Algorithm::EcdsaSha2
     end
   end
 
-  describe "::DIGEST" do
-    it "is available" do
-      expect( described_class::DIGEST ).to eq digest
-    end
-  end
-
-  describe "::IDENTIFIER" do
-    it "is available" do
-      expect( described_class::IDENTIFIER ).to eq identifier
-    end
-  end
-
-  describe "::CURVE_NAME" do
-    it "is available" do
-      expect( described_class::CURVE_NAME ).to eq curve_name
-    end
-  end
-
   describe '#verify_public_key' do
     let(:public_key_algorithm_name){ name }
     let(:public_key_str){
@@ -73,12 +55,6 @@ Gelm/QWH974Nb01akww=
           expect(algorithm.verify_public_key public_key_algorithm_name, public_key_str, public_key_blob).to be true
         end
       end
-
-      context "when public_key is an instance of OpenSSL::PKey::EC" do
-        it "returns true" do
-          expect(algorithm.verify_public_key public_key_algorithm_name, public_key, public_key_blob).to be true
-        end
-      end
     end
 
     context "with incorrect arguments" do
@@ -86,7 +62,7 @@ Gelm/QWH974Nb01akww=
         let(:incorrect_public_key_algorithm_name){ 'incorrect' }
 
         it "returns false" do
-          expect(algorithm.verify_public_key incorrect_public_key_algorithm_name, public_key, public_key_blob).to be false
+          expect(algorithm.verify_public_key incorrect_public_key_algorithm_name, public_key_str, public_key_blob).to be false
         end
       end
 
@@ -102,7 +78,7 @@ Gelm/QWH974Nb01akww=
         let(:incorrect_public_key_blob){ String.new }
 
         it "returns false" do
-          expect(algorithm.verify_public_key public_key_algorithm_name, public_key, incorrect_public_key_blob).to be false
+          expect(algorithm.verify_public_key public_key_algorithm_name, public_key_str, incorrect_public_key_blob).to be false
         end
       end
     end

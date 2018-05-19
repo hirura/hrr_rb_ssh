@@ -5,16 +5,16 @@ require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
-  class Transport
-    class ServerHostKeyAlgorithm
-      class EcdsaSha2Nistp256
-        module EcdsaSignatureBlob
+  module Algorithm
+    class Publickey
+      class SshDss
+        module Signature
           class << self
             include Codable
           end
           DEFINITION = [
-            [DataType::Mpint, :'r'],
-            [DataType::Mpint, :'s'],
+            [DataType::String, :'public key algorithm name'],
+            [DataType::String, :'signature blob'],
           ]
         end
       end
