@@ -160,4 +160,39 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
       end
     end
   end
+
+  context "when 'method name' is \"keyboard-interactive\"" do
+    let(:message){
+      {
+        :'message number' => value,
+        :'user name'      => 'rspec',
+        :'service name'   => 'ssh-connection',
+        :'method name'    => 'keyboard-interactive',
+        :'language tag'   => '',
+        :'submethods'     => '',
+      }
+    }
+    let(:payload){
+      [
+        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataType::String.encode(message[:'user name']),
+        HrrRbSsh::DataType::String.encode(message[:'service name']),
+        HrrRbSsh::DataType::String.encode(message[:'method name']),
+        HrrRbSsh::DataType::String.encode(message[:'language tag']),
+        HrrRbSsh::DataType::String.encode(message[:'submethods']),
+      ].join
+    }
+
+    describe ".encode" do
+      it "returns payload encoded" do
+        expect(described_class.encode(message)).to eq payload
+      end
+    end
+
+    describe ".decode" do
+      it "returns message decoded" do
+        expect(described_class.decode(payload)).to eq message
+      end
+    end
+  end
 end

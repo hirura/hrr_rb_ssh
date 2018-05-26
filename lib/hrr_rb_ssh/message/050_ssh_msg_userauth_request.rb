@@ -43,11 +43,19 @@ module HrrRbSsh
         [DataType::String,    :'plaintext password'],
       ]
 
+      KEYBOARD_INTERACTIVE_DEFINITION = [
+        #[DataType, Field Name]
+        #[DataType::String,   :'method name' : "keyboard-interactive"],
+        [DataType::String,    :'language tag'],
+        [DataType::String,    :'submethods'],
+      ]
+
       CONDITIONAL_DEFINITION = {
         # Field Name => {Field Value => Conditional Definition}
         :'method name' => {
-          "publickey" => PUBLICKEY_DEFINITION,
-          "password"  => PASSWORD_DEFINITION,
+          "publickey"             => PUBLICKEY_DEFINITION,
+          "password"              => PASSWORD_DEFINITION,
+          "keyboard-interactive"  => KEYBOARD_INTERACTIVE_DEFINITION,
         },
         :'with signature' => {
           true => PUBLICKEY_SIGNATURE_DEFINITION,
