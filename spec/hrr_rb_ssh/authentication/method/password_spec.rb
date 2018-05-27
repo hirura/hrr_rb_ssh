@@ -3,6 +3,7 @@
 
 RSpec.describe HrrRbSsh::Authentication::Method::Password do
   let(:name){ 'password' }
+  let(:transport){ 'dummy' }
 
   it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
     expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
@@ -17,9 +18,9 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password do
   end           
 
   describe ".new" do
-    it "can take one argument: options" do
-      expect { described_class.new({}) }.not_to raise_error
-    end
+    it "takes two arguments: transport and options" do
+      expect { described_class.new(transport, {}) }.not_to raise_error
+    end     
   end
 
   describe "#authenticate" do
@@ -32,7 +33,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password do
 
     context "when options does not have 'authentication_password_authenticator'" do
       let(:options){ {} }
-      let(:password_method){ described_class.new options }
+      let(:password_method){ described_class.new transport, options }
 
       it "returns false" do
         expect( password_method.authenticate userauth_request_message ).to be false
@@ -45,7 +46,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password do
           'authentication_password_authenticator' => HrrRbSsh::Authentication::Authenticator.new { true }
         }
       }
-      let(:password_method){ described_class.new options }
+      let(:password_method){ described_class.new transport, options }
 
       it "returns true" do
         expect( password_method.authenticate userauth_request_message ).to be true
@@ -59,7 +60,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password do
             'authentication_password_authenticator' => HrrRbSsh::Authentication::Authenticator.new { |context| context.verify "username", "password" }
           }
         }
-        let(:password_method){ described_class.new options }
+        let(:password_method){ described_class.new transport, options }
 
         it "returns true" do
           expect( password_method.authenticate userauth_request_message ).to be true
@@ -72,7 +73,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password do
             'authentication_password_authenticator' => HrrRbSsh::Authentication::Authenticator.new { |context| context.verify "mismatch", "mismatch" }
           }
         }
-        let(:password_method){ described_class.new options }
+        let(:password_method){ described_class.new transport, options }
 
         it "returns false" do
           expect( password_method.authenticate userauth_request_message ).to be false

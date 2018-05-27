@@ -69,7 +69,7 @@ module HrrRbSsh
         when Message::SSH_MSG_USERAUTH_REQUEST::VALUE
           userauth_request_message = Message::SSH_MSG_USERAUTH_REQUEST.decode payload
           method_name = userauth_request_message[:'method name']
-          method = Method[method_name].new({'session id' => @transport.session_id}.merge(@options))
+          method = Method[method_name].new(@transport, {'session id' => @transport.session_id}.merge(@options))
           result = method.authenticate(userauth_request_message)
           case result
           when TrueClass

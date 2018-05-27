@@ -3,6 +3,7 @@
 
 RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
   let(:name){ 'publickey' }
+  let(:transport){ 'dummy' }
 
   it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
     expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
@@ -24,12 +25,12 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
       'authentication_publickey_authenticator' => authentication_publickey_authenticator,
     }
   }
-  let(:publickey){ described_class.new(options) }
+  let(:publickey){ described_class.new(transport, options) }
 
   describe ".new" do
-    it "can take one argument: options" do
-      expect { publickey }.not_to raise_error
-    end
+    it "takes two arguments: transport and options" do
+      expect { described_class.new(transport, {}) }.not_to raise_error
+    end     
 
     it "stores @session_id" do
       expect(publickey.instance_variable_get('@session_id')).to be session_id

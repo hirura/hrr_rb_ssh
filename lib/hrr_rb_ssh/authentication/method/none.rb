@@ -10,7 +10,7 @@ module HrrRbSsh
         NAME = 'none'
         PREFERENCE = 0
 
-        def initialize options
+        def initialize transport, options
           @logger = Logger.new(self.class.name)
           @authenticator = options.fetch( 'authentication_none_authenticator', Authenticator.new { false } )
         end

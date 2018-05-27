@@ -10,7 +10,7 @@ module HrrRbSsh
         NAME = 'password'
         PREFERENCE = 10
 
-        def initialize options
+        def initialize transport, options
           @logger = Logger.new(self.class.name)
           @authenticator = options.fetch( 'authentication_password_authenticator', Authenticator.new { false } )
         end

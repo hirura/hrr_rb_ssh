@@ -10,7 +10,7 @@ module HrrRbSsh
         NAME = 'publickey'
         PREFERENCE = 20
 
-        def initialize options
+        def initialize transport, options
           @logger = Logger.new(self.class.name)
           @session_id = options['session id']
           @authenticator = options.fetch( 'authentication_publickey_authenticator', Authenticator.new { false } )
