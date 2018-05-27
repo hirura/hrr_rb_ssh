@@ -19,6 +19,7 @@ hrr_rb_ssh is a pure Ruby SSH 2.0 server implementation.
         - [Defining authentications](#defining-authentications)
             - [Password authentication](#password-authentication)
             - [Publickey authentication](#publickey-authentication)
+            - [Keyboard-interactive authentication](#keyboard-interactive-authentication)
             - [None authentication (NOT recomended)](#none-authentication-not-recomended)
         - [Handling session channel requests](#handling-session-channel-requests)
             - [Reference request handlers](#reference-request-handlers)
@@ -180,9 +181,38 @@ The `context` variable in public key authentication context provides the `#verif
 
 And public keys that is in OpenSSH public key format is now available. To use OpenSSH public keys, it is easy to use $USER_HOME/.ssh/authorized_keys file.
 
+##### Keyboard-interactive authentication
+
+The third one is keyboard-interactive authentication. This is also known as challenge-response authentication.
+
+To define a keyboard-interactive authentication, the `HrrRbSsh::Authentication::Authenticator.new { |context| ... }` block is used as well.  When the block returns `true`, then the authentication succeeded as well. However, `context` variable behaves differently.
+
+```ruby
+auth_keyboard_interactive = HrrRbSsh::Authentication::Authenticator.new { |context|
+  user_name        = 'user1'
+  req_name         = 'demo keyboard interactive authentication'
+  req_instruction  = 'demo instruction'
+  req_language_tag = ''
+  req_prompts = [
+    #[prompt[n], echo[n]]
+    ['Password1: ', false],
+    ['Password2: ', true],
+  ]
+  info_response = context.info_request req_name, req_instruction, req_language_tag, req_prompts
+  context.username == user_name && info_response.responses == ['password1', 'password2']
+}
+options['authentication_keyboard_interactive_authenticator'] = auth_keyboard_interactive
+```
+
+The `context` variable in keyboard-interactive authentication context does NOT provides the `#verify` method. Instead, `#info_request` method is available. Since keyboard-interactive authentication has multiple times interactions between server and client, the values in responses needs to be verified respectively.
+
+The `#info_request` method takes four arguments: name, instruction, language tag, and prompts. The name, instruction, and language tag can be empty string. The prompts needs to have at least one charactor for prompt message, and `true` or `false` value to specify whether echo back is enabled or not.
+
+The responses are listed in the same order as request prompts.
+
 ##### None authentication (NOT recomended)
 
-The third one is none authentication. None authentication is usually NOT used.
+The last one is none authentication. None authentication is usually NOT used.
 
 To define a none authentication, the `HrrRbSsh::Authentication::Authenticator.new { |context| ... }` block is used as well.  When the block returns `true`, then the authentication succeeded as well. However, `context` variable behaves differently.
 
@@ -316,6 +346,7 @@ The following features are currently supported.
     - ecdsa-sha2-nistp256
     - ecdsa-sha2-nistp384
     - ecdsa-sha2-nistp521
+- Keyboard interactive (generic interactive / challenge response) authentication
 
 ### Transport layer
 
