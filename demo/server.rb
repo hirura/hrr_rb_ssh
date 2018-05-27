@@ -46,6 +46,19 @@ def start_service io, logger=nil
       context.verify user, pass
     }
   }
+  auth_keyboard_interactive = HrrRbSsh::Authentication::Authenticator.new { |context|
+    user_name        = 'user1'
+    req_name         = 'demo keyboard interactive authentication'
+    req_instruction  = 'demo instruction'
+    req_language_tag = ''
+    req_prompts = [
+      #[prompt[n], echo[n]]
+      ['Password1: ', false],
+      ['Password2: ', true],
+    ]
+    info_response = context.info_request req_name, req_instruction, req_language_tag, req_prompts
+    context.username == user_name && info_response.responses == ['password1', 'password2']
+  }
 
 
   options = {}
@@ -65,9 +78,10 @@ OfeosJOO9twerD7pPhmXREkygblPsEXaVA==
 -----END EC PRIVATE KEY-----
   EOB
 
-  options['authentication_none_authenticator']      = auth_none
-  options['authentication_publickey_authenticator'] = auth_publickey
-  options['authentication_password_authenticator']  = auth_password
+  options['authentication_none_authenticator']                 = auth_none
+  options['authentication_publickey_authenticator']            = auth_publickey
+  options['authentication_password_authenticator']             = auth_password
+  options['authentication_keyboard_interactive_authenticator'] = auth_keyboard_interactive
 
   options['connection_channel_request_pty_req']       = HrrRbSsh::Connection::RequestHandler::ReferencePtyReqRequestHandler.new
   options['connection_channel_request_env']           = HrrRbSsh::Connection::RequestHandler::ReferenceEnvRequestHandler.new
