@@ -7,6 +7,8 @@
 
 hrr_rb_ssh is a pure Ruby SSH 2.0 server implementation.
 
+With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible to write an original server side application on secure connection provided by SSH protocol.
+
 ## Table of Contents
 
 - [Installation](#installation)
