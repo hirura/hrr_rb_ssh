@@ -2,6 +2,7 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
+  # DataType is a parent class of classes that provide methods to convert value and binary string each other.
   class DataType
   end
 end
