@@ -3,7 +3,13 @@
 
 module HrrRbSsh
   class DataType
+    # Boolean provides methods to convert boolean value and 8-bit unsigned binary string each other.
     class Boolean < DataType
+      # Convert boolean value info 8-bit unsigned binary string.
+      #
+      # @param [::Boolean] arg boolean value to be converted
+      # @raise [::ArgumentError] when arg is not true nor false
+      # @return [::String] converted 8-bit unsigned binary string
       def self.encode arg
         case arg
         when false
@@ -15,6 +21,10 @@ module HrrRbSsh
         end
       end
 
+      # Convert 8-bit unsigned binary into boolean value.
+      #
+      # @param [::IO] io IO instance that has buffer to be read
+      # @return [::Boolean] converted boolean value
       def self.decode io
         if 0 == io.read(1).unpack("C")[0]
           false
