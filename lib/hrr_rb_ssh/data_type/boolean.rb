@@ -5,7 +5,7 @@ module HrrRbSsh
   class DataType
     # Boolean provides methods to convert boolean value and 8-bit unsigned binary string each other.
     class Boolean < DataType
-      # Convert boolean value info 8-bit unsigned binary string.
+      # Convert boolean value into 8-bit unsigned binary string.
       #
       # @param [::Boolean] arg boolean value to be converted
       # @raise [::ArgumentError] when arg is not true nor false
