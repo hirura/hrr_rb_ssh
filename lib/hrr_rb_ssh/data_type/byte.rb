@@ -5,7 +5,7 @@ module HrrRbSsh
   class DataType
     # Byte provides methods to convert integer value and 8-bit unsigned binary string each other.
     class Byte < DataType
-      # Convert integer value info 8-bit unsigned binary string.
+      # Convert integer value into 8-bit unsigned binary string.
       #
       # @param [::Integer] arg integer value to be converted
       # @raise [::ArgumentError] when arg is not between 0x00 and 0xff
