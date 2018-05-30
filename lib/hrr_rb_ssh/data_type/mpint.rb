@@ -5,7 +5,13 @@ require 'openssl'
 
 module HrrRbSsh
   class DataType
+    # Mpint provides methods to convert integer value and multiple precision integer in two's complement as binary string each other.
     class Mpint < DataType
+      # Convert integer value into multiple precision integer in two's complement as binary string.
+      #
+      # @param [::Integer] arg integer value to be converted
+      # @raise [::ArgumentError] when arg is not an integer value
+      # @return [::String] converted multiple precision integer in two's complement as binary string
       def self.encode arg
         unless arg.kind_of? ::Integer
           raise ArgumentError, "must be a kind of Integer, but got #{arg.inspect}"
@@ -27,6 +33,10 @@ module HrrRbSsh
         end
       end
 
+      # Convert multiple precision integer in two's complement as binary string into integer value.
+      #
+      # @param [::IO] io IO instance that has buffer to be read
+      # @return [::Integer] converted integer value
       def self.decode io
         length = io.read(4).unpack("N")[0]
         hex_str = io.read(length).unpack("H*")[0]
