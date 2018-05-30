@@ -33,7 +33,7 @@ RSpec.describe HrrRbSsh::DataType::NameList do
           string_mock = double('string mock with length (0xffff_ffff + 1)')
 
           expect(array_mock).to receive(:kind_of?).with(Array).and_return(true).once
-          expect(array_mock).to receive(:map).with(any_args).and_return([::String]).once
+          expect(array_mock).to receive(:all?).with(any_args).and_return(true).once
           expect(array_mock).to receive(:join).with(',').and_return(string_mock).once
           expect(string_mock).to receive(:length).with(no_args).and_return(0xffff_ffff + 1).twice
 

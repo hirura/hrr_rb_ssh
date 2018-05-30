@@ -12,10 +12,10 @@ module HrrRbSsh
       # @raise [::ArgumentError] when arg array containes an instance of not string
       # @return [::String] converted binary string
       def self.encode arg
-        unless arg.kind_of? Array
+        unless arg.kind_of? ::Array
           raise ArgumentError, "must be a kind of Array, but got #{arg.inspect}"
         end
-        unless (arg.map(&:class) - [::String]).empty?
+        unless arg.all?{ |e| e.kind_of? ::String }
           raise ArgumentError, "must be with all elements of String, but got #{arg.inspect}"
         end
         joined_arg = arg.join(',')
