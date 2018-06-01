@@ -67,19 +67,13 @@ module HrrRbSsh
                   }
                   chain.call_next
                 ensure
+                  context.logger.info { "closing pty-req request handler chain_proc" }
                   context.vars[:ptm].close rescue nil
                   context.vars[:pts].close rescue nil
-                  begin
-                    ptm_read_thread.join
-                  rescue => e
-                    context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                  end
-                  begin
-                    ptm_write_thread.exit
-                    ptm_write_thread.join
-                  rescue => e
-                    context.logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                  end
+                  ptm_read_thread.join
+                  ptm_write_thread.exit
+                  ptm_write_thread.join
+                  context.logger.info { "pty-req request handler chain_proc closed" }
                 end
               }
             rescue => e
