@@ -14,10 +14,11 @@ module HrrRbSsh
     end
 
     def conditional_definition message
+      return [] unless self.const_defined? :CONDITIONAL_DEFINITION
       message.inject([]){ |a, (k,v)|
         field_name  = k
         field_value = if v.instance_of? ::Proc then v.call else v end
-        a + ((self::CONDITIONAL_DEFINITION rescue {}).fetch(field_name, {})[field_value] || [])
+        a + (self::CONDITIONAL_DEFINITION.fetch(field_name, {})[field_value] || [])
       }
     end
 
