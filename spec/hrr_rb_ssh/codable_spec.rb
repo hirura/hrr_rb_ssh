@@ -32,6 +32,12 @@ RSpec.describe HrrRbSsh::Codable do
           expect( mixed_in.encode( {:'message number' => 168, :'data' => lambda { 'testing' }} ) ).to eq( ["A8", "00000007", "testing"].pack("H*H*a*") )
         end
       end
+
+      context "when arg is not acceptable by data_type" do
+        it "raises an error" do
+          expect { mixed_in.encode( {:'message number' => 168, :'data' => nil} ) }.to raise_error ArgumentError
+        end
+      end
     end
 
     describe ".decode" do
@@ -79,6 +85,12 @@ RSpec.describe HrrRbSsh::Codable do
       context "when arg contains an instance of Proc" do
         it "encodes #{{:'message number' => 168, :'data' => lambda { 'testing' }, :'testing data' => lambda { 'conditional' }}.inspect} to \"A8 00 00 00 07 t e s t i n g 00 00 00 0B c o n d i t i o n a l\"" do
           expect( mixed_in.encode( {:'message number' => 168, :'data' => lambda { 'testing' }, :'testing data' => lambda { 'conditional' }} ) ).to eq( ["A8", "00000007", "testing", "0000000B", "conditional"].pack("H*H*a*H*a*") )
+        end
+      end
+
+      context "when arg is not acceptable by data_type" do
+        it "raises an error" do
+          expect { mixed_in.encode( {:'message number' => 168, :'data' => 'testing', :'testing data' => nil} ) }.to raise_error ArgumentError
         end
       end
     end
@@ -137,6 +149,12 @@ RSpec.describe HrrRbSsh::Codable do
           expect( mixed_in.encode( {:'message number' => 168, :'data' => lambda { 'testing' }, :'testing data' => lambda { 'conditional' }, :'chained data' => lambda { 'chained' }} ) ).to eq( ["A8", "00000007", "testing", "0000000B", "conditional", "00000007", "chained"].pack("H*H*a*H*a*H*a*") )
         end
       end
+
+      context "when arg is not acceptable by data_type" do
+        it "raises an error" do
+          expect { mixed_in.encode( {:'message number' => 168, :'data' => 'testing', :'testing data' => 'conditional', :'chained data' => nil} ) }.to raise_error ArgumentError
+        end
+      end
     end
 
     describe ".decode" do
@@ -184,6 +202,12 @@ RSpec.describe HrrRbSsh::Codable do
       context "when arg contains an instance of Proc" do
         it "encodes #{{:'message number' => 168, :'data' => lambda { 'testing' }, :'hidden data' => lambda { 'conditional' }}.inspect} with complementary message #{{:'require hidden' => lambda { true }}.inspect} to \"A8 00 00 00 07 t e s t i n g 00 00 00 0B c o n d i t i o n a l\"" do
           expect( mixed_in.encode( {:'message number' => 168, :'data' => lambda { 'testing' }, :'hidden data' => lambda { 'conditional' }}, {:'require hidden' => lambda { true }} ) ).to eq( ["A8", "00000007", "testing", "0000000B", "conditional"].pack("H*H*a*H*a*") )
+        end
+      end
+
+      context "when arg is not acceptable by data_type" do
+        it "raises an error" do
+          expect { mixed_in.encode( {:'message number' => 168, :'data' => 'testing', :'hidden data' => nil}, {:'require hidden' => true} ) }.to raise_error ArgumentError
         end
       end
     end
