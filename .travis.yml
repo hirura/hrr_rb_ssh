@@ -18,8 +18,9 @@ matrix:
   allow_failures:
     - rvm: ruby-head
 before_install:
+  - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  - gem install bundler -v '< 2'
 install:
-  - gem install bundler --no-document
   - bundle install --path vendor/bundle
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
