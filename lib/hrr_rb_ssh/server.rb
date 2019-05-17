@@ -8,16 +8,22 @@ require 'hrr_rb_ssh/connection'
 
 module HrrRbSsh
   class Server
-    def initialize io, options={}
-      @logger = Logger.new self.class.name
-      @transport      = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, options
-      @authentication = HrrRbSsh::Authentication.new @transport, options
-      @connection     = HrrRbSsh::Connection.new     @authentication, options
+    def self.start io, options={}
+      server = self.new options
+      server.start io
     end
 
-    def start
+    def initialize options={}
+      @logger = Logger.new self.class.name
+      @options = options
+    end
+
+    def start io
       @logger.info { "start server service" }
-      @connection.start
+      transport      = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, @options
+      authentication = HrrRbSsh::Authentication.new transport, @options
+      connection     = HrrRbSsh::Connection.new     authentication, @options
+      connection.start
     end
   end
 end

@@ -79,8 +79,8 @@ loop do
   Thread.new(server.accept) do |io|
     pid = fork do
       begin
-        server = HrrRbSsh::Server.new io, options
-        server.start
+        server = HrrRbSsh::Server.new options
+        server.start io
       ensure
         io.close
       end

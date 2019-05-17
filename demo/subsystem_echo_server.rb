@@ -47,8 +47,8 @@ def start_service io, logger=nil
   options['authentication_password_authenticator'] = auth_password
   options['connection_channel_request_subsystem']  = conn_echo
 
-  server = HrrRbSsh::Server.new io, options
-  server.start
+  server = HrrRbSsh::Server.new options
+  server.start io
 end
 
 logger = Logger.new STDOUT
