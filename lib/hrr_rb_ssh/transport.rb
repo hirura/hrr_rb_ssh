@@ -67,7 +67,7 @@ module HrrRbSsh
       @sender_monitor   = Monitor.new
       @receiver_monitor = Monitor.new
 
-      @local_version  = "SSH-2.0-HrrRbSsh-#{VERSION}".force_encoding(Encoding::ASCII_8BIT)
+      @local_version  = @options.delete('local_version') || "SSH-2.0-HrrRbSsh-#{VERSION}".force_encoding(Encoding::ASCII_8BIT)
       @remote_version = "".force_encoding(Encoding::ASCII_8BIT)
 
       @incoming_sequence_number = SequenceNumber.new
