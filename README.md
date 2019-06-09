@@ -321,6 +321,23 @@ p HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
 # => ["none", "zlib"]
 ```
 
+#### Hiding and/or simulating local SSH version
+
+By default, hrr_rb_ssh sends `SSH-2.0-HrrRbSsh-#{VERSION}` string at initial negotiation with remote peer. To address security concerns, it is possible to replace the version string.
+
+```ruby
+# Hiding version
+options['local_version'] = "SSH-2.0-HrrRbSsh"
+
+# Simulating OpenSSH
+options['local_version'] = "SSH-2.0-OpenSSH_x.x"
+
+# Simulating OpenSSH and hiding version
+options['local_version'] = "SSH-2.0-OpenSSH"
+```
+
+Please note that the beginning of the string must be `SSH-2.0-`. Otherwise SSH 2.0 remote peer cannot continue negotiation with the local peer.
+
 ### Demo
 
 The `demo/server.rb` shows a good example on how to use the hrr_rb_ssh library in SSH server mode.
