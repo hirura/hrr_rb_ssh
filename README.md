@@ -27,6 +27,7 @@ With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible
             - [Reference request handlers](#reference-request-handlers)
             - [Custom request handlers](#custom-request-handlers)
         - [Defining preferred algorithms (optional)](#defining-preferred-algorithms-optional)
+        - [Hiding and/or simulating local SSH version](#hiding-and-or-simulating-local-ssh-version)
     - [Demo](#demo)
 - [Supported Features](#supported-features)
     - [Connection layer](#connection-layer)
