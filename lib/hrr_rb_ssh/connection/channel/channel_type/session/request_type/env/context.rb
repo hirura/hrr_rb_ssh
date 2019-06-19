@@ -20,7 +20,7 @@ module HrrRbSsh
                   :variable_name,
                   :variable_value
 
-                def initialize proc_chain, username, io, variables, message
+                def initialize proc_chain, username, io, variables, message, session
                   @logger = Logger.new self.class.name
 
                   @proc_chain = proc_chain
@@ -28,6 +28,7 @@ module HrrRbSsh
                   @io         = io
                   @variables  = variables
                   @vars       = variables
+                  @session    = session
 
                   @variable_name  = message[:'variable name']
                   @variable_value = message[:'variable value']
@@ -35,6 +36,10 @@ module HrrRbSsh
 
                 def chain_proc &block
                   @proc = block || @proc
+                end
+
+                def close_session
+                  @session.close
                 end
               end
             end

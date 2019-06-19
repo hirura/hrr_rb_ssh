@@ -19,7 +19,7 @@ module HrrRbSsh
                   :vars,
                   :command
 
-                def initialize proc_chain, username, io, variables, message
+                def initialize proc_chain, username, io, variables, message, session
                   @logger = Logger.new self.class.name
 
                   @proc_chain = proc_chain
@@ -27,12 +27,17 @@ module HrrRbSsh
                   @io         = io
                   @variables  = variables
                   @vars       = variables
+                  @session    = session
 
                   @command = message[:'command']
                 end
 
                 def chain_proc &block
                   @proc = block || @proc
+                end
+
+                def close_session
+                  @session.close
                 end
               end
             end

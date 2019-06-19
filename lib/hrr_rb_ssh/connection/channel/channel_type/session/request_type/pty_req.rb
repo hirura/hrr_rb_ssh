@@ -13,10 +13,10 @@ module HrrRbSsh
             class PtyReq < RequestType
               NAME = 'pty-req'
 
-              def self.run proc_chain, username, io, variables, message, options
+              def self.run proc_chain, username, io, variables, message, options, session
                 logger = Logger.new self.class.name
 
-                context = Context.new proc_chain, username, io, variables, message
+                context = Context.new proc_chain, username, io, variables, message, session
                 handler = options.fetch('connection_channel_request_pty_req', RequestHandler.new {})
                 handler.run context
 
