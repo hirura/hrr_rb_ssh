@@ -14,13 +14,14 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
     let(:io){ 'dummy' }
     let(:variables){ Hash.new }
     let(:message){ Hash.new }
+    let(:session){ double('session') }
 
     context "when options does not have 'connection_channel_request_subsystem'" do
       let(:options){ Hash.new }
 
       it "calls proc_chain.connect" do
         expect( proc_chain ).to receive(:connect).with(nil).once
-        described_class.run proc_chain, username, io, variables, message, options
+        described_class.run proc_chain, username, io, variables, message, options, session
       end
     end
 
@@ -38,7 +39,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
 
       it "calls proc_chain.connect" do
         expect(proc_chain).to receive(:connect).with(chain_proc).once
-        described_class.run proc_chain, username, io, variables, message, options
+        described_class.run proc_chain, username, io, variables, message, options, session
       end
     end
   end

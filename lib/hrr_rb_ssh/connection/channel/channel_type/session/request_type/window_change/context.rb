@@ -22,7 +22,7 @@ module HrrRbSsh
                   :terminal_width_pixels,
                   :terminal_height_pixels
 
-                def initialize proc_chain, username, io, variables, message
+                def initialize proc_chain, username, io, variables, message, session
                   @logger = Logger.new self.class.name
 
                   @proc_chain = proc_chain
@@ -30,6 +30,7 @@ module HrrRbSsh
                   @io         = io
                   @variables  = variables
                   @vars       = variables
+                  @session    = session
 
                   @terminal_width_columns = message[:'terminal width, columns']
                   @terminal_height_rows   = message[:'terminal height, rows']
@@ -39,6 +40,10 @@ module HrrRbSsh
 
                 def chain_proc &block
                   @proc = block || @proc
+                end
+
+                def close_session
+                  @session.close
                 end
               end
             end

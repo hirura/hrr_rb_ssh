@@ -12,7 +12,7 @@ RSpec.describe HrrRbSsh::Connection::RequestHandler::ReferenceEnvRequestHandler 
     let(:request_handler){ described_class.new }
 
     let(:context){
-      HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Env::Context.new proc_chain, username, io, variables, message
+      HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Env::Context.new proc_chain, username, io, variables, message, session
     }
 
     let(:proc_chain){
@@ -32,6 +32,9 @@ RSpec.describe HrrRbSsh::Connection::RequestHandler::ReferenceEnvRequestHandler 
         :'variable name'  => variable_name,
         :'variable value' => variable_value,
       }
+    }
+    let(:session){
+      double('session')
     }
 
     let(:variable_name ){ 'variable name'  }

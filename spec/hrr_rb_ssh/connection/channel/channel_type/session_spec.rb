@@ -87,6 +87,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session do
         session.instance_variable_get('@variables'),
         channel_request_message,
         session.instance_variable_get('@connection').options,
+        session,
       ]
     }
 
