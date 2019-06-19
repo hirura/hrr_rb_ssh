@@ -12,7 +12,7 @@ RSpec.describe HrrRbSsh::Connection::RequestHandler::ReferenceWindowChangeReques
     let(:request_handler){ described_class.new }
 
     let(:context){
-      HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::WindowChange::Context.new proc_chain, username, io, variables, message
+      HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::WindowChange::Context.new proc_chain, username, io, variables, message, session
     }
 
     let(:proc_chain){
@@ -36,6 +36,9 @@ RSpec.describe HrrRbSsh::Connection::RequestHandler::ReferenceWindowChangeReques
         :'terminal width, pixels'  => 2000,
         :'terminal height, pixels' => 1000,
       }
+    }
+    let(:session){
+      double('session')
     }
 
     let(:ptm_pts){ PTY.open }

@@ -12,7 +12,7 @@ RSpec.describe HrrRbSsh::Connection::RequestHandler::ReferencePtyReqRequestHandl
     let(:request_handler){ described_class.new }
 
     let(:context){
-      HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::PtyReq::Context.new proc_chain, username, io, variables, message
+      HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::PtyReq::Context.new proc_chain, username, io, variables, message, session
     }
 
     let(:proc_chain){
@@ -36,6 +36,9 @@ RSpec.describe HrrRbSsh::Connection::RequestHandler::ReferencePtyReqRequestHandl
          :'terminal height, pixels'         => 1000,
          :'encoded terminal modes'          => 'dummy encoded term modes',
       }
+    }
+    let(:session){
+      double('session')
     }
 
     let(:chain){

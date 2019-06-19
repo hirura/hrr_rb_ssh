@@ -16,10 +16,11 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
       :'variable value'    => 'variable value',
     }
   }
-  let(:context){ described_class.new proc_chain, username, io, variables, message }
+  let(:session){ double('session') }
+  let(:context){ described_class.new proc_chain, username, io, variables, message, session }
 
   describe ".new" do
-    it "takes 5 arguments" do
+    it "takes 6 arguments" do
       expect { context }.not_to raise_error
     end
   end
@@ -41,6 +42,13 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
         context.chain_proc
         expect(context.chain_proc).to be nil
       end
+    end
+  end
+
+  describe "#close_session" do
+    it "closes session" do
+      expect(session).to receive(:close).once
+      context.close_session
     end
   end
 
