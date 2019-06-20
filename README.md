@@ -161,6 +161,8 @@ The `context` variable in password authentication context provides the following
 
 - `#username` : The username that a remote user tries to authenticate
 - `#password` : The password that a remote user tries to authenticate
+- `#variables` : A hash instance that is shared in each authenticator and subsequent session channel request handlers
+- `#vars` : The same object that `#variables` returns
 - `#verify(username, password)` : Returns `true` when username and password arguments match with the context's username and password. Or returns `false` when username and password arguments don't match.
 
 ##### Publickey authentication
@@ -277,6 +279,8 @@ In `HrrRbSsh::Connection::RequestHandler.new` block, context variable basically 
 - `#io => [in, out, err]` : `in` is readable and read data is sent by remote. `out` and `err` are writable. `out` is for standard output and written data is sent as channel data. `err` is for standard error and written data is sent as channel extended data.
 - `#chain_proc => {|chain| ... }` : When a session channel is opened, a background thread is started and is waitng for a chained block registered. This `#chain_proc` is used to define how to handle subsequent communications between local and remote. The `chain` variable provides `#call_next` method. In `#proc_chain` block, it is possible to call subsequent block that is defined in another request handler. For instance, shell request must called after pty-req request. The `chain` in pty-req request handler's `#chain_proc` calls `#next_proc` and then subsequent shell request handler's `#chain_proc` will be called.
 - `#close_session` : In most cases, input and output between a client and the server is handled in `#chain_proc` and closing the `#chain_proc` block will lead closing the underlying session channel. This means that to close the underlying session channel it is required to write at least one `#chain_proc` block. If it is not required to use `#chain_proc` block or is required to close the underlying session channel from outside of `#chain_proc` block, `#close_session` can be used. The `#close_session` will close the background thread that calls `#chain_proc` blocks.
+- `#variables => Hash` : A hash instance that is passed from authenticator and is shared in subsequent session channel request handlers
+- `#vars` : The same object that `#variables` returns
 
 And request handler's `context` variable also provides additional methods based on request type. See `lib/hrr_rb_ssh/connection/channel/channel_type/session/request_type/<request type>/context.rb`.
 

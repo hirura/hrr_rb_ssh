@@ -5,7 +5,8 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive::Context do
   let(:context_transport){ double('transport') }
   let(:context_username){ "username" }
   let(:context_submethods){ "submethods" }
-  let(:context){ described_class.new context_transport, context_username, context_submethods }
+  let(:context_variables){ {} }
+  let(:context){ described_class.new context_transport, context_username, context_submethods, context_variables }
 
   describe ".new" do
     it "takes three arguments: transport, username and submethods" do
@@ -22,6 +23,18 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive::Context do
   describe "#submethods" do
     it "returns \"submethods\"" do
       expect( context.submethods ).to eq context_submethods
+    end
+  end
+
+  describe "#variables" do
+    it "returns \"variables\"" do
+      expect( context.variables ).to be context_variables
+    end
+  end
+
+  describe "#vars" do
+    it "returns \"variables\"" do
+      expect( context.vars ).to be context_variables
     end
   end
 

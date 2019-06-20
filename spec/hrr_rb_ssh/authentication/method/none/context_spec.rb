@@ -2,24 +2,40 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Authentication::Method::None::Context do
+  let(:context_username){ 'username' }
+  let(:context_variables){ {} }
+  let(:context){ described_class.new context_username, context_variables }
+
   describe ".new" do
     it "takes one argument: username" do
-      expect { described_class.new "username" }.not_to raise_error
+      expect { context }.not_to raise_error
     end
   end
 
   describe "#username" do
     let(:context_username){ "username" }
-    let(:context){ described_class.new context_username }
+    let(:context){ described_class.new context_username, context_variables }
 
     it "returns \"username\"" do
       expect( context.username ).to eq context_username
     end
   end
 
+  describe "#variables" do
+    it "returns \"variables\"" do
+      expect( context.variables ).to be context_variables
+    end
+  end
+
+  describe "#vars" do
+    it "returns \"variables\"" do
+      expect( context.vars ).to be context_variables
+    end
+  end
+
   describe "#verify" do
     let(:context_username){ "username" }
-    let(:context){ described_class.new context_username }
+    let(:context){ described_class.new context_username, context_variables }
     
     context "with \"username\"" do
       let(:username){ "username" }

@@ -2,16 +2,21 @@
 # vim: et ts=2 sw=2
 
 RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
+  let(:context_username){ 'username' }
+  let(:context_password){ 'password' }
+  let(:context_variables){ {} }
+  let(:context){ described_class.new context_username, context_password, context_variables }
+
   describe ".new" do
     it "takes two arguments: username and password" do
-      expect { described_class.new "username", "password" }.not_to raise_error
+      expect { context }.not_to raise_error
     end
   end
 
   describe "#username" do
     let(:context_username){ "username" }
     let(:context_password){ "password" }
-    let(:context){ described_class.new context_username, context_password }
+    let(:context){ described_class.new context_username, context_password, context_variables }
 
     it "returns \"username\"" do
       expect( context.username ).to eq context_username
@@ -21,17 +26,29 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
   describe "#password" do
     let(:context_username){ "username" }
     let(:context_password){ "password" }
-    let(:context){ described_class.new context_username, context_password }
+    let(:context){ described_class.new context_username, context_password, context_variables }
 
     it "returns \"password\"" do
       expect( context.password ).to eq context_password
     end
   end
 
+  describe "#variables" do
+    it "returns \"variables\"" do
+      expect( context.variables ).to be context_variables
+    end
+  end
+
+  describe "#vars" do
+    it "returns \"variables\"" do
+      expect( context.vars ).to be context_variables
+    end
+  end
+
   describe "#verify" do
     let(:context_username){ "username" }
     let(:context_password){ "password" }
-    let(:context){ described_class.new context_username, context_password }
+    let(:context){ described_class.new context_username, context_password, context_variables }
     
     context "with \"username\" and \"password\"" do
       let(:username){ "username" }

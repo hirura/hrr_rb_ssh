@@ -19,7 +19,8 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Context do
       :'signature'                 => "signature",
     }
   }
-  let(:context){ described_class.new username, algorithm, session_id, message }
+  let(:context_variables){ {} }
+  let(:context){ described_class.new username, algorithm, session_id, message, context_variables }
 
   describe ".new" do
     it "takes four arguments: username, algorithm, session_id, message" do
@@ -78,6 +79,18 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Context do
   describe "#signature" do
     it "returns \"signature\"" do
       expect( context.signature ).to eq "signature"
+    end
+  end
+
+  describe "#variables" do
+    it "returns \"variables\"" do
+      expect( context.variables ).to be context_variables
+    end
+  end
+
+  describe "#vars" do
+    it "returns \"variables\"" do
+      expect( context.vars ).to be context_variables
     end
   end
 
