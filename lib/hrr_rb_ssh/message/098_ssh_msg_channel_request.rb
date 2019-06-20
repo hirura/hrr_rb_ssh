@@ -89,7 +89,7 @@ module HrrRbSsh
       ID    = self.name.split('::').last
       VALUE = 98
 
-      TERMINAL_MODE_INV = TerminalMode.constants.map{|c| [TerminalMode.const_get(c), c.to_s]}.to_h
+      TERMINAL_MODE_INV = TerminalMode.constants.map{|c| [TerminalMode.const_get(c), c.to_s]}.inject(Hash.new){ |h, (k, v)| h.update({k => v}) }
 
       DEFINITION = [
         #[DataType, Field Name]

@@ -30,7 +30,7 @@ module HrrRbSsh
               [
                 [:"prompt[#{i+1}]", prompt],
                 [:"echo[#{i+1}]",   echo],
-              ].to_h
+              ].inject(Hash.new){ |h, (k, v)| h.update({k => v}) }
             }.inject(Hash.new){ |a, b| a.merge(b) }
             message.merge(message_prompts)
           end

@@ -58,9 +58,9 @@ module HrrRbSsh
 
     def decode payload, complementary_message={}
       payload_io = StringIO.new payload
-      decoded_message = decode_recursively(payload_io).to_h
+      decoded_message = decode_recursively(payload_io).inject(Hash.new){ |h, (k, v)| h.update({k => v}) }
       if complementary_message.any?
-        decoded_message.merge! decode_recursively(payload_io, complementary_message.to_a).to_h
+        decoded_message.merge! decode_recursively(payload_io, complementary_message.to_a).inject(Hash.new){ |h, (k, v)| h.update({k => v}) }
       end
       logger.debug { 'decoded message: ' + decoded_message.inspect }
       decoded_message
