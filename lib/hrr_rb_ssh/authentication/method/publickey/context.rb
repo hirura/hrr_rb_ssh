@@ -11,6 +11,8 @@ module HrrRbSsh
           attr_reader \
             :username,
             :session_id,
+            :variables,
+            :vars,
             :message_number,
             :service_name,
             :method_name,
@@ -19,11 +21,13 @@ module HrrRbSsh
             :public_key_blob,
             :signature
 
-          def initialize username, algorithm, session_id, message
+          def initialize username, algorithm, session_id, message, variables
             @username   = username
             @algorithm  = algorithm
             @session_id = session_id
             @message    = message
+            @variables  = variables
+            @vars       = variables
 
             @message_number            = message[:'message number']
             @service_name              = message[:'service name']

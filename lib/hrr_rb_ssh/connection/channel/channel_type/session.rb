@@ -14,7 +14,6 @@ module HrrRbSsh
             @logger = Logger.new self.class.name
             @connection = connection
             @channel = channel
-            @variables = {}
             @proc_chain = ProcChain.new
           end
 
@@ -30,7 +29,7 @@ module HrrRbSsh
 
           def request message
             request_type = message[:'request type']
-            RequestType[request_type].run @proc_chain, @connection.username, @channel.io, @variables, message, @connection.options, self
+            RequestType[request_type].run @proc_chain, @connection.username, @channel.io, @connection.variables, message, @connection.options, self
           end
 
           def proc_chain_thread

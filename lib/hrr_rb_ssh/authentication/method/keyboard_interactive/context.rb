@@ -13,12 +13,16 @@ module HrrRbSsh
           attr_reader \
             :username,
             :submethods,
-            :info_response
+            :info_response,
+            :variables,
+            :vars
 
-          def initialize transport, username, submethods
+          def initialize transport, username, submethods, variables
             @transport = transport
             @username = username
             @submethods = submethods
+            @variables = variables
+            @vars = variables
 
             @logger = Logger.new self.class.name
           end

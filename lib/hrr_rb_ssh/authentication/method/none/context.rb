@@ -8,10 +8,15 @@ module HrrRbSsh
     class Method
       class None
         class Context
-          attr_reader :username
+          attr_reader \
+            :username,
+            :variables,
+            :vars
 
-          def initialize username
+          def initialize username, variables
             @username = username
+            @variables = variables
+            @vars = variables
 
             @logger = Logger.new self.class.name
           end

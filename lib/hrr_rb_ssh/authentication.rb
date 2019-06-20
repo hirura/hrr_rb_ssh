@@ -22,6 +22,7 @@ module HrrRbSsh
       @closed = nil
 
       @username = nil
+      @variables = {}
     end
 
     def send payload
@@ -62,6 +63,11 @@ module HrrRbSsh
       @username
     end
 
+    def variables
+      raise Error::ClosedAuthentication if @closed
+      @variables
+    end
+
     def authenticate
       loop do
         payload = @transport.receive
@@ -69,7 +75,7 @@ module HrrRbSsh
         when Message::SSH_MSG_USERAUTH_REQUEST::VALUE
           userauth_request_message = Message::SSH_MSG_USERAUTH_REQUEST.decode payload
           method_name = userauth_request_message[:'method name']
-          method = Method[method_name].new(@transport, {'session id' => @transport.session_id}.merge(@options))
+          method = Method[method_name].new(@transport, {'session id' => @transport.session_id}.merge(@options), @variables)
           result = method.authenticate(userauth_request_message)
           case result
           when TrueClass

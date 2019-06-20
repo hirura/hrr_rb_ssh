@@ -8,11 +8,17 @@ module HrrRbSsh
     class Method
       class Password
         class Context
-          attr_reader :username, :password
+          attr_reader \
+            :username,
+            :password,
+            :variables,
+            :vars
 
-          def initialize username, password
+          def initialize username, password, variables
             @username = username
             @password = password
+            @variables = variables
+            @vars = variables
 
             @logger = Logger.new self.class.name
           end

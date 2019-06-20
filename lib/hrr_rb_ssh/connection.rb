@@ -10,6 +10,7 @@ module HrrRbSsh
   class Connection
     attr_reader \
       :username,
+      :variables,
       :options
 
     def initialize authentication, options={}
@@ -21,6 +22,7 @@ module HrrRbSsh
       @global_request_handler = GlobalRequestHandler.new self
       @channels = Hash.new
       @username = nil
+      @variables = nil
       @closed = nil
     end
 
@@ -76,6 +78,7 @@ module HrrRbSsh
           break
         end
         @username ||= @authentication.username
+        @variables ||= @authentication.variables
         case payload[0,1].unpack("C")[0]
         when Message::SSH_MSG_GLOBAL_REQUEST::VALUE
           global_request payload
