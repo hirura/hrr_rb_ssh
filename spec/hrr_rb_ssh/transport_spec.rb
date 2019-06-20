@@ -489,7 +489,12 @@ RSpec.describe HrrRbSsh::Transport do
       it "sends SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION} || CR || LF" do
         io.remote_write ("SSH-2.0-dummy_ssh_1.2.3" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         transport.exchange_version
-        expect(io.remote_read 24).to eq (local_version_string + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
+        buf = StringIO.new
+        10240.times do 
+          buf.write io.remote_read(1)
+          break if buf.string[-2,2] == HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF
+        end
+        expect(buf.string).to eq (local_version_string + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
       end
 
       it "receives remote version string and updates v_c" do
@@ -757,7 +762,12 @@ RSpec.describe HrrRbSsh::Transport do
       it "sends SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION} || CR || LF" do
         io.remote_write ("SSH-2.0-dummy_ssh_1.2.3" + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
         transport.exchange_version
-        expect(io.remote_read 24).to eq (local_version_string + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
+        buf = StringIO.new
+        10240.times do 
+          buf.write io.remote_read(1)
+          break if buf.string[-2,2] == HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF
+        end
+        expect(buf.string).to eq (local_version_string + HrrRbSsh::Transport::Constant::CR + HrrRbSsh::Transport::Constant::LF)
       end
 
       it "receives remote version string and updates v_s" do
