@@ -25,11 +25,12 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
       'authentication_publickey_authenticator' => authentication_publickey_authenticator,
     }
   }
-  let(:publickey){ described_class.new(transport, options) }
+  let(:variables){ {} }
+  let(:publickey){ described_class.new(transport, options, variables) }
 
   describe ".new" do
-    it "takes two arguments: transport and options" do
-      expect { described_class.new(transport, {}) }.not_to raise_error
+    it "takes three arguments: transport, options, and variables" do
+      expect { described_class.new(transport, {}, {}) }.not_to raise_error
     end     
 
     it "stores @session_id" do
