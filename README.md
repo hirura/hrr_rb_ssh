@@ -23,6 +23,7 @@ With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible
             - [Publickey authentication](#publickey-authentication)
             - [Keyboard-interactive authentication](#keyboard-interactive-authentication)
             - [None authentication (NOT recomended)](#none-authentication-not-recomended)
+            - [Multi\-step authentication](#multi-step-authentication)
         - [Handling session channel requests](#handling-session-channel-requests)
             - [Reference request handlers](#reference-request-handlers)
             - [Custom request handlers](#custom-request-handlers)
@@ -233,6 +234,35 @@ options['authentication_none_authenticator'] = auth_none
 ```
 
 In none authentication context, `context` variable provides the `#username` method.
+
+##### Multi-step authentication
+
+Combining authentications, it is possible to implement multi-step authentication. In case that the combination is a publickey authentication method and a password authentication method, it is so-called two-factor authentication.
+
+A return value of each authentication handler can be `HrrRbSsh::Authentication::PARTIAL_SUCCESS`. The value means that the authentication method returns success and another authenticatoin method is requested (i.e. the authentication method is deleted from the list of authentication that can continue, and then the server sends USERAUTH_FAILURE message with the updated list of authentication that can continue and partial success true). When all preferred authentication methods returns `PARTIAL_SUCCESS` (i.e. there is no more authentication that can continue), then the user is treated as authenticated.
+
+```ruby
+auth_preferred_authentication_methods = ["publickey", "password"]
+auth_publickey = HrrRbSsh::Authentication::Authenticator.new { |context|
+  is_verified = some_verification_method(context)
+  if is_verified
+    HrrRbSsh::Authentication::PARTIAL_SUCCESS
+  else
+    false
+  end
+}
+auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
+  is_verified = some_verification_method(context)
+  if is_verified
+    HrrRbSsh::Authentication::PARTIAL_SUCCESS
+  else
+    false
+  end
+}
+options['authentication_preferred_authentication_methods'] = auth_preferred_authentication_methods
+options['authentication_publickey_authenticator'] = auth_publickey
+options['authentication_password_authenticator'] = auth_password
+```
 
 #### Handling session channel requests
 
