@@ -149,12 +149,22 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:userauth_failure_message){
       {
         :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
-        :'authentications that can continue' => HrrRbSsh::Authentication::Method.list_preferred,
-        :'partial success'                   => false,
+        :'authentications that can continue' => preferred_authentication_methods,
+        :'partial success'                   => partial_success,
       }
     }
     let(:userauth_failure_payload){
       HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE.encode userauth_failure_message
+    }
+    let(:userauth_failure_message_2){
+      {
+        :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        :'authentications that can continue' => preferred_authentication_methods_2,
+        :'partial success'                   => partial_success_2,
+      }
+    }
+    let(:userauth_failure_payload_2){
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE.encode userauth_failure_message_2
     }
     let(:userauth_success_message){
       {
@@ -232,6 +242,12 @@ RSpec.describe HrrRbSsh::Authentication do
           userauth_request_with_password_method_payload,
         ]
       }
+      let(:preferred_authentication_methods){
+        HrrRbSsh::Authentication::Method.list_preferred
+      }
+      let(:partial_success){
+        false
+      }
 
       it "sends userauth success message for password method after userauth failure message for none method, and will return authenticated username" do
         expect( transport ).to receive(:receive).with(no_args).and_return(*userauth_requests).twice
@@ -300,6 +316,70 @@ RSpec.describe HrrRbSsh::Authentication do
       it "sends userauth success message for publickey method with signature after userauth pk ok message for no signature message, and will return authenticated username" do
         expect( transport ).to receive(:receive).with(no_args).and_return(*userauth_requests).twice
         expect( transport ).to receive(:send).with(userauth_pk_ok_payload).once
+        expect( transport ).to receive(:send).with(userauth_success_payload).once
+
+        authentication.authenticate
+
+        expect( authentication.closed? ).to be false
+        expect( authentication.username ).to eq username
+      end
+    end
+
+    context "when password method is partially success after none method is partially success" do
+      let(:options){
+        {
+          'authentication_none_authenticator' => HrrRbSsh::Authentication::Authenticator.new { HrrRbSsh::Authentication::PARTIAL_SUCCESS },
+          'authentication_password_authenticator' => HrrRbSsh::Authentication::Authenticator.new { HrrRbSsh::Authentication::PARTIAL_SUCCESS },
+          'authentication_preferred_authentication_methods' => preferred_authentication_methods,
+        }
+      }
+      let(:userauth_request_with_none_method_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'user name'      => username,
+          :'service name'   => "ssh-connection",
+          :'method name'    => "none",
+        }
+      }
+      let(:userauth_request_with_none_method_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_none_method_message
+      }
+      let(:userauth_request_with_password_method_message){
+        {
+          :'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'user name'          => username,
+          :'service name'       => "ssh-connection",
+          :'method name'        => "password",
+          :'FALSE'              => false, 
+          :'plaintext password' => "password"
+        }
+      }
+      let(:userauth_request_with_password_method_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_password_method_message
+      }
+      let(:userauth_requests){
+        [
+          userauth_request_with_none_method_payload,
+          userauth_request_with_password_method_payload,
+        ]
+      }
+      let(:partial_success_2){ true }
+
+      let(:preferred_authentication_methods){
+        [
+          "none",
+          "password",
+        ]
+      }
+      let(:preferred_authentication_methods_2){
+        [
+          "password",
+        ]
+      }
+
+      it "sends userauth success message for password method after userauth failure message with partial success for none method, and will return authenticated username" do
+        expect( transport ).to receive(:receive).with(no_args).and_return(*userauth_requests).twice
+        expect( transport ).to receive(:send).with(userauth_failure_payload_2).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
         authentication.authenticate
