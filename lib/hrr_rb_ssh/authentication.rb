@@ -70,7 +70,7 @@ module HrrRbSsh
     end
 
     def authenticate
-      preferred_authentication_methods = @options['authentication_preferred_authentication_methods'].dup || Method.list_preferred
+      preferred_authentication_methods = (@options['authentication_preferred_authentication_methods'].dup rescue nil) || Method.list_preferred # rescue nil.dup for Ruby version < 2.4
       @logger.info { "preferred authentication methods: #{preferred_authentication_methods}" }
       loop do
         payload = @transport.receive
