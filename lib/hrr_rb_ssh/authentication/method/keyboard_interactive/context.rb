@@ -15,14 +15,16 @@ module HrrRbSsh
             :submethods,
             :info_response,
             :variables,
-            :vars
+            :vars,
+            :authentication_methods
 
-          def initialize transport, username, submethods, variables
+          def initialize transport, username, submethods, variables, authentication_methods
             @transport = transport
             @username = username
             @submethods = submethods
             @variables = variables
             @vars = variables
+            @authentication_methods = authentication_methods
 
             @logger = Logger.new self.class.name
           end

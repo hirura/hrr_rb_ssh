@@ -12,13 +12,15 @@ module HrrRbSsh
             :username,
             :password,
             :variables,
-            :vars
+            :vars,
+            :authentication_methods
 
-          def initialize username, password, variables
+          def initialize username, password, variables, authentication_methods
             @username = username
             @password = password
             @variables = variables
             @vars = variables
+            @authentication_methods = authentication_methods
 
             @logger = Logger.new self.class.name
           end

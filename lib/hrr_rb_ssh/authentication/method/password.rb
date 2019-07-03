@@ -10,10 +10,11 @@ module HrrRbSsh
         NAME = 'password'
         PREFERENCE = 10
 
-        def initialize transport, options, variables
+        def initialize transport, options, variables, authentication_methods
           @logger = Logger.new(self.class.name)
           @authenticator = options.fetch( 'authentication_password_authenticator', Authenticator.new { false } )
           @variables = variables
+          @authentication_methods = authentication_methods
         end
 
         def authenticate userauth_request_message
@@ -21,7 +22,7 @@ module HrrRbSsh
           @logger.debug { "userauth request: " + userauth_request_message.inspect }
           username = userauth_request_message[:'user name']
           password = userauth_request_message[:'plaintext password']
-          context = Context.new(username, password, @variables)
+          context = Context.new(username, password, @variables, @authentication_methods)
           @authenticator.authenticate context
         end
       end

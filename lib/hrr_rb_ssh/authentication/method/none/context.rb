@@ -11,12 +11,14 @@ module HrrRbSsh
           attr_reader \
             :username,
             :variables,
-            :vars
+            :vars,
+            :authentication_methods
 
-          def initialize username, variables
+          def initialize username, variables, authentication_methods
             @username = username
             @variables = variables
             @vars = variables
+            @authentication_methods = authentication_methods
 
             @logger = Logger.new self.class.name
           end

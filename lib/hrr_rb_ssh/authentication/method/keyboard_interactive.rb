@@ -10,11 +10,12 @@ module HrrRbSsh
         NAME = 'keyboard-interactive'
         PREFERENCE = 30
 
-        def initialize transport, options, variables
+        def initialize transport, options, variables, authentication_methods
           @logger = Logger.new(self.class.name)
           @transport = transport
           @authenticator = options.fetch( 'authentication_keyboard_interactive_authenticator', Authenticator.new { false } )
           @variables = variables
+          @authentication_methods = authentication_methods
         end
 
         def authenticate userauth_request_message
@@ -22,7 +23,7 @@ module HrrRbSsh
           @logger.debug { "userauth request: " + userauth_request_message.inspect }
           username = userauth_request_message[:'user name']
           submethods = userauth_request_message[:'submethods']
-          context = Context.new(@transport, username, submethods, @variables)
+          context = Context.new(@transport, username, submethods, @variables, @authentication_methods)
           @authenticator.authenticate context
         end
       end
