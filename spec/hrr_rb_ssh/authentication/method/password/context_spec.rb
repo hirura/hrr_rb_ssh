@@ -5,7 +5,8 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
   let(:context_username){ 'username' }
   let(:context_password){ 'password' }
   let(:context_variables){ {} }
-  let(:context){ described_class.new context_username, context_password, context_variables }
+  let(:context_authentication_methods){ [] }
+  let(:context){ described_class.new context_username, context_password, context_variables, context_authentication_methods }
 
   describe ".new" do
     it "takes two arguments: username and password" do
@@ -16,7 +17,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
   describe "#username" do
     let(:context_username){ "username" }
     let(:context_password){ "password" }
-    let(:context){ described_class.new context_username, context_password, context_variables }
+    let(:context){ described_class.new context_username, context_password, context_variables, context_authentication_methods }
 
     it "returns \"username\"" do
       expect( context.username ).to eq context_username
@@ -26,7 +27,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
   describe "#password" do
     let(:context_username){ "username" }
     let(:context_password){ "password" }
-    let(:context){ described_class.new context_username, context_password, context_variables }
+    let(:context){ described_class.new context_username, context_password, context_variables, context_authentication_methods }
 
     it "returns \"password\"" do
       expect( context.password ).to eq context_password
@@ -45,10 +46,16 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
     end
   end
 
+  describe "#authentication_methods" do
+    it "returns \"authentication_methods\"" do
+      expect( context.authentication_methods ).to be context_authentication_methods
+    end
+  end
+
   describe "#verify" do
     let(:context_username){ "username" }
     let(:context_password){ "password" }
-    let(:context){ described_class.new context_username, context_password, context_variables }
+    let(:context){ described_class.new context_username, context_password, context_variables, context_authentication_methods }
     
     context "with \"username\" and \"password\"" do
       let(:username){ "username" }

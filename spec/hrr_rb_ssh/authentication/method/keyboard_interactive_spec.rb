@@ -18,12 +18,14 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
   end           
 
   describe ".new" do
-    it "takes three arguments: transport, options, and variables" do
-      expect { described_class.new(transport, {}, {}) }.not_to raise_error
+    it "takes three arguments: transport, options, variables, and authentication_methods" do
+      expect { described_class.new(transport, {}, {}, []) }.not_to raise_error
     end     
   end
 
   describe "#authenticate" do
+    let(:variables){ {} }
+    let(:authentication_methods){ [] }
     let(:userauth_request_message){
       {
         :'user name'  => "username",
@@ -33,8 +35,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
 
     context "when options does not have 'authentication_keyboard_interactive_authenticator'" do
       let(:options){ {} }
-      let(:variables){ {} }
-      let(:keyboard_interactive_method){ described_class.new transport, options, variables }
+      let(:keyboard_interactive_method){ described_class.new transport, options, variables, authentication_methods }
 
       it "returns false" do
         expect( keyboard_interactive_method.authenticate userauth_request_message ).to be false
@@ -42,7 +43,6 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
     end
 
     context "when options has 'authentication_keyboard_interactive_authenticator'" do
-      let(:variables){ {} }
       let(:keyboard_interactive_authenticator){
         HrrRbSsh::Authentication::Authenticator.new { |context|
           user_name        = 'username'
@@ -57,7 +57,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
           context.username == user_name && info_response.responses == ['password1', 'password2']
         }
       }
-      let(:keyboard_interactive_method){ described_class.new transport, options, variables }
+      let(:keyboard_interactive_method){ described_class.new transport, options, variables, authentication_methods }
       let(:userauth_info_request_message){
         {
           :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE,

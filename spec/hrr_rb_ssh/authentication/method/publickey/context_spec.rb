@@ -20,7 +20,8 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Context do
     }
   }
   let(:context_variables){ {} }
-  let(:context){ described_class.new username, algorithm, session_id, message, context_variables }
+  let(:context_authentication_methods){ [] }
+  let(:context){ described_class.new username, algorithm, session_id, message, context_variables, context_authentication_methods }
 
   describe ".new" do
     it "takes four arguments: username, algorithm, session_id, message" do
@@ -91,6 +92,12 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Context do
   describe "#vars" do
     it "returns \"variables\"" do
       expect( context.vars ).to be context_variables
+    end
+  end
+
+  describe "#authentication_methods" do
+    it "returns \"authentication_methods\"" do
+      expect( context.authentication_methods ).to be context_authentication_methods
     end
   end
 
