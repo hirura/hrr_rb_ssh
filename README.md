@@ -19,11 +19,13 @@ With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible
         - [Logging](#logging)
         - [Registering pre\-generated secret keys for server host key](#registering-pre-generated-secret-keys-for-server-host-key)
         - [Defining authentications](#defining-authentications)
-            - [Password authentication](#password-authentication)
-            - [Publickey authentication](#publickey-authentication)
-            - [Keyboard-interactive authentication](#keyboard-interactive-authentication)
-            - [None authentication (NOT recomended)](#none-authentication-not-recomended)
+            - [Single authentication](#single-authentication)
+              - [Password authentication](#password-authentication)
+              - [Publickey authentication](#publickey-authentication)
+              - [Keyboard-interactive authentication](#keyboard-interactive-authentication)
+              - [None authentication (NOT recomended)](#none-authentication-not-recomended)
             - [Multi\-step authentication](#multi-step-authentication)
+            - [More flexible authentication](#more-flexible-authentication)
         - [Handling session channel requests](#handling-session-channel-requests)
             - [Reference request handlers](#reference-request-handlers)
             - [Custom request handlers](#custom-request-handlers)
@@ -139,7 +141,13 @@ EOB
 
 By default, any authentications get failed. To allow users to login to the SSH service, at least one of the authentication methods must be defined and registered into the instance of HrrRbSsh::Authentication through `options` variable.
 
-##### Password authentication
+The library defines a sort of strategies to implement handling authentication.
+
+##### Single authentication
+
+Each authenticator returns `true` (or `HrrRbSsh::Authentication::SUCCESS`) or `false` (or `HrrRbSsh::Authentication::FAILURE`). When it is true, the user is accepted. When it is false, the user is not accepted and a subsequent authenticator is called.
+
+###### Password authentication
 
 Password authentication is the most simple way to allow users to login to the SSH service. Password authentication requires user-name and password.
 
@@ -166,7 +174,7 @@ The `context` variable in password authentication context provides the following
 - `#vars` : The same object that `#variables` returns
 - `#verify(username, password)` : Returns `true` when username and password arguments match with the context's username and password. Or returns `false` when username and password arguments don't match.
 
-##### Publickey authentication
+###### Publickey authentication
 
 The second one is public key authentication. Public key authentication requires user-name, public key algorithm name, and PEM or DER formed public key.
 
@@ -187,7 +195,7 @@ The `context` variable in public key authentication context provides the `#verif
 
 And public keys that is in OpenSSH public key format is now available. To use OpenSSH public keys, it is easy to use $USER_HOME/.ssh/authorized_keys file.
 
-##### Keyboard-interactive authentication
+###### Keyboard-interactive authentication
 
 The third one is keyboard-interactive authentication. This is also known as challenge-response authentication.
 
@@ -216,7 +224,7 @@ The `#info_request` method takes four arguments: name, instruction, language tag
 
 The responses are listed in the same order as request prompts.
 
-##### None authentication (NOT recomended)
+###### None authentication (NOT recomended)
 
 The last one is none authentication. None authentication is usually NOT used.
 
@@ -237,7 +245,7 @@ In none authentication context, `context` variable provides the `#username` meth
 
 ##### Multi-step authentication
 
-Combining authentications, it is possible to implement multi-step authentication. In case that the combination is a publickey authentication method and a password authentication method, it is so-called two-factor authentication.
+In this strategy that conbines single authentications, it is possible to implement multi-step authentication. In case that the combination is a publickey authentication method and a password authentication method, it is so-called two-factor authentication.
 
 A return value of each authentication handler can be `HrrRbSsh::Authentication::PARTIAL_SUCCESS`. The value means that the authentication method returns success and another authenticatoin method is requested (i.e. the authentication method is deleted from the list of authentication that can continue, and then the server sends USERAUTH_FAILURE message with the updated list of authentication that can continue and partial success true). When all preferred authentication methods returns `PARTIAL_SUCCESS` (i.e. there is no more authentication that can continue), then the user is treated as authenticated.
 
@@ -262,6 +270,44 @@ auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
 options['authentication_preferred_authentication_methods'] = auth_preferred_authentication_methods
 options['authentication_publickey_authenticator'] = auth_publickey
 options['authentication_password_authenticator'] = auth_password
+```
+
+##### More flexible authentication
+
+A `context` variable in an authenticator gives an access to remaining authentication methods that can continue. In this strategy, an implementer is able to control the order of authentication methods and to control which authentication methods are used for the user.
+
+The below is an example. It is expected that any user must be verified by publickey and then another authentication is requested for the user accordingly.
+
+```ruby
+auth_preferred_authentication_methods = ['none']
+auth_none = HrrRbSsh::Authentication::Authenticator.new{ |context|
+  context.authentication_methods.push 'publickey'
+  HrrRbSsh::Authentication::PARTIAL_SUCCESS
+}
+auth_publickey = HrrRbSsh::Authentication::Authenticator.new{ |context|
+  if some_verification(context)
+    case context.username
+    when 'user1'
+      context.authentiation_methods.push 'keyboard-interactive'
+      HrrRbSsh::Authentication::PARTIAL_SUCCESS
+    else
+      false
+    end
+  else
+    false
+  end
+}
+auth_keyboard_interactive = HrrRbSsh::Authentication::Authenticator.new{ |context|
+  if some_verification(context)
+    true # or HrrRbSsh::Authentication::PARTIAL_SUCCESS; both will accept the user because remaining authentication method is only 'keyboard-interactive' in this case
+  else
+    false
+  end
+}
+options['authentication_preferred_authentication_methods'] = auth_preferred_authentication_methods
+options['authentication_none_authenticator'] = auth_none
+options['authentication_publickey_authenticator'] = auth_publickey
+options['authentication_keyboard_interactive_authenticator'] = auth_keyboard_interactive
 ```
 
 #### Handling session channel requests
