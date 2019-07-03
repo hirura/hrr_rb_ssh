@@ -4,12 +4,13 @@
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/message'
 require 'hrr_rb_ssh/error/closed_authentication'
+require 'hrr_rb_ssh/authentication/constant'
 require 'hrr_rb_ssh/authentication/authenticator'
 require 'hrr_rb_ssh/authentication/method'
 
 module HrrRbSsh
   class Authentication
-    SERVICE_NAME = 'ssh-userauth'
+    include Constant
 
     def initialize transport, options={}
       @transport = transport
@@ -69,27 +70,44 @@ module HrrRbSsh
     end
 
     def authenticate
+      preferred_authentication_methods = (@options['authentication_preferred_authentication_methods'].dup rescue nil) || Method.list_preferred # rescue nil.dup for Ruby version < 2.4
+      @logger.info { "preferred authentication methods: #{preferred_authentication_methods}" }
       loop do
         payload = @transport.receive
         case payload[0,1].unpack("C")[0]
         when Message::SSH_MSG_USERAUTH_REQUEST::VALUE
           userauth_request_message = Message::SSH_MSG_USERAUTH_REQUEST.decode payload
           method_name = userauth_request_message[:'method name']
+          @logger.info { "authentication method: #{method_name}" }
           method = Method[method_name].new(@transport, {'session id' => @transport.session_id}.merge(@options), @variables)
           result = method.authenticate(userauth_request_message)
           case result
-          when TrueClass
+          when true, SUCCESS
             @logger.info { "verified" }
             send_userauth_success
             @username = userauth_request_message[:'user name']
             @closed = false
             break
-          when FalseClass
-            @logger.info { "verify failed" }
-            send_userauth_failure
+          when PARTIAL_SUCCESS
+            @logger.info { "partially verified" }
+            preferred_authentication_methods.delete method_name
+            @logger.debug { "remaining preferred: #{preferred_authentication_methods}" }
+            if preferred_authentication_methods.empty?
+              @logger.info { "verified" }
+              send_userauth_success
+              @username = userauth_request_message[:'user name']
+              @closed = false
+              break
+            else
+              @logger.info { "continue" }
+              send_userauth_failure preferred_authentication_methods, true
+            end
           when String
             @logger.info { "send method specific message to continue" }
             send_method_specific_message result
+          else # when false, FAILURE
+            @logger.info { "verify failed" }
+            send_userauth_failure preferred_authentication_methods, false
           end
         else
           @closed = true
@@ -98,11 +116,11 @@ module HrrRbSsh
       end
     end
 
-    def send_userauth_failure
+    def send_userauth_failure preferred_authentication_methods, partial_success
       message = {
         :'message number'                    => Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
-        :'authentications that can continue' => Method.list_preferred,
-        :'partial success'                   => false,
+        :'authentications that can continue' => preferred_authentication_methods,
+        :'partial success'                   => partial_success,
       }
       payload = Message::SSH_MSG_USERAUTH_FAILURE.encode message
       @transport.send payload
