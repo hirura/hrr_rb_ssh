@@ -4,7 +4,8 @@
 RSpec.describe HrrRbSsh::Authentication::Method::None::Context do
   let(:context_username){ 'username' }
   let(:context_variables){ {} }
-  let(:context){ described_class.new context_username, context_variables }
+  let(:context_authentication_methods){ [] }
+  let(:context){ described_class.new context_username, context_variables, context_authentication_methods }
 
   describe ".new" do
     it "takes one argument: username" do
@@ -14,7 +15,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None::Context do
 
   describe "#username" do
     let(:context_username){ "username" }
-    let(:context){ described_class.new context_username, context_variables }
+    let(:context){ described_class.new context_username, context_variables, context_authentication_methods }
 
     it "returns \"username\"" do
       expect( context.username ).to eq context_username
@@ -33,9 +34,15 @@ RSpec.describe HrrRbSsh::Authentication::Method::None::Context do
     end
   end
 
+  describe "#authentication_methods" do
+    it "returns \"authentication_methods\"" do
+      expect( context.authentication_methods ).to be context_authentication_methods
+    end
+  end
+
   describe "#verify" do
     let(:context_username){ "username" }
-    let(:context){ described_class.new context_username, context_variables }
+    let(:context){ described_class.new context_username, context_variables, context_authentication_methods }
     
     context "with \"username\"" do
       let(:username){ "username" }

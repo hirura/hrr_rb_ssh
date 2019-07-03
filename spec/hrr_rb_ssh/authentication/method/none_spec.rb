@@ -18,13 +18,14 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
   end
 
   describe ".new" do
-    it "takes three arguments: transport, options, and variables" do
-      expect { described_class.new(transport, {}, {}) }.not_to raise_error
+    it "takes three arguments: transport, options, variables, and authentication_methods" do
+      expect { described_class.new(transport, {}, {}, []) }.not_to raise_error
     end
   end
 
   describe "#authenticate" do
     let(:variables){ {} }
+    let(:authentication_methods){ [] }
     let(:userauth_request_message){
       {
         :'user name' => "username",
@@ -33,7 +34,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
 
     context "when options does not have 'authentication_none_authenticator'" do
       let(:options){ {} }
-      let(:none_method){ described_class.new transport, options, variables }
+      let(:none_method){ described_class.new transport, options, variables, authentication_methods }
 
       it "returns false" do
         expect( none_method.authenticate userauth_request_message ).to be false
@@ -46,7 +47,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
           'authentication_none_authenticator' => HrrRbSsh::Authentication::Authenticator.new { true }
         }
       }
-      let(:none_method){ described_class.new transport, options, variables }
+      let(:none_method){ described_class.new transport, options, variables, authentication_methods }
 
       it "returns true" do
         expect( none_method.authenticate userauth_request_message ).to be true
@@ -60,7 +61,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
             'authentication_none_authenticator' => HrrRbSsh::Authentication::Authenticator.new { |context| context.verify "username" }
           }
         }
-        let(:none_method){ described_class.new transport, options, variables }
+        let(:none_method){ described_class.new transport, options, variables, authentication_methods }
 
         it "returns true" do
           expect( none_method.authenticate userauth_request_message ).to be true
@@ -73,7 +74,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
             'authentication_none_authenticator' => HrrRbSsh::Authentication::Authenticator.new { |context| context.verify "mismatch" }
           }
         }
-        let(:none_method){ described_class.new transport, options, variables }
+        let(:none_method){ described_class.new transport, options, variables, authentication_methods }
 
         it "returns false" do
           expect( none_method.authenticate userauth_request_message ).to be false

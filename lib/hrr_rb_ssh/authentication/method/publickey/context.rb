@@ -13,6 +13,7 @@ module HrrRbSsh
             :session_id,
             :variables,
             :vars,
+            :authentication_methods,
             :message_number,
             :service_name,
             :method_name,
@@ -21,13 +22,14 @@ module HrrRbSsh
             :public_key_blob,
             :signature
 
-          def initialize username, algorithm, session_id, message, variables
+          def initialize username, algorithm, session_id, message, variables, authentication_methods
             @username   = username
             @algorithm  = algorithm
             @session_id = session_id
             @message    = message
             @variables  = variables
             @vars       = variables
+            @authentication_methods = authentication_methods
 
             @message_number            = message[:'message number']
             @service_name              = message[:'service name']

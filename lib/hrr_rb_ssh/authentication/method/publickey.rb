@@ -10,11 +10,12 @@ module HrrRbSsh
         NAME = 'publickey'
         PREFERENCE = 20
 
-        def initialize transport, options, variables
+        def initialize transport, options, variables, authentication_methods
           @logger = Logger.new(self.class.name)
           @session_id = options['session id']
           @authenticator = options.fetch( 'authentication_publickey_authenticator', Authenticator.new { false } )
           @variables = variables
+          @authentication_methods = authentication_methods
         end
 
         def authenticate userauth_request_message
@@ -31,7 +32,7 @@ module HrrRbSsh
             @logger.info { "verify signature" }
             username = userauth_request_message[:'user name']
             algorithm = Algorithm[public_key_algorithm_name].new
-            context = Context.new(username, algorithm, @session_id, userauth_request_message, @variables)
+            context = Context.new(username, algorithm, @session_id, userauth_request_message, @variables, @authentication_methods)
             @authenticator.authenticate context
           end
         end
