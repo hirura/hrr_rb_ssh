@@ -12,7 +12,9 @@ module HrrRbSsh
 
         def initialize transport, options, variables, authentication_methods
           @logger = Logger.new(self.class.name)
+          @transport = transport
           @authenticator = options.fetch( 'authentication_password_authenticator', Authenticator.new { false } )
+          @options = options
           @variables = variables
           @authentication_methods = authentication_methods
         end
@@ -24,6 +26,22 @@ module HrrRbSsh
           password = userauth_request_message[:'plaintext password']
           context = Context.new(username, password, @variables, @authentication_methods)
           @authenticator.authenticate context
+        end
+
+        def request_authentication username, service_name
+          password = @options['client_authentication_password']
+          message = {
+            :'message number'     => Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+            :"user name"          => username,
+            :"service name"       => service_name,
+            :"method name"        => NAME,
+            :"FALSE"              => false,
+            :"plaintext password" => password,
+          }
+          payload = Message::SSH_MSG_USERAUTH_REQUEST.encode message
+          @transport.send payload
+
+          payload = @transport.receive
         end
       end
     end

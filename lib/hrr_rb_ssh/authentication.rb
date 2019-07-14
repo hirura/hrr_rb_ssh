@@ -12,8 +12,9 @@ module HrrRbSsh
   class Authentication
     include Constant
 
-    def initialize transport, options={}
+    def initialize transport, mode, options={}
       @transport = transport
+      @mode = mode
       @options = options
 
       @logger = Logger.new self.class.name
@@ -70,6 +71,15 @@ module HrrRbSsh
     end
 
     def authenticate
+      case @mode
+      when Mode::SERVER
+        respond_to_authentication
+      when Mode::CLIENT
+        request_authentication
+      end
+    end
+
+    def respond_to_authentication
       authentication_methods = (@options['authentication_preferred_authentication_methods'].dup rescue nil) || Method.list_preferred # rescue nil.dup for Ruby version < 2.4
       @logger.info { "preferred authentication methods: #{authentication_methods}" }
       loop do
@@ -112,6 +122,42 @@ module HrrRbSsh
         else
           @closed = true
           raise
+        end
+      end
+    end
+
+    def request_authentication
+      authentication_methods = (@options['authentication_preferred_authentication_methods'].dup rescue nil) || Method.list_preferred # rescue nil.dup for Ruby version < 2.4
+      @logger.info { "preferred authentication methods: #{authentication_methods}" }
+      next_method_name = "none"
+      @logger.info { "authentication request begins with none method" }
+      loop do
+        @logger.info { "authentication method: #{next_method_name}" }
+        method = Method[next_method_name].new(@transport, {'session id' => @transport.session_id}.merge(@options), @variables, authentication_methods)
+        payload = method.request_authentication @options['username'], "ssh-connection"
+        case payload[0,1].unpack("C")[0]
+        when Message::SSH_MSG_USERAUTH_SUCCESS::VALUE
+          @logger.info { "verified" }
+          @username = @options['username']
+          @closed = false
+          break
+        when Message::SSH_MSG_USERAUTH_FAILURE::VALUE
+          message = Message::SSH_MSG_USERAUTH_FAILURE.decode payload
+          partial_success = message[:'partial success']
+          if partial_success
+            @logger.info { "partially verified" }
+          end
+          authentication_methods_that_can_continue = message[:'authentications that can continue']
+          @logger.debug { "authentication methods that can continue: #{authentication_methods_that_can_continue}" }
+          next_method_name = authentication_methods.find{ |local_m| authentication_methods_that_can_continue.find{ |remote_m| local_m == remote_m } }
+          if next_method_name
+            authentication_methods.delete next_method_name
+            @logger.info { "continue" }
+          else
+            @logger.info { "no more available authentication methods" }
+            @closed = true
+            raise "failed authentication"
+          end
         end
       end
     end
