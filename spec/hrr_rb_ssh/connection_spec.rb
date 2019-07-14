@@ -4,27 +4,42 @@
 RSpec.describe HrrRbSsh::Connection do
   describe '.new' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
 
-    it "can take one argument: authentication" do
-      expect { described_class.new(authentication) }.not_to raise_error
+    describe "when mode is server" do
+      let(:mode){ HrrRbSsh::Mode::SERVER }
+
+      it "can take one argument: authentication" do
+        expect { described_class.new(authentication, mode) }.not_to raise_error
+      end
+
+      it "can take two arguments: authentication and options" do
+        expect { described_class.new(authentication, mode, options) }.not_to raise_error
+      end
     end
 
-    it "can take two arguments: authentication and options" do
-      expect { described_class.new(authentication, options) }.not_to raise_error
+    describe "when mode is client" do
+      let(:mode){ HrrRbSsh::Mode::CLIENT }
+
+      it "can take one argument: authentication" do
+        expect { described_class.new(authentication, mode) }.not_to raise_error
+      end
+
+      it "can take two arguments: authentication and options" do
+        expect { described_class.new(authentication, mode, options) }.not_to raise_error
+      end
     end
   end
 
   describe '#send' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
     let(:payload){ "testing" }
 
     context "when connection is closed" do
@@ -63,11 +78,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#assign_channel' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when @channels is empty" do
       it "returns 0" do
@@ -98,26 +113,29 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#start' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection_loop_thread){ 'connection_loop_thread' }
 
-    it "calls authentication.start and connection_loop" do
+    it "calls authentication.start and connection_loop_thread" do
       expect(authentication).to receive(:start).with(no_args).once
-      expect(connection).to receive(:connection_loop).with(no_args).once
+      expect(connection).to receive(:connection_loop_thread).with(no_args).and_return(connection_loop_thread).once
+      expect(connection_loop_thread).to receive(:join).with(no_args).once
       connection.start
     end
   end
 
   describe '#close' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
+    let(:connection_loop_thread){ 'connection_loop_thread' }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
     let(:channel0){ double("channel0") }
     let(:channel1){ double("channel1") }
     let(:channels){
@@ -134,21 +152,25 @@ RSpec.describe HrrRbSsh::Connection do
     context "when connection is not closed" do
       before :example do
         connection.instance_variable_set('@closed', false)
+        connection.instance_variable_set('@connection_loop_thread', connection_loop_thread)
       end
 
       it "closes channels" do
+        expect(connection_loop_thread).to receive(:join).with(no_args).once
         expect(channel0).to receive(:close).with(no_args).once
         expect(channel1).to receive(:close).with(no_args).once
         connection.close
       end
 
       it "does not raise error even though channel.close raises some error" do
+        expect(connection_loop_thread).to receive(:join).with(no_args).once
         expect(channel0).to receive(:close).with(no_args).once
         expect(channel1).to receive(:close).with(no_args).and_raise(RuntimeError).once
         expect { connection.close }.not_to raise_error
       end
 
       it "clears channels" do
+        expect(connection_loop_thread).to receive(:join).with(no_args).once
         expect(channel0).to receive(:close).with(no_args).once
         expect(channel1).to receive(:close).with(no_args).and_raise(RuntimeError).once
         connection.close
@@ -159,11 +181,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#closed?' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when connection is closed" do
       before :example do
@@ -186,13 +208,13 @@ RSpec.describe HrrRbSsh::Connection do
     end
   end
 
-  describe '#connection_loop' do
+  describe '#connection_loop_thread' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when receives global request message" do
       let(:global_request_message){
@@ -211,7 +233,7 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:global_request).with(global_request_payload).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
 
@@ -234,7 +256,7 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_open).with(channel_open_payload).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
 
@@ -258,7 +280,7 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_open_confirmation).with(channel_open_confirmation_payload).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
 
@@ -280,7 +302,7 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_request).with(channel_request_payload).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
 
@@ -301,7 +323,7 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_window_adjust).with(channel_window_adjust_payload).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
 
@@ -322,7 +344,7 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_data).with(channel_data_payload).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
 
@@ -349,7 +371,7 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_eof).with(channel_eof_payload).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
 
@@ -369,7 +391,7 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:channel_close).with(channel_close_payload).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
 
@@ -391,18 +413,18 @@ RSpec.describe HrrRbSsh::Connection do
         expect(authentication).to receive(:receive).with(no_args).and_return(unknown_payload).once
         expect(authentication).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedAuthentication).once
         expect(connection).to receive(:close).with(no_args).once
-        connection.connection_loop
+        connection.connection_loop_thread.join
       end
     end
   end
 
   describe '#global_request' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when receives supported global request message" do
       let(:global_request_message){
@@ -462,11 +484,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#channel_open_start' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
     let(:address){ 'localhost' }
     let(:port){ 12345 }
     let(:remote_address){ double('mock remote_address') }
@@ -501,11 +523,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#channel_open' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when receives valid channel open message" do
       let(:channel_open_message){
@@ -576,11 +598,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#channel_open_confirmation' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when receives valid channel open confirmation message" do
       let(:channel_open_confirmation_message){
@@ -612,11 +634,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#channel_request' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when receives valid channel request message" do
       let(:channel_request_message){
@@ -648,11 +670,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#channel_window_adjust' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when receives valid channel window adjust message" do
       let(:channel_window_adjust_message){
@@ -683,11 +705,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#channel_data' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     context "when receives valid channel data message" do
       let(:channel_data_message){
@@ -718,11 +740,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#channel_eof' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     let(:channel0){ double('channel0') }
     let(:channel0_receive_message_queue){ double('channel0_receive_message_queue') }
@@ -744,7 +766,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "eofs the channel and delete the channel from channels" do
         expect(channel0).to receive(:receive_message_queue).with(no_args).and_return(channel0_receive_message_queue).once
-        expect(channel0_receive_message_queue).to receive(:close).with(no_args).once
+        expect(channel0_receive_message_queue).to receive(:enq).with(channel_eof_message).once
         connection.channel_eof channel_eof_payload
       end
     end
@@ -752,11 +774,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#channel_close' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
     let(:channel0){ double("channel0") }
     let(:channel1){ double("channel1") }
     let(:channels){
@@ -783,6 +805,7 @@ RSpec.describe HrrRbSsh::Connection do
 
       it "closes the channel and delete the channel from channels" do
         expect(channel0).to receive(:close).with(no_args).once
+        expect(channel0).to receive(:wait_until_closed).with(no_args).once
         connection.channel_close channel_close_payload
         expect(channels).to eq( { 1 => channel1 } )
       end
@@ -791,11 +814,11 @@ RSpec.describe HrrRbSsh::Connection do
 
   describe '#send_request_success' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ HrrRbSsh::Authentication.new transport }
+    let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, options }
+    let(:connection){ described_class.new authentication, mode, options }
 
     let(:request_success_message){
       {

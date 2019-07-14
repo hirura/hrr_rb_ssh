@@ -2,6 +2,8 @@
 # vim: et ts=2 sw=2
 
 require 'socket'
+require 'thread'
+require 'monitor'
 require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/channel/channel_type'
 
@@ -19,7 +21,8 @@ module HrrRbSsh
         :local_maximum_packet_size,
         :remote_window_size,
         :remote_maximum_packet_size,
-        :receive_message_queue
+        :receive_message_queue,
+        :exit_status
 
       def initialize connection, message, socket=nil
         @logger = Logger.new self.class.name
@@ -38,60 +41,81 @@ module HrrRbSsh
 
         @receive_message_queue = Queue.new
         @receive_data_queue = Queue.new
+        @receive_extended_data_queue = Queue.new
 
         @r_io_in,  @w_io_in  = IO.pipe
         @r_io_out, @w_io_out = IO.pipe
         @r_io_err, @w_io_err = IO.pipe
 
+        @channel_closing_monitor = Monitor.new
+
         @closed = nil
+        @exit_status = nil
       end
 
       def set_remote_parameters message
         @remote_channel = message[:'sender channel']
-        @remote_window_size         = message[:'initial window size']
+        @remote_window_size = message[:'initial window size']
         @remote_maximum_packet_size = message[:'maximum packet size']
       end
 
       def io
-        [@r_io_in, @w_io_out, @w_io_err]
+        case @connection.mode
+        when Mode::SERVER
+          [@r_io_in, @w_io_out, @w_io_err]
+        when Mode::CLIENT
+          [@w_io_in, @r_io_out, @r_io_err]
+        end
       end
 
       def start
         @channel_loop_thread = channel_loop_thread
-        @out_sender_thread   = out_sender_thread
-        @err_sender_thread   = err_sender_thread
-        @receiver_thread     = receiver_thread
-        @channel_type_instance.start
+        case @connection.mode
+        when Mode::SERVER
+          @out_sender_thread   = out_sender_thread
+          @err_sender_thread   = err_sender_thread
+          @receiver_thread     = receiver_thread
+          @channel_type_instance.start
+        when Mode::CLIENT
+          @out_receiver_thread = out_receiver_thread
+          @err_receiver_thread = err_receiver_thread
+          @sender_thread       = sender_thread
+          @channel_type_instance.start
+        end
         @closed = false
+        @logger.debug { "in start: #{@waiting_thread}" }
+        @waiting_thread.wakeup if @waiting_thread
+      end
+
+      def wait_until_started
+        @waiting_thread = Thread.current
+        @logger.debug { "in wait_until_started: #{@waiting_thread}" }
+        Thread.stop
       end
 
       def wait_until_senders_closed
-        [@w_io_out, @w_io_err].each{ |io|
+        [
+          @out_sender_thread,
+          @err_sender_thread,
+        ].each{ |t|
           begin
-            io.close
-          rescue IOError # for compatibility for Ruby version < 2.3
-            Thread.pass
+            t.join if t.instance_of? Thread
+          rescue => e
+            @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           end
         }
-        [@out_sender_thread, @err_sender_thread].select{ |t| t.instance_of? Thread }.each(&:join)
       end
 
       def close from=:outside, exitstatus=0
-        return if @closed
-        @logger.info { "close channel" }
-        @closed = true
+        @channel_closing_monitor.synchronize {
+          return if @closed
+          @logger.info { "close channel" }
+          @closed = true
+        }
         unless from == :channel_type_instance
           @channel_type_instance.close
         end
         @receive_message_queue.close
-        @receive_data_queue.close
-        [@r_io_in, @w_io_in, @r_io_out, @w_io_out, @r_io_err, @w_io_err].each{ |io|
-          begin
-            io.close
-          rescue IOError # for compatibility for Ruby version < 2.3
-            Thread.pass
-          end
-        }
         begin
           if from == :channel_type_instance
             send_channel_eof
@@ -111,6 +135,24 @@ module HrrRbSsh
         @logger.info { "channel closed" }
       end
 
+      def wait_until_closed
+        [
+          @out_sender_thread,
+          @err_sender_thread,
+          @receiver_thread,
+          @out_receiver_thread,
+          @err_receiver_thread,
+          @sender_thread,
+          @channel_loop_thread
+        ].each{ |t|
+          begin
+            t.join if t.instance_of? Thread
+          rescue => e
+            @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+          end
+        }
+      end
+
       def closed?
         @closed
       end
@@ -118,44 +160,60 @@ module HrrRbSsh
       def channel_loop_thread
         Thread.start do
           @logger.info { "start channel loop thread" }
-          loop do
-            begin
-              message = @receive_message_queue.deq
-              if message.nil? && @receive_message_queue.closed?
-                @receive_data_queue.close
-                @logger.info { "closing channel loop thread" }
+          begin
+            loop do
+              begin
+                message = @receive_message_queue.deq
+                if message.nil? && @receive_message_queue.closed?
+                  break
+                end
+                case message[:'message number']
+                when Message::SSH_MSG_CHANNEL_EOF::VALUE
+                  @receive_data_queue.close
+                  @receive_extended_data_queue.close
+                when Message::SSH_MSG_CHANNEL_REQUEST::VALUE
+                  @logger.info { "received channel request: #{message[:'request type']}" }
+                  case @connection.mode
+                  when Mode::SERVER
+                    begin
+                      @channel_type_instance.request message
+                    rescue => e
+                      @logger.warn { "request failed: #{e.message}" }
+                      send_channel_failure if message[:'want reply']
+                    else
+                      send_channel_success if message[:'want reply']
+                    end
+                  when Mode::CLIENT
+                    case message[:'request type']
+                    when "exit-status"
+                      @logger.info { "exit status: #{message[:'exit status']}" }
+                      @exit_status = message[:'exit status'].to_i
+                    end
+                  end
+                when Message::SSH_MSG_CHANNEL_DATA::VALUE
+                  @logger.info { "received channel data" }
+                  local_channel = message[:'recipient channel']
+                  @receive_data_queue.enq message[:'data']
+                when Message::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE
+                  @logger.info { "received channel extended data" }
+                  local_channel = message[:'recipient channel']
+                  @receive_extended_data_queue.enq message[:'data']
+                when Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
+                  @logger.debug { "received channel window adjust" }
+                  @remote_window_size = [@remote_window_size + message[:'bytes to add'], 0xffff_ffff].min
+                else
+                  @logger.warn { "received unsupported message: #{message.inspect}" }
+                end
+              rescue => e
+                @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+                close from=:channel_loop_thread
                 break
               end
-              case message[:'message number']
-              when Message::SSH_MSG_CHANNEL_REQUEST::VALUE
-                @logger.info { "received channel request: #{message[:'request type']}" }
-                begin
-                  @channel_type_instance.request message
-                rescue => e
-                  @logger.warn { "request failed: #{e.message}" }
-                  if message[:'want reply']
-                    send_channel_failure
-                  end
-                else
-                  if message[:'want reply']
-                    send_channel_success
-                  end
-                end
-              when Message::SSH_MSG_CHANNEL_DATA::VALUE
-                @logger.info { "received channel data" }
-                local_channel = message[:'recipient channel']
-                @receive_data_queue.enq message[:'data']
-              when Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
-                @logger.debug { "received channel window adjust" }
-                @remote_window_size = [@remote_window_size + message[:'bytes to add'], 0xffff_ffff].min
-              else
-                @logger.warn { "received unsupported message: #{message.inspect}" }
-              end
-            rescue => e
-              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-              close from=:channel_loop_thread
-              break
             end
+          ensure
+            @logger.info { "closing channel loop thread" }
+            @receive_data_queue.close
+            @receive_extended_data_queue.close
           end
           @logger.info { "channel loop thread closed" }
         end
@@ -175,17 +233,11 @@ module HrrRbSsh
               sending_data = data[0, sendable_size]
               send_channel_data sending_data if sendable_size > 0
               @remote_window_size -= sendable_size
-            rescue EOFError => e
-              begin
-                @r_io_out.close
-              rescue IOError # for compatibility for Ruby version < 2.3
-                Thread.pass
-              end
-            rescue IOError => e
-              @logger.warn { "channel IO is closed" }
-              close
+            rescue EOFError, IOError => e
+              @r_io_out.close rescue nil
             rescue => e
               @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+              @r_io_out.close rescue nil
               close
             end
           end
@@ -207,17 +259,11 @@ module HrrRbSsh
               sending_data = data[0, sendable_size]
               send_channel_extended_data sending_data if sendable_size > 0
               @remote_window_size -= sendable_size
-            rescue EOFError => e
-              begin
-                @r_io_err.close
-              rescue IOError # for compatibility for Ruby version < 2.3
-                Thread.pass
-              end
-            rescue IOError => e
-              @logger.warn { "channel IO is closed" }
-              close
+            rescue EOFError, IOError => e
+              @r_io_err.close rescue nil
             rescue => e
               @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+              @r_io_err.close rescue nil
               close
             end
           end
@@ -233,9 +279,9 @@ module HrrRbSsh
               data = @receive_data_queue.deq
               if data.nil? && @receive_data_queue.closed?
                 @logger.info { "closing receiver thread" }
-                @logger.info { "closing channel IO write" }
-                @w_io_in.close_write
-                @logger.info { "channel IO write closed" }
+                @logger.info { "closing w_io_in" }
+                @w_io_in.close
+                @logger.info { "w_io_in closed" }
                 break
               end
               @w_io_in.write data
@@ -245,8 +291,7 @@ module HrrRbSsh
                 send_channel_window_adjust
                 @local_window_size += INITIAL_WINDOW_SIZE
               end
-            rescue IOError => e
-              @logger.warn { "channel IO is closed" }
+            rescue Errno::EPIPE, IOError => e
               close
               break
             rescue => e
@@ -256,6 +301,98 @@ module HrrRbSsh
             end
           end
           @logger.info { "receiver thread closed" }
+        }
+      end
+
+      def out_receiver_thread
+        Thread.start {
+          @logger.info { "start out receiver thread" }
+          loop do
+            begin
+              data = @receive_data_queue.deq
+              if data.nil? && @receive_data_queue.closed?
+                @logger.info { "closing out receiver thread" }
+                @logger.info { "closing w_io_out" }
+                @w_io_out.close
+                @logger.info { "w_io_out closed" }
+                break
+              end
+              @w_io_out.write data
+              @local_window_size -= data.size
+              if @local_window_size < INITIAL_WINDOW_SIZE/2
+                @logger.info { "send channel window adjust" }
+                send_channel_window_adjust
+                @local_window_size += INITIAL_WINDOW_SIZE
+              end
+            rescue Errno::EPIPE, IOError => e
+              close
+              break
+            rescue => e
+              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+              close
+              break
+            end
+          end
+          @logger.info { "out receiver thread closed" }
+        }
+      end
+
+      def err_receiver_thread
+        Thread.start {
+          @logger.info { "start err receiver thread" }
+          loop do
+            begin
+              data = @receive_extended_data_queue.deq
+              if data.nil? && @receive_extended_data_queue.closed?
+                @logger.info { "closing err receiver thread" }
+                @logger.info { "closing w_io_err" }
+                @w_io_err.close
+                @logger.info { "w_io_err closed" }
+                break
+              end
+              @w_io_err.write data
+              @local_window_size -= data.size
+              if @local_window_size < INITIAL_WINDOW_SIZE/2
+                @logger.info { "send channel window adjust" }
+                send_channel_window_adjust
+                @local_window_size += INITIAL_WINDOW_SIZE
+              end
+            rescue Error::EPIPE, IOError => e
+              close
+              break
+            rescue => e
+              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+              close
+              break
+            end
+          end
+          @logger.info { "err receiver thread closed" }
+        }
+      end
+
+      def sender_thread
+        Thread.start {
+          @logger.info { "start sender thread" }
+          loop do
+            if @r_io_in.closed?
+              @logger.info { "closing sender thread" }
+              break
+            end
+            begin
+              data = @r_io_in.readpartial(10240)
+              sendable_size = [data.size, @remote_window_size].min
+              sending_data = data[0, sendable_size]
+              send_channel_data sending_data if sendable_size > 0
+              @remote_window_size -= sendable_size
+            rescue EOFError, IOError => e
+              @r_io_in.close rescue nil
+            rescue => e
+              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+              @r_io_in.close rescue nil
+              close
+            end
+          end
+          @logger.info { "sender thread closed" }
         }
       end
 
@@ -305,6 +442,98 @@ module HrrRbSsh
           :'data'              => data,
         }
         payload = Message::SSH_MSG_CHANNEL_EXTENDED_DATA.encode message
+        @connection.send payload
+      end
+
+      def send_channel_request_pty_req term_env_var_val, term_width_chars, term_height_rows, term_width_pixel, term_height_pixel, encoded_term_modes
+        message = {
+          :'message number'                  => Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'recipient channel'               => @remote_channel,
+          :'request type'                    => "pty-req",
+          :'want reply'                      => false,
+          :'TERM environment variable value' => term_env_var_val,
+          :'terminal width, characters'      => term_width_chars,
+          :'terminal height, rows'           => term_height_rows,
+          :'terminal width, pixels'          => term_width_pixel,
+          :'terminal height, pixels'         => term_height_pixel,
+          :'encoded terminal modes'          => encoded_term_modes,
+        }
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message
+        @connection.send payload
+      end
+
+      def send_channel_request_env variable_name, variable_value
+        message = {
+          :'message number'    => Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'recipient channel' => @remote_channel,
+          :'request type'      => "env",
+          :'want reply'        => false,
+          :'variable name'     => variable_name,
+          :'variable value'    => variable_value,
+        }
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message
+        @connection.send payload
+      end
+
+      def send_channel_request_shell
+        message = {
+          :'message number'    => Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'recipient channel' => @remote_channel,
+          :'request type'      => "shell",
+          :'want reply'        => false,
+        }
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message
+        @connection.send payload
+      end
+
+      def send_channel_request_exec command
+        message = {
+          :'message number'    => Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'recipient channel' => @remote_channel,
+          :'request type'      => "exec",
+          :'want reply'        => false,
+          :'command'           => command,
+        }
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message
+        @connection.send payload
+      end
+
+      def send_channel_request_subsystem subsystem_name
+        message = {
+          :'message number'    => Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'recipient channel' => @remote_channel,
+          :'request type'      => "subsystem",
+          :'want reply'        => false,
+          :'subsystem name'    => subsystem_name,
+        }
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message
+        @connection.send payload
+      end
+
+      def send_channel_request_window_change term_width_cols, term_height_rows, term_width_pixel, term_height_pixel
+        message = {
+          :'message number'          => Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'recipient channel'       => @remote_channel,
+          :'request type'            => "window-change",
+          :'want reply'              => false,
+          :'terminal width, columns' => term_width_cols,
+          :'terminal height, rows'   => term_height_rows,
+          :'terminal width, pixels'  => term_width_pixel,
+          :'terminal height, pixels' => term_height_pixel,
+        }
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message
+        @connection.send payload
+      end
+
+      def send_channel_request_signal signal_name
+        message = {
+          :'message number'    => Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'recipient channel' => @remote_channel,
+          :'request type'      => "signal",
+          :'want reply'        => false,
+          :'signal name'       => signal_name,
+        }
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message
         @connection.send payload
       end
 

@@ -22,73 +22,78 @@ module HrrRbSsh
             @dh.g = OpenSSL::BN.new(self.class::G)
           end
           @dh.generate_key!
+          @public_key = @dh.pub_key.to_i
         end
 
-        def start transport, mode
-          case mode
+        def start transport
+          case transport.mode
           when Mode::SERVER
-            receive_kexdh_init transport.receive
+            @k_s = transport.server_host_key_algorithm.server_public_host_key
+            @f   = @public_key
+            message = receive_kexdh_init transport.receive
+            @e = message[:'e']
+            @shared_secret = OpenSSL::BN.new(@dh.compute_key(OpenSSL::BN.new(@e)), 2).to_i
             send_kexdh_reply transport
-          else
-            raise "unsupported mode"
+          when Mode::CLIENT
+            @e   = @public_key
+            send_kexdh_init transport
+            message = receive_kexdh_reply transport.receive
+            @k_s = message[:'server public host key and certificates (K_S)']
+            @f   = message[:'f']
+            @shared_secret = OpenSSL::BN.new(@dh.compute_key(OpenSSL::BN.new(@f)), 2).to_i
           end
         end
 
-        def set_e e
-          @e = e
-        end
-
         def shared_secret
-          k = OpenSSL::BN.new(@dh.compute_key(OpenSSL::BN.new(@e)), 2).to_i
-        end
-
-        def pub_key
-          f = @dh.pub_key.to_i
+          @shared_secret
         end
 
         def hash transport
-          e = @e
-          k = shared_secret
-          f = pub_key
-
           h0_payload = {
             :'V_C' => transport.v_c,
             :'V_S' => transport.v_s,
             :'I_C' => transport.i_c,
             :'I_S' => transport.i_s,
-            :'K_S' => transport.server_host_key_algorithm.server_public_host_key,
-            :'e'   => e,
-            :'f'   => f,
-            :'k'   => k,
+            :'K_S' => @k_s,
+            :'e'   => @e,
+            :'f'   => @f,
+            :'k'   => @shared_secret,
           }
           h0 = H0.encode h0_payload
-
-          h = OpenSSL::Digest.digest self.class::DIGEST, h0
-
-          h
+          h  = OpenSSL::Digest.digest self.class::DIGEST, h0
         end
 
         def sign transport
           h = hash transport
           s = transport.server_host_key_algorithm.sign h
-
-          s
         end
 
         def receive_kexdh_init payload
-          message = Message::SSH_MSG_KEXDH_INIT.decode payload
-          set_e message[:'e']
+          Message::SSH_MSG_KEXDH_INIT.decode payload
         end
 
         def send_kexdh_reply transport
           message = {
             :'message number'                                => Message::SSH_MSG_KEXDH_REPLY::VALUE,
-            :'server public host key and certificates (K_S)' => transport.server_host_key_algorithm.server_public_host_key,
-            :'f'                                             => pub_key,
+            :'server public host key and certificates (K_S)' => @k_s,
+            :'f'                                             => @f,
             :'signature of H'                                => sign(transport),
           }
           payload = Message::SSH_MSG_KEXDH_REPLY.encode message
           transport.send payload
+        end
+
+        def send_kexdh_init transport
+          message = {
+            :'message number' => Message::SSH_MSG_KEXDH_INIT::VALUE,
+            :'e'              => @e,
+          }
+          payload = Message::SSH_MSG_KEXDH_INIT.encode message
+          transport.send payload
+        end
+
+        def receive_kexdh_reply payload
+          Message::SSH_MSG_KEXDH_REPLY.decode payload
         end
       end
     end

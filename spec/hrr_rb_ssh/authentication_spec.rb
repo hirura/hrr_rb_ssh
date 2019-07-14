@@ -12,24 +12,39 @@ RSpec.describe HrrRbSsh::Authentication do
 
   describe '#new' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:options){ Hash.new }
 
-    it "can take one argument: transport" do
-      expect { described_class.new(transport) }.not_to raise_error
+    describe "when mode is server" do
+      let(:mode){ HrrRbSsh::Mode::SERVER }
+
+      it "can take one argument: transport" do
+        expect { described_class.new(transport, mode) }.not_to raise_error
+      end
+
+      it "can take two arguments: transport and options" do
+        expect { described_class.new(transport, mode, options) }.not_to raise_error
+      end
+
+      it "registeres ::SERVICE_NAME in transport" do
+        expect {
+          described_class.new transport, mode
+        }.to change {
+          transport.instance_variable_get(:@acceptable_services)
+        }.from([]).to([described_class::SERVICE_NAME])
+      end
     end
 
-    it "can take two arguments: transport and options" do
-      expect { described_class.new(transport, options) }.not_to raise_error
-    end
+    describe "when mode is client" do
+      let(:mode){ HrrRbSsh::Mode::CLIENT }
 
-    it "registeres ::SERVICE_NAME in transport" do
-      expect {
-        described_class.new transport
-      }.to change {
-        transport.instance_variable_get(:@acceptable_services)
-      }.from([]).to([described_class::SERVICE_NAME])
+      it "can take one argument: transport" do
+        expect { described_class.new(transport, mode) }.not_to raise_error
+      end
+
+      it "can take two arguments: transport and options" do
+        expect { described_class.new(transport, mode, options) }.not_to raise_error
+      end
     end
   end
 
@@ -37,7 +52,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ described_class.new(transport) }
+    let(:authentication){ described_class.new(transport, mode) }
     let(:payload){ "testing" }
 
     context "when transport is not closed" do
@@ -59,7 +74,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ described_class.new(transport) }
+    let(:authentication){ described_class.new(transport, mode) }
     let(:payload){ "testing" }
 
     context "when transport is not closed" do
@@ -79,15 +94,29 @@ RSpec.describe HrrRbSsh::Authentication do
 
   describe '#start' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ described_class.new(transport) }
+    let(:authentication){ described_class.new(transport, mode) }
 
-    it "calls transport.start and authenticate methods" do
-      expect( transport ).to receive(:start).with(no_args).once
-      expect( authentication ).to receive(:authenticate).with(no_args).once
+    describe "when mode is server" do
+      let(:mode){ HrrRbSsh::Mode::SERVER }
 
-      authentication.start
+      it "calls transport.start and respond_to_authentication methods" do
+        expect( transport ).to receive(:start).with(no_args).once
+        expect( authentication ).to receive(:respond_to_authentication).with(no_args).once
+
+        authentication.start
+      end
+    end
+
+    describe "when mode is client" do
+      let(:mode){ HrrRbSsh::Mode::CLIENT }
+
+      it "calls transport.start and request_authentication methods" do
+        expect( transport ).to receive(:start).with(no_args).once
+        expect( authentication ).to receive(:request_authentication).with(no_args).once
+
+        authentication.start
+      end
     end
   end
 
@@ -95,7 +124,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ described_class.new(transport) }
+    let(:authentication){ described_class.new(transport, mode) }
 
     context "when not closed" do
       before :example do
@@ -118,7 +147,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ described_class.new(transport) }
+    let(:authentication){ described_class.new(transport, mode) }
 
     context "when not closed" do
       before :example do
@@ -141,11 +170,11 @@ RSpec.describe HrrRbSsh::Authentication do
     end
   end
 
-  describe '#authenticate' do
+  describe '#respond_to_authentication' do
     let(:io){ 'dummy' }
-    let(:mode){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ described_class.new(transport, options) }
+    let(:authentication){ described_class.new(transport, mode, options) }
     let(:userauth_failure_message){
       {
         :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
@@ -198,7 +227,7 @@ RSpec.describe HrrRbSsh::Authentication do
         expect( transport ).to receive(:receive).with(no_args).and_return(userauth_request_with_none_method_payload).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
-        authentication.authenticate
+        authentication.respond_to_authentication
 
         expect( authentication.closed? ).to be false
         expect( authentication.username ).to eq username
@@ -254,7 +283,7 @@ RSpec.describe HrrRbSsh::Authentication do
         expect( transport ).to receive(:send).with(userauth_failure_payload).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
-        authentication.authenticate
+        authentication.respond_to_authentication
 
         expect( authentication.closed? ).to be false
         expect( authentication.username ).to eq username
@@ -318,7 +347,7 @@ RSpec.describe HrrRbSsh::Authentication do
         expect( transport ).to receive(:send).with(userauth_pk_ok_payload).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
-        authentication.authenticate
+        authentication.respond_to_authentication
 
         expect( authentication.closed? ).to be false
         expect( authentication.username ).to eq username
@@ -382,7 +411,7 @@ RSpec.describe HrrRbSsh::Authentication do
         expect( transport ).to receive(:send).with(userauth_failure_payload_2).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
-        authentication.authenticate
+        authentication.respond_to_authentication
 
         expect( authentication.closed? ).to be false
         expect( authentication.username ).to eq username
@@ -450,7 +479,7 @@ RSpec.describe HrrRbSsh::Authentication do
         expect( transport ).to receive(:send).with(userauth_failure_payload_2).once
         expect( transport ).to receive(:send).with(userauth_success_payload).once
 
-        authentication.authenticate
+        authentication.respond_to_authentication
 
         expect( authentication.closed? ).to be false
         expect( authentication.username ).to eq username
@@ -473,9 +502,202 @@ RSpec.describe HrrRbSsh::Authentication do
       it "sends userauth failure message and raise error" do
         expect( transport ).to receive(:receive).with(no_args).and_return(not_userauth_request_payload).once
 
-        expect { authentication.authenticate }.to raise_error RuntimeError
+        expect { authentication.respond_to_authentication }.to raise_error RuntimeError
 
         expect( authentication.closed? ).to be true
+      end
+    end
+  end
+
+  describe '#request_authentication' do
+    let(:io){ 'dummy' }
+    let(:mode){ HrrRbSsh::Mode::CLIENT }
+    let(:transport){ HrrRbSsh::Transport.new io, mode }
+    let(:authentication){ described_class.new(transport, mode, options) }
+    let(:userauth_failure_message){
+      {
+        :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        :'authentications that can continue' => authentications_that_can_continue,
+        :'partial success'                   => partial_success,
+      }
+    }
+    let(:userauth_failure_payload){
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE.encode userauth_failure_message
+    }
+    let(:userauth_success_message){
+      {
+        :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
+      }
+    }
+    let(:userauth_success_payload){
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS.encode userauth_success_message
+    }
+    let(:username){ "username" }
+
+    context "when preferred_authentication_methods has no methods" do
+      let(:options){
+        {
+          'username' => username,
+          'authentication_preferred_authentication_methods' => [],
+        }
+      }
+      let(:userauth_request_with_none_method_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'user name'      => username,
+          :'service name'   => "ssh-connection",
+          :'method name'    => "none",
+        }
+      }
+      let(:userauth_request_with_none_method_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_none_method_message
+      }
+
+      context "when success" do
+        it "sends userauth request message for none method, and will return authenticated username" do
+          expect( transport ).to receive(:send).with(userauth_request_with_none_method_payload).once
+          expect( transport ).to receive(:receive).with(no_args).and_return(userauth_success_payload).once
+
+          authentication.request_authentication
+
+          expect( authentication.closed? ).to be false
+          expect( authentication.username ).to eq username
+        end
+      end
+
+      context "when failure" do
+        let(:authentications_that_can_continue){
+          ['password', 'publickey', 'keyboard-interactive']
+        }
+        let(:partial_success){
+          false
+        }
+
+        it "sends userauth request message for none method, and is closed" do
+          expect( transport ).to receive(:send).with(userauth_request_with_none_method_payload).once
+          expect( transport ).to receive(:receive).with(no_args).and_return(userauth_failure_payload).once
+
+          expect { authentication.request_authentication }.to raise_error
+
+          expect( authentication.closed? ).to be true
+        end
+      end
+    end
+
+    context "when preferred_authentication_methods has password method" do
+      let(:options){
+        {
+          'username' => username,
+          'authentication_preferred_authentication_methods' => ['password'],
+          'client_authentication_password' => "password",
+        }
+      }
+      let(:userauth_request_with_none_method_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'user name'      => username,
+          :'service name'   => "ssh-connection",
+          :'method name'    => "none",
+        }
+      }
+      let(:userauth_request_with_none_method_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_none_method_message
+      }
+      let(:userauth_request_with_password_method_message){
+        {
+          :'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'user name'          => username,
+          :'service name'       => "ssh-connection",
+          :'method name'        => "password",
+          :'FALSE'              => false, 
+          :'plaintext password' => "password"
+        }
+      }
+      let(:userauth_request_with_password_method_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_password_method_message
+      }
+      let(:authentications_that_can_continue){
+        ['password', 'publickey', 'keyboard-interactive']
+      }
+      let(:partial_success){
+        false
+      }
+
+      it "sends userauth request message for password method and it is accepted after userauth request message for none method, and will return authenticated username" do
+        expect( transport ).to receive(:send).with(userauth_request_with_none_method_payload).once
+        expect( transport ).to receive(:send).with(userauth_request_with_password_method_payload).once
+        expect( transport ).to receive(:receive).with(no_args).and_return(userauth_failure_payload, userauth_success_payload).twice
+
+        authentication.request_authentication
+
+        expect( authentication.closed? ).to be false
+        expect( authentication.username ).to eq username
+      end
+    end
+
+    context "when preferred_authentication_methods has password and keyboard-interactive methods, and password authentication response is partial success" do
+      let(:options){
+        {
+          'username' => username,
+          'authentication_preferred_authentication_methods' => ['password', 'keyboard-interactive'],
+          'client_authentication_password' => "password",
+          'client_authentication_keyboard_interactive' => ["password1", "password1"],
+        }
+      }
+      let(:userauth_request_with_none_method_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'user name'      => username,
+          :'service name'   => "ssh-connection",
+          :'method name'    => "none",
+        }
+      }
+      let(:userauth_request_with_none_method_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_none_method_message
+      }
+      let(:userauth_request_with_password_method_message){
+        {
+          :'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'user name'          => username,
+          :'service name'       => "ssh-connection",
+          :'method name'        => "password",
+          :'FALSE'              => false, 
+          :'plaintext password' => "password"
+        }
+      }
+      let(:userauth_request_with_password_method_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_password_method_message
+      }
+      let(:userauth_request_with_keyboard_interactive_method_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'user name'      => username,
+          :'service name'   => "ssh-connection",
+          :'method name'    => "keyboard-interactive",
+          :'language tag'   => "",
+          :'submethods'     => "",
+        }
+      }
+      let(:userauth_request_with_keyboard_interactive_method_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_keyboard_interactive_method_message
+      }
+      let(:authentications_that_can_continue){
+        ['password', 'publickey', 'keyboard-interactive']
+      }
+      let(:partial_success){
+        true
+      }
+
+      it "sends userauth request message for password method and it is accepted after userauth request message for none method, and will return authenticated username" do
+        expect( transport ).to receive(:send).with(userauth_request_with_none_method_payload).once
+        expect( transport ).to receive(:send).with(userauth_request_with_password_method_payload).once
+        expect( transport ).to receive(:send).with(userauth_request_with_keyboard_interactive_method_payload).once
+        expect( transport ).to receive(:receive).with(no_args).and_return(userauth_failure_payload, userauth_failure_payload, userauth_success_payload).exactly(3).times
+
+        authentication.request_authentication
+
+        expect( authentication.closed? ).to be false
+        expect( authentication.username ).to eq username
       end
     end
   end
@@ -484,7 +706,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:io){ 'dummy' }
     let(:mode){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ described_class.new(transport) }
+    let(:authentication){ described_class.new(transport, mode) }
     let(:username){ "username" }
 
     context "when transport is not closed" do

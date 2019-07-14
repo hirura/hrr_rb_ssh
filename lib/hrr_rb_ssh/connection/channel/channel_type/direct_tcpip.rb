@@ -31,6 +31,9 @@ module HrrRbSsh
               if @sender_thread_finished && @receiver_thread_finished
                 @logger.info { "closing direct-tcpip" }
                 @socket.close
+                @logger.info { "closing channel IOs" }
+                @channel.io.each{ |io| io.close rescue nil }
+                @logger.info { "channel IOs closed" }
                 @channel.close from=:channel_type_instance
                 @logger.info { "direct-tcpip closed" }
               end
@@ -47,15 +50,15 @@ module HrrRbSsh
                     @channel.io[1].write s.readpartial(10240)
                   rescue EOFError
                     @logger.info { "socket is EOF" }
-                    @channel.io[1].close
+                    @channel.io[1].close rescue nil
                     break
                   rescue IOError
                     @logger.info { "socket is closed" }
-                    @channel.io[1].close
+                    @channel.io[1].close rescue nil
                     break
                   rescue => e
                     @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                    @channel.io[1].close
+                    @channel.io[1].close rescue nil
                     break
                   end
                 end

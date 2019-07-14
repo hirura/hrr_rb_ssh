@@ -618,7 +618,7 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       it "calls kex_algorithm#start" do
-        expect(mock_kex_algorithm).to receive(:start).with(transport, mode).once
+        expect(mock_kex_algorithm).to receive(:start).with(transport).once
         transport.start_kex_algorithm
       end
     end
@@ -754,6 +754,100 @@ RSpec.describe HrrRbSsh::Transport do
     let(:io){ MockSocket.new }
     let(:mode){ HrrRbSsh::Mode::CLIENT }
 
+    describe "#start" do
+      let(:transport){ described_class.new io, mode }
+
+      it "calls #exchange_version, #exchange_key, #verify_service_request" do
+        expect(transport).to receive(:exchange_version).with(no_args).once
+        expect(transport).to receive(:exchange_key).with(no_args).once
+        expect(transport).to receive(:send_service_request).with(no_args).once
+        transport.start
+      end
+    end
+
+    describe "#close" do
+      let(:transport){ described_class.new io, mode }
+
+      before :example do
+        transport.instance_variable_set('@closed', false)
+      end
+
+      it "updates @closed with true, and calls disconnect" do
+        expect(transport).to receive(:disconnect).with(no_args).once
+        transport.close
+        expect(transport.instance_variable_get('@closed')).to be true
+      end
+    end
+
+    describe "#closed?" do
+      let(:transport){ described_class.new io, mode }
+
+      context "when opened" do
+        before :example do
+          transport.instance_variable_set('@closed', false)
+        end
+
+        it "returns false" do
+          expect(transport.closed?).to be false
+        end
+      end
+
+      context "when closed" do
+        before :example do
+          transport.instance_variable_set('@closed', true)
+        end
+
+        it "returns true" do
+          expect(transport.closed?).to be true
+        end
+      end
+    end
+
+    describe "#disconnect" do
+      let(:transport){ described_class.new io, mode }
+
+      let(:disconnect_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+          :'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+          :'description'    => "disconnected by user",
+          :'language tag'   => ""
+        }
+      }
+      let(:disconnect_payload){
+        HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+      }
+      let(:mock_sender  ){ double("mock sender") }
+
+      before :example do
+        transport.instance_variable_set('@disconnected', false)
+        transport.instance_variable_set('@sender', mock_sender  )
+      end
+
+      context "when disconnect message can be sent" do
+        it "sends disconnect" do
+          expect(mock_sender).to receive(:send).with(transport, disconnect_payload).once
+          expect { transport.disconnect }.not_to raise_error
+        end
+      end
+
+      context "when disconnect message can not be sent" do
+        context "due to IOError" do
+          it "can not send disconnect" do
+            expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(IOError).once
+            expect { transport.disconnect }.not_to raise_error
+          end
+        end
+
+        context "due to other error" do
+          it "can not send disconnect" do
+            expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(RuntimeError).once
+            expect { transport.disconnect }.not_to raise_error
+          end
+        end
+      end
+    end
+
     describe "#exchange_version" do
       let(:transport){ described_class.new io, mode }
       let(:local_version_string){ "SSH-2.0-HrrRbSsh-#{HrrRbSsh::VERSION}" }
@@ -821,6 +915,12 @@ RSpec.describe HrrRbSsh::Transport do
         }
       }
       let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
+      let(:remote_newkeys_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
+        }
+      }
+      let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode remote_newkeys_message }
 
       before :example do
         transport.instance_variable_set('@sender',   mock_sender  )
@@ -834,14 +934,14 @@ RSpec.describe HrrRbSsh::Transport do
         local_kexinit_message = {
           :'message number'                          => HrrRbSsh::Message::SSH_MSG_KEXINIT::VALUE,
           :'cookie (random byte)'                    => lambda { rand(0x01_00) },
-          :'kex_algorithms'                          => HrrRbSsh::Transport::KexAlgorithm.list_preferred,
-          :'server_host_key_algorithms'              => HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred,
-          :'encryption_algorithms_client_to_server'  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
-          :'encryption_algorithms_server_to_client'  => HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred,
-          :'mac_algorithms_client_to_server'         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
-          :'mac_algorithms_server_to_client'         => HrrRbSsh::Transport::MacAlgorithm.list_preferred,
-          :'compression_algorithms_client_to_server' => HrrRbSsh::Transport::CompressionAlgorithm.list_preferred,
-          :'compression_algorithms_server_to_client' => HrrRbSsh::Transport::CompressionAlgorithm.list_preferred,
+          :'kex_algorithms'                          => ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"],
+          :'server_host_key_algorithms'              => ["ssh-rsa", "ssh-dss"],
+          :'encryption_algorithms_client_to_server'  => ["aes128-cbc", "aes256-cbc"],
+          :'encryption_algorithms_server_to_client'  => ["aes128-cbc", "aes256-cbc"],
+          :'mac_algorithms_client_to_server'         => ["hmac-sha1", "hmac-md5"],
+          :'mac_algorithms_server_to_client'         => ["hmac-sha1", "hmac-md5"],
+          :'compression_algorithms_client_to_server' => ["none", "zlib@openssh.com", "zlib"],
+          :'compression_algorithms_server_to_client' => ["none", "zlib@openssh.com", "zlib"],
           :'languages_client_to_server'              => [],
           :'languages_server_to_client'              => [],
           :'first_kex_packet_follows'                => false,
@@ -889,8 +989,145 @@ RSpec.describe HrrRbSsh::Transport do
 
         transport.exchange_key
 
-        expect(transport.server_host_key_algorithm).to be_a_kind_of HrrRbSsh::Transport::ServerHostKeyAlgorithm
-        expect(transport.instance_variable_get('@kex_algorithm')).to be_a_kind_of HrrRbSsh::Transport::KexAlgorithm
+        expect(transport.server_host_key_algorithm).to be_an_instance_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa
+        expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1
+      end
+    end
+
+    describe "#start_kex_algorithm" do
+      let(:transport){ described_class.new io, mode }
+      let(:mock_kex_algorithm){ double('kex algorithm') }
+
+      before :example do
+        transport.instance_variable_set('@kex_algorithm', mock_kex_algorithm)
+      end
+
+      it "calls kex_algorithm#start" do
+        expect(mock_kex_algorithm).to receive(:start).with(transport).once
+        transport.start_kex_algorithm
+      end
+    end
+
+    describe "#update_encryption_mac_compression_algorithms" do
+      let(:transport){ described_class.new io, mode }
+      let(:mock_kex_algorithm){ double('kex algorithm') }
+
+      let(:hash){ 'dummy hash' }
+      let(:iv_c_to_s ){ '1234567890123456'  }
+      let(:iv_s_to_c ){ '1234567890123456'  }
+      let(:key_c_to_s){ '1234567890123456' }
+      let(:key_s_to_c){ '1234567890123456' }
+      let(:mac_c_to_s){ '12345678901234567890' }
+      let(:mac_s_to_c){ '12345678901234567890' }
+
+      let(:remote_kex_algorithms                         ){ ["diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"] }
+      let(:remote_server_host_key_algorithms             ){ ["ssh-rsa", "ssh-dss"]                                        }
+      let(:remote_encryption_algorithms_client_to_server ){ ["aes128-cbc", "aes256-cbc"]                                  }
+      let(:remote_encryption_algorithms_server_to_client ){ ["aes128-cbc", "aes256-cbc"]                                  }
+      let(:remote_mac_algorithms_client_to_server        ){ ["hmac-sha1", "hmac-md5"]                                     }
+      let(:remote_mac_algorithms_server_to_client        ){ ["hmac-sha1", "hmac-md5"]                                     }
+      let(:remote_compression_algorithms_client_to_server){ ["none", "zlib@openssh.com", "zlib"]                          }
+      let(:remote_compression_algorithms_server_to_client){ ["none", "zlib@openssh.com", "zlib"]                          }
+
+      before :example do
+        transport.instance_variable_set('@kex_algorithm',                                  mock_kex_algorithm                            )
+        transport.instance_variable_set('@remote_kex_algorithms',                          remote_kex_algorithms                         )
+        transport.instance_variable_set('@remote_server_host_key_algorithms',              remote_server_host_key_algorithms             )
+        transport.instance_variable_set('@remote_encryption_algorithms_client_to_server',  remote_encryption_algorithms_client_to_server )
+        transport.instance_variable_set('@remote_encryption_algorithms_server_to_client',  remote_encryption_algorithms_server_to_client )
+        transport.instance_variable_set('@remote_mac_algorithms_client_to_server',         remote_mac_algorithms_client_to_server        )
+        transport.instance_variable_set('@remote_mac_algorithms_server_to_client',         remote_mac_algorithms_server_to_client        )
+        transport.instance_variable_set('@remote_compression_algorithms_client_to_server', remote_compression_algorithms_client_to_server)
+        transport.instance_variable_set('@remote_compression_algorithms_server_to_client', remote_compression_algorithms_server_to_client)
+      end
+
+      it "updates encryption, mac, and compression algorithms" do
+        expect(mock_kex_algorithm).to receive(:hash).with(transport).and_return(hash).once
+
+        expect(mock_kex_algorithm).to receive(:iv_c_to_s ).with(transport, 'aes128-cbc').and_return(iv_c_to_s).once
+        expect(mock_kex_algorithm).to receive(:iv_s_to_c ).with(transport, 'aes128-cbc').and_return(iv_s_to_c).once
+        expect(mock_kex_algorithm).to receive(:key_c_to_s).with(transport, 'aes128-cbc').and_return(key_c_to_s).once
+        expect(mock_kex_algorithm).to receive(:key_s_to_c).with(transport, 'aes128-cbc').and_return(key_s_to_c).once
+        expect(mock_kex_algorithm).to receive(:mac_c_to_s).with(transport, 'hmac-sha1' ).and_return(mac_c_to_s).once
+        expect(mock_kex_algorithm).to receive(:mac_s_to_c).with(transport, 'hmac-sha1' ).and_return(mac_s_to_c).once
+
+        transport.update_encryption_mac_compression_algorithms
+
+        expect(transport.session_id).to be hash
+
+        expect(transport.incoming_encryption_algorithm).to  be_an_instance_of HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc
+        expect(transport.outgoing_encryption_algorithm).to  be_an_instance_of HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc
+        expect(transport.incoming_mac_algorithm).to         be_an_instance_of HrrRbSsh::Transport::MacAlgorithm::HmacSha1
+        expect(transport.outgoing_mac_algorithm).to         be_an_instance_of HrrRbSsh::Transport::MacAlgorithm::HmacSha1
+        expect(transport.incoming_compression_algorithm).to be_an_instance_of HrrRbSsh::Transport::CompressionAlgorithm::None
+        expect(transport.outgoing_compression_algorithm).to be_an_instance_of HrrRbSsh::Transport::CompressionAlgorithm::None
+      end
+    end
+
+    describe "#send_service_request" do
+      let(:transport){ described_class.new io, mode }
+
+      let(:mock_sender  ){ double("mock sender") }
+      let(:mock_receiver){ double("mock receiver") }
+
+      let(:service_request_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST::VALUE,
+          :'service name'   => 'ssh-userauth',
+        }
+      }
+      let(:service_request_payload){
+        HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.encode service_request_message
+      }
+
+      let(:service_accept_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
+          :'service name'   => 'ssh-userauth',
+        }
+      }
+      let(:service_accept_payload){
+        HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode service_accept_message
+      }
+
+      before :example do
+        transport.instance_variable_set('@sender',   mock_sender  )
+        transport.instance_variable_set('@receiver', mock_receiver)
+      end
+
+      context "when 'ssh-userauth' is accepted" do
+        it "sends service request and receives service accept" do
+          expect(mock_sender).to   receive(:send).with(transport, service_request_payload).once
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(service_accept_payload).once
+
+          transport.send_service_request
+        end
+      end
+
+      context "when 'ssh-userauth' is not accepted" do
+        let(:disconnect_message){
+          {
+            :'message number' => HrrRbSsh::Message::SSH_MSG_DISCONNECT::VALUE,
+            :'reason code'    => HrrRbSsh::Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+            :'description'    => 'disconnected by user',
+            :'language tag'   => '',
+          }
+        }
+        let(:disconnect_payload){
+          HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+        }
+
+        before :example do
+          transport.instance_variable_set('@closed',       false)
+          transport.instance_variable_set('@disconnected', false)
+        end
+
+        it "sends service request and receives disconnect and close" do
+          expect(mock_sender).to   receive(:send).with(transport, service_request_payload).once
+          expect(mock_receiver).to receive(:receive).with(transport).and_return(disconnect_payload).once
+
+          transport.send_service_request
+        end
       end
     end
   end

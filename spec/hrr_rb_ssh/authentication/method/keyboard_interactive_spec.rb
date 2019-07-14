@@ -152,4 +152,75 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
       end
     end
   end
+
+  describe "#request_authentication" do
+    let(:options){
+      { 
+        'client_authentication_keyboard_interactive' => ['password1', 'password2']
+      } 
+    } 
+    let(:keyboard_interactive_method){ described_class.new transport, options, {}, [] }
+    let(:username){ "username" }
+    let(:service_name){ "ssh-connection" }
+    let(:userauth_request_with_keyboard_interactive_method_message){
+      {             
+        :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'user name'      => username,    
+        :'service name'   => service_name,
+        :'method name'    => "keyboard-interactive",
+        :"language tag"   => "",
+        :'submethods'     => "",
+      }                                                               
+    }                     
+    let(:userauth_request_with_keyboard_interactive_method_payload){
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_keyboard_interactive_method_message
+    }                           
+
+    context "when response message is info request" do
+      let(:userauth_info_request_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE,
+          :'name'           => "keyboard interactive authentication",
+          :'instruction'    => "instruction",
+          :'language tag'   => "",
+          :'num-prompts'    => 2,
+          :'prompt[1]'      => "Password1: ",
+          :'echo[1]'        => false,
+          :'prompt[2]'      => "Password2: ",
+          :'echo[2]'        => true
+        }
+      }
+      let(:userauth_info_request_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST.encode userauth_info_request_message
+      }
+      let(:userauth_info_response_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE::VALUE,
+          :'num-responses'  => 2,
+          :'response[1]'    => "password1",
+          :'response[2]'    => "password2",
+        }
+      }
+      let(:userauth_info_response_payload){
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE.encode userauth_info_response_message
+      }
+
+      it "sends userauth request for keyboard_interactive method" do
+        expect( transport ).to receive(:send).with(userauth_request_with_keyboard_interactive_method_payload).once
+        expect( transport ).to receive(:send).with(userauth_info_response_payload).once
+        expect( transport ).to receive(:receive).with(no_args).and_return(userauth_info_request_payload, "payload").twice
+
+        expect( keyboard_interactive_method.request_authentication username, service_name ).to eq "payload"
+      end                  
+    end                    
+
+    context "when response message is other than info request" do
+      it "sends userauth request for keyboard_interactive method" do
+        expect( transport ).to receive(:send).with(userauth_request_with_keyboard_interactive_method_payload).once
+        expect( transport ).to receive(:receive).with(no_args).and_return("payload").once
+
+        expect( keyboard_interactive_method.request_authentication username, service_name ).to eq "payload"
+      end                  
+    end                    
+  end
 end

@@ -4,11 +4,11 @@
 RSpec.describe HrrRbSsh::Connection::GlobalRequestHandler do
   let(:name){ 'forwarded-tcpip' }
   let(:io){ 'dummy' }
-  let(:mode){ 'dummy' }
+  let(:mode){ HrrRbSsh::Mode::SERVER }
   let(:transport){ HrrRbSsh::Transport.new io, mode }
-  let(:authentication){ HrrRbSsh::Authentication.new transport }
+  let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
   let(:options){ Hash.new }
-  let(:connection){ HrrRbSsh::Connection.new authentication, options }
+  let(:connection){ HrrRbSsh::Connection.new authentication, mode, options }
   let(:global_request_handler){ described_class.new connection }
 
   describe "#close" do

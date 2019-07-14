@@ -5,9 +5,9 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f5dfdb97d72f24ca5939/test_coverage)](https://codeclimate.com/github/hirura/hrr_rb_ssh/test_coverage)
 [![Gem Version](https://badge.fury.io/rb/hrr_rb_ssh.svg)](https://badge.fury.io/rb/hrr_rb_ssh)
 
-hrr_rb_ssh is a pure Ruby SSH 2.0 server implementation.
+hrr_rb_ssh is a pure Ruby SSH 2.0 server and client implementation.
 
-With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible to write an original server side application on secure connection provided by SSH protocol.
+With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible to write an original server side application on secure connection provided by SSH protocol. And it supports to write SSH client as well.
 
 ## Table of Contents
 
@@ -31,6 +31,7 @@ With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible
             - [Custom request handlers](#custom-request-handlers)
         - [Defining preferred algorithms (optional)](#defining-preferred-algorithms-optional)
         - [Hiding and/or simulating local SSH version](#hiding-and-or-simulating-local-ssh-version)
+    - [Writing SSH client (Experimental)](#writing-ssh-client-experimental)
     - [Demo](#demo)
 - [Supported Features](#supported-features)
     - [Connection layer](#connection-layer)
@@ -420,9 +421,66 @@ options['local_version'] = "SSH-2.0-OpenSSH"
 
 Please note that the beginning of the string must be `SSH-2.0-`. Otherwise SSH 2.0 remote peer cannot continue negotiation with the local peer.
 
+### Writing SSH client (Experimental)
+
+#### Requiring `hrr_rb_ssh` library
+
+First of all, `hrr_rb_ssh` library needs to be loaded.
+
+```ruby
+require 'hrr_rb_ssh'
+```
+
+#### Starting SSH connection
+
+The client mode can be started with `HrrRbSsh::Client.start`. The method takes `address` and `options` arguments. The `address` is the target host address that the SSH client connects to. And the `options` contains various parameters for the SSH connection. At least `username` key must be set in the `options`. Also at least one of `password`, `publickey`, or `keyboard-interactive` needs to be set for authentication instead of authenticators that are used in server mode. Also as similar to server mode, it is possible to specify preferred transport algorithms and preferred authentication methods with the same keywords.
+
+```ruby
+address = 'remotehost'
+options = {
+  port: 22,
+  username: 'user1',
+  password: 'password1',
+  publickey: ['ssh-rsa', "/home/user1/.ssh/id_rsa")],
+  authentication_preferred_authentication_methods = ['publickey', 'password'],
+}
+HrrRbSsh::Client.start(address, options) do |conn|
+  # Do something here
+  # For instance: conn.exec "command"
+end
+```
+
+#### Executing remote commands
+
+There are some methods supported in client mode. The methods works as a receiver of `conn` block variable.
+
+##### exec method
+
+The `exec` and `exec!` methods execute command on a remote host. Both takes a command argument that is executed in the remote host. And they can take optional `pty` and `env` arguments. When `pty: true` is set, then the command will be executed on a pseudo-TTY. When `env: {'key' => 'value'}` is set, then the environmental variables are set before the command is executed.
+
+The `exec!` method returns `[stdout, stderr]` outputs. Once the command is executed and the outputs are completed, then the method returns the value.
+
+On the other hand, `exec` method takes block like the below example and returns exit status of the command. When the command is executed and the outputs and reading them are finished, then `io_out` and `io_err` return EOF.
+
+```ruby
+conn.exec "command" do |io_in, io_out, io_err|
+  # Do something here
+end
+```
+
+##### shell method
+
+The `shell` method provides a shell access on a remote host. As similar to `exec` method, it takes block and its block variable is also `io_in, io_out, io_err`. `shell` is always on pseudo-TTY, so it doesn't take `pty` optional argument. It takes `env` optional argument. Exiting shell will leads `io_out` and `io_err` EOF.
+
+```ruby
+conn.shell do |io_in, io_out, io_err|
+  # Do something here
+end
+```
+
 ### Demo
 
-The `demo/server.rb` shows a good example on how to use the hrr_rb_ssh library in SSH server mode.
+The `demo/server.rb` shows a good example on how to use the hrr_rb_ssh library in SSH server mode. And the `demo/client.rb` shows an example on how to use the hrr_rb_ssh library in SSH client mode.
 
 ## Supported Features
 

@@ -44,6 +44,28 @@ module HrrRbSsh
                 false
               end
             end
+
+            def generate_public_key_blob secret_key
+              publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new secret_key
+              publickey.to_public_key_blob
+            end
+
+            def generate_signature session_id, username, service_name, method_name, secret_key
+              publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new secret_key
+              publickey_blob = publickey.to_public_key_blob
+              signature_blob_h = {
+                :'session identifier'        => session_id,
+                :'message number'            => Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+                :'user name'                 => username,
+                :'service name'              => service_name,
+                :'method name'               => method_name,
+                :'with signature'            => true,
+                :'public key algorithm name' => self.class::NAME,
+                :'public key blob'           => publickey_blob
+              }
+              signature_blob = SignatureBlob.encode signature_blob_h
+              publickey.sign signature_blob
+            end
           end
         end
       end

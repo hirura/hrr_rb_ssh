@@ -3,7 +3,7 @@
 
 RSpec.describe HrrRbSsh::Authentication::Method::None do
   let(:name){ 'none' }
-  let(:transport){ 'dummy' }
+  let(:transport){ double('transport') }
 
   it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
     expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
@@ -80,6 +80,31 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
           expect( none_method.authenticate userauth_request_message ).to be false
         end
       end
+    end
+  end
+
+  describe "#request_authentication" do
+    let(:options){ {} }
+    let(:none_method){ described_class.new transport, options, {}, [] }
+    let(:username){ "username" }
+    let(:service_name){ "ssh-connection" }
+    let(:userauth_request_with_none_method_message){
+      {
+        :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'user name'      => username,
+        :'service name'   => service_name,
+        :'method name'    => "none",
+      }
+    }
+    let(:userauth_request_with_none_method_payload){
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_none_method_message
+    }
+
+    it "sends userauth request for none method" do
+      expect( transport ).to receive(:send).with(userauth_request_with_none_method_payload).once
+      expect( transport ).to receive(:receive).with(no_args).and_return("payload").once
+
+      expect( none_method.request_authentication username, service_name ).to eq "payload"
     end
   end
 end
