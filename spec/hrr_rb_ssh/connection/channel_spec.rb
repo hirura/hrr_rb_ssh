@@ -3,11 +3,11 @@
 
 RSpec.describe HrrRbSsh::Connection::Channel do
   let(:io){ 'dummy' }
-  let(:mode){ 'dummy' }
+  let(:mode){ HrrRbSsh::Mode::SERVER }
   let(:transport){ HrrRbSsh::Transport.new io, mode }
-  let(:authentication){ HrrRbSsh::Authentication.new transport }
+  let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
   let(:options){ Hash.new }
-  let(:connection){ HrrRbSsh::Connection.new authentication, options }
+  let(:connection){ HrrRbSsh::Connection.new authentication, mode, options }
   let(:channel_type){ "session" }
   let(:local_channel){ 0 }
   let(:remote_channel){ 0 }
@@ -120,71 +120,71 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
           context "when exit-status is an instance of Integer" do
             let(:exitstatus){ 0 }
-            it "updates closed with true, closes queues and IOs, and send EOF, exit-status, and CLOSE" do
+            it "updates closed with true, closes receive message queue, but keep IOs open, and send EOF, exit-status, and CLOSE" do
               expect(connection).to receive(:send).with(channel_eof_payload).once
               expect(connection).to receive(:send).with(channel_request_exit_status_payload).once
               expect(connection).to receive(:send).with(channel_close_payload).once
               channel.close from=:channel_type_instance, exitstatus
               expect(channel.instance_variable_get('@closed')).to be true
               expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
-              expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
-              expect(channel.instance_variable_get('@r_io_in' ).closed?).to be true
-              expect(channel.instance_variable_get('@w_io_in' ).closed?).to be true
-              expect(channel.instance_variable_get('@r_io_out').closed?).to be true
-              expect(channel.instance_variable_get('@w_io_out').closed?).to be true
-              expect(channel.instance_variable_get('@r_io_err').closed?).to be true
-              expect(channel.instance_variable_get('@w_io_err').closed?).to be true
+              expect(channel.instance_variable_get('@receive_data_queue').closed?).to be false
+              expect(channel.instance_variable_get('@r_io_in' ).closed?).to be false
+              expect(channel.instance_variable_get('@w_io_in' ).closed?).to be false
+              expect(channel.instance_variable_get('@r_io_out').closed?).to be false
+              expect(channel.instance_variable_get('@w_io_out').closed?).to be false
+              expect(channel.instance_variable_get('@r_io_err').closed?).to be false
+              expect(channel.instance_variable_get('@w_io_err').closed?).to be false
             end
           end
 
           context "when exit-status is not an instance of Integer" do
             let(:exitstatus){ 'string' }
-            it "updates closed with true, closes queues and IOs, and send EOF, exit-status, and CLOSE" do
+            it "updates closed with true, closes receive message queue, but keep IOs open, and send EOF and CLOSE" do
               expect(connection).to receive(:send).with(channel_eof_payload).once
               expect(connection).to receive(:send).with(channel_close_payload).once
               channel.close from=:channel_type_instance, exitstatus
               expect(channel.instance_variable_get('@closed')).to be true
               expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
-              expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
-              expect(channel.instance_variable_get('@r_io_in' ).closed?).to be true
-              expect(channel.instance_variable_get('@w_io_in' ).closed?).to be true
-              expect(channel.instance_variable_get('@r_io_out').closed?).to be true
-              expect(channel.instance_variable_get('@w_io_out').closed?).to be true
-              expect(channel.instance_variable_get('@r_io_err').closed?).to be true
-              expect(channel.instance_variable_get('@w_io_err').closed?).to be true
+              expect(channel.instance_variable_get('@receive_data_queue').closed?).to be false
+              expect(channel.instance_variable_get('@r_io_in' ).closed?).to be false
+              expect(channel.instance_variable_get('@w_io_in' ).closed?).to be false
+              expect(channel.instance_variable_get('@r_io_out').closed?).to be false
+              expect(channel.instance_variable_get('@w_io_out').closed?).to be false
+              expect(channel.instance_variable_get('@r_io_err').closed?).to be false
+              expect(channel.instance_variable_get('@w_io_err').closed?).to be false
             end
           end
         end
 
         context "when connection is closed" do
-          it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
+          it "updates closed with true, closes receive message queue, but keep IOs open, and send EOF and CLOSE" do
             expect(channel).to receive(:send_channel_eof).with(no_args).and_raise(HrrRbSsh::Error::ClosedConnection).once
             expect { channel.close from=:channel_type_instance }.not_to raise_error
             expect(channel.instance_variable_get('@closed')).to be true
             expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
-            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
-            expect(channel.instance_variable_get('@r_io_in' ).closed?).to be true
-            expect(channel.instance_variable_get('@w_io_in' ).closed?).to be true
-            expect(channel.instance_variable_get('@r_io_out').closed?).to be true
-            expect(channel.instance_variable_get('@w_io_out').closed?).to be true
-            expect(channel.instance_variable_get('@r_io_err').closed?).to be true
-            expect(channel.instance_variable_get('@w_io_err').closed?).to be true
+            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be false
+            expect(channel.instance_variable_get('@r_io_in' ).closed?).to be false
+            expect(channel.instance_variable_get('@w_io_in' ).closed?).to be false
+            expect(channel.instance_variable_get('@r_io_out').closed?).to be false
+            expect(channel.instance_variable_get('@w_io_out').closed?).to be false
+            expect(channel.instance_variable_get('@r_io_err').closed?).to be false
+            expect(channel.instance_variable_get('@w_io_err').closed?).to be false
           end
         end
 
         context "when send raises unexpected error" do
-          it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
+          it "updates closed with true, closes receive message queue, but keep IOs open, and send EOF and CLOSE" do
             expect(channel).to receive(:send_channel_eof).with(no_args).and_raise(RuntimeError).once
             expect { channel.close from=:channel_type_instance }.not_to raise_error
             expect(channel.instance_variable_get('@closed')).to be true
             expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
-            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
-            expect(channel.instance_variable_get('@r_io_in' ).closed?).to be true
-            expect(channel.instance_variable_get('@w_io_in' ).closed?).to be true
-            expect(channel.instance_variable_get('@r_io_out').closed?).to be true
-            expect(channel.instance_variable_get('@w_io_out').closed?).to be true
-            expect(channel.instance_variable_get('@r_io_err').closed?).to be true
-            expect(channel.instance_variable_get('@w_io_err').closed?).to be true
+            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be false
+            expect(channel.instance_variable_get('@r_io_in' ).closed?).to be false
+            expect(channel.instance_variable_get('@w_io_in' ).closed?).to be false
+            expect(channel.instance_variable_get('@r_io_out').closed?).to be false
+            expect(channel.instance_variable_get('@w_io_out').closed?).to be false
+            expect(channel.instance_variable_get('@r_io_err').closed?).to be false
+            expect(channel.instance_variable_get('@w_io_err').closed?).to be false
           end
         end
       end
@@ -197,19 +197,19 @@ RSpec.describe HrrRbSsh::Connection::Channel do
             channel.instance_variable_set('@channel_type_instance', mock_channel_type_instance)
           end
 
-          it "updates closed with true, closes queues and IOs, and send EOF and CLOSE" do
+          it "updates closed with true, closes receive message queue, but keep IOs open, and send EOF and CLOSE" do
             expect(channel).to receive(:send_channel_close).with(no_args).once
             expect(mock_channel_type_instance).to receive(:close).with(no_args).once
             channel.close
             expect(channel.instance_variable_get('@closed')).to be true
             expect(channel.instance_variable_get('@receive_message_queue').closed?).to be true
-            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be true
-            expect(channel.instance_variable_get('@r_io_in' ).closed?).to be true
-            expect(channel.instance_variable_get('@w_io_in' ).closed?).to be true
-            expect(channel.instance_variable_get('@r_io_out').closed?).to be true
-            expect(channel.instance_variable_get('@w_io_out').closed?).to be true
-            expect(channel.instance_variable_get('@r_io_err').closed?).to be true
-            expect(channel.instance_variable_get('@w_io_err').closed?).to be true
+            expect(channel.instance_variable_get('@receive_data_queue').closed?).to be false
+            expect(channel.instance_variable_get('@r_io_in' ).closed?).to be false
+            expect(channel.instance_variable_get('@w_io_in' ).closed?).to be false
+            expect(channel.instance_variable_get('@r_io_out').closed?).to be false
+            expect(channel.instance_variable_get('@w_io_out').closed?).to be false
+            expect(channel.instance_variable_get('@r_io_err').closed?).to be false
+            expect(channel.instance_variable_get('@w_io_err').closed?).to be false
           end
         end
       end
@@ -479,11 +479,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when IOError occurs" do
       it "receives data from UNIX socket pair and send the data" do
         expect(connection).to receive(:send).with(channel_data_payload).and_raise(IOError).once
-        allow(channel).to receive(:send_channel_eof).with(no_args).once
-        allow(channel).to receive(:send_channel_close).with(no_args).once
         t = channel.out_sender_thread
         t.join
-        expect(channel.closed?).to be true
+        expect(channel.closed?).to be false
       end
     end
 
@@ -535,11 +533,9 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when IOError occurs" do
       it "receives data from UNIX socket pair and send the data" do
         expect(connection).to receive(:send).with(channel_extended_data_payload).and_raise(IOError).once
-        allow(channel).to receive(:send_channel_eof).with(no_args).once
-        allow(channel).to receive(:send_channel_close).with(no_args).once
         t = channel.err_sender_thread
         t.join
-        expect(channel.closed?).to be true
+        expect(channel.closed?).to be false
       end
     end
 
