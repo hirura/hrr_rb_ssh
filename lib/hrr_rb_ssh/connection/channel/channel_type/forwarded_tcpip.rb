@@ -46,15 +46,15 @@ module HrrRbSsh
                     @channel.io[1].write s.readpartial(10240)
                   rescue EOFError
                     @logger.info { "socket is EOF" }
-                    @channel.io[1].close
+                    @channel.io[1].close rescue nil
                     break
                   rescue IOError
                     @logger.info { "socket is closed" }
-                    @channel.io[1].close
+                    @channel.io[1].close rescue nil
                     break
                   rescue => e
                     @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-                    @channel.io[1].close
+                    @channel.io[1].close rescue nil
                     break
                   end
                 end
