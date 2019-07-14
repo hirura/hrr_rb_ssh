@@ -20,9 +20,9 @@ module HrrRbSsh
 
     def start io
       @logger.info { "start server service" }
-      transport      = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::SERVER, @options
-      authentication = HrrRbSsh::Authentication.new transport, @options
-      connection     = HrrRbSsh::Connection.new     authentication, @options
+      transport      = Transport.new      io, Mode::SERVER, @options
+      authentication = Authentication.new transport, Mode::SERVER, @options
+      connection     = Connection.new     authentication, Mode::SERVER, @options
       connection.start
     end
   end
