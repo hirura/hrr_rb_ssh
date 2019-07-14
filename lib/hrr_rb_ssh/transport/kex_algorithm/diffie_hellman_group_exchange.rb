@@ -16,25 +16,50 @@ module HrrRbSsh
           @logger = Logger.new(self.class.name)
         end
 
-        def start transport, mode
-          case mode
+        def start transport
+          case transport.mode
           when Mode::SERVER
-            receive_kex_dh_gex_request transport.receive
-            set_dh
+            message = receive_kex_dh_gex_request transport.receive
+            @min = message[:'min']
+            @n   = message[:'n']
+            @max = message[:'max']
+            initialize_dh
+            @p = @dh.p.to_i
+            @g = @dh.g.to_i
             send_kex_dh_gex_group transport
-            receive_kex_dh_gex_init transport.receive
+            @k_s = transport.server_host_key_algorithm.server_public_host_key
+            @f   = @public_key
+            message = receive_kex_dh_gex_init transport.receive
+            @e   = message[:'e']
+            @shared_secret = OpenSSL::BN.new(@dh.compute_key(OpenSSL::BN.new(@e)), 2).to_i
             send_kex_dh_gex_reply transport
-          else
-            raise "unsupported mode"
+          when Mode::CLIENT
+            @min = 1024
+            @n   = 2048
+            @max = 8192
+            send_kex_dh_gex_request transport
+            message = receive_kex_dh_gex_group transport.receive
+            @p   = message[:'p']
+            @g   = message[:'g']
+            initialize_dh [@p, @g]
+            @e   = @public_key
+            send_kex_dh_gex_init transport
+            message = receive_kex_dh_gex_reply transport.receive
+            @k_s = message[:'server public host key and certificates (K_S)']
+            @f   = message[:'f']
+            @shared_secret = OpenSSL::BN.new(@dh.compute_key(OpenSSL::BN.new(@f)), 2).to_i
           end
         end
 
-        def set_dh
-          p_list = KexAlgorithm.list_supported.map{ |e| KexAlgorithm[e] }.select{ |e| e.const_defined?(:P) }.map{ |e| [OpenSSL::BN.new(e::P,16).num_bits, e::P] }.sort_by{ |e| e[0] }.reverse
-          candidate = p_list.find{ |e| e[0] <= @n }
-          raise unless (@min .. @max).include?(candidate[0])
-          p = candidate[1]
-          g = 2
+        def initialize_dh pg=nil
+          unless pg
+            p_list = KexAlgorithm.list_supported.map{ |e| KexAlgorithm[e] }.select{ |e| e.const_defined?(:P) }.map{ |e| [OpenSSL::BN.new(e::P,16).num_bits, e::P] }.sort_by{ |e| e[0] }.reverse
+            candidate = p_list.find{ |e| e[0] <= @n }
+            raise unless (@min .. @max).include?(candidate[0])
+            p, g = candidate[1], 2
+          else
+            p, g = pg
+          end
           @dh = OpenSSL::PKey::DH.new
           if @dh.respond_to?(:set_pqg)
             @dh.set_pqg OpenSSL::BN.new(p, 16), nil, OpenSSL::BN.new(g)
@@ -43,84 +68,93 @@ module HrrRbSsh
             @dh.g = OpenSSL::BN.new(g)
           end
           @dh.generate_key!
-        end
-
-        def set_e e
-          @e = e
+          @public_key = @dh.pub_key.to_i
         end
 
         def shared_secret
-          k = OpenSSL::BN.new(@dh.compute_key(OpenSSL::BN.new(@e)), 2).to_i
-        end
-
-        def pub_key
-          f = @dh.pub_key.to_i
+          @shared_secret
         end
 
         def hash transport
-          e = @e
-          k = shared_secret
-          f = pub_key
-
           h0_payload = {
             :'V_C' => transport.v_c,
             :'V_S' => transport.v_s,
             :'I_C' => transport.i_c,
             :'I_S' => transport.i_s,
-            :'K_S' => transport.server_host_key_algorithm.server_public_host_key,
+            :'K_S' => @k_s,
             :'min' => @min,
             :'n'   => @n,
             :'max' => @max,
-            :'p'   => @dh.p.to_i,
-            :'g'   => @dh.g.to_i,
-            :'e'   => e,
-            :'f'   => f,
-            :'k'   => k,
+            :'p'   => @p,
+            :'g'   => @g,
+            :'e'   => @e,
+            :'f'   => @f,
+            :'k'   => @shared_secret,
           }
           h0 = H0.encode h0_payload
-
           h = OpenSSL::Digest.digest self.class::DIGEST, h0
-
-          h
         end
 
         def sign transport
           h = hash transport
           s = transport.server_host_key_algorithm.sign h
-          s
         end
 
         def receive_kex_dh_gex_request payload
-          message = Message::SSH_MSG_KEX_DH_GEX_REQUEST.decode payload
-          @min = message[:'min']
-          @n   = message[:'n']
-          @max = message[:'max']
+          Message::SSH_MSG_KEX_DH_GEX_REQUEST.decode payload
         end
 
         def send_kex_dh_gex_group transport
           message = {
             :'message number' => Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
-            :'p'              => @dh.p.to_i,
-            :'g'              => @dh.g.to_i,
+            :'p'              => @p,
+            :'g'              => @g,
           }
           payload = Message::SSH_MSG_KEX_DH_GEX_GROUP.encode message
           transport.send payload
         end
 
         def receive_kex_dh_gex_init payload
-          message = Message::SSH_MSG_KEX_DH_GEX_INIT.decode payload
-          set_e message[:'e']
+          Message::SSH_MSG_KEX_DH_GEX_INIT.decode payload
         end
 
         def send_kex_dh_gex_reply transport
           message = {
             :'message number'                                => Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
-            :'server public host key and certificates (K_S)' => transport.server_host_key_algorithm.server_public_host_key,
-            :'f'                                             => pub_key,
+            :'server public host key and certificates (K_S)' => @k_s,
+            :'f'                                             => @f,
             :'signature of H'                                => sign(transport),
           }
           payload = Message::SSH_MSG_KEX_DH_GEX_REPLY.encode message
           transport.send payload
+        end
+
+        def send_kex_dh_gex_request transport
+          message = {
+            :'message number' => Message::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
+            :'min'            => @min,
+            :'n'              => @n,
+            :'max'            => @max,
+          }
+          payload = Message::SSH_MSG_KEX_DH_GEX_REQUEST.encode message
+          transport.send payload
+        end
+
+        def receive_kex_dh_gex_group payload
+          Message::SSH_MSG_KEX_DH_GEX_GROUP.decode payload
+        end
+
+        def send_kex_dh_gex_init transport
+          message = {
+            :'message number' => Message::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
+            :'e'              => @e,
+          }
+          payload = Message::SSH_MSG_KEX_DH_GEX_INIT.encode message
+          transport.send payload
+        end
+
+        def receive_kex_dh_gex_reply payload
+          Message::SSH_MSG_KEX_DH_GEX_REPLY.decode payload
         end
       end
     end
