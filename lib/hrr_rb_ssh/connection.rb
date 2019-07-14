@@ -11,12 +11,14 @@ module HrrRbSsh
     attr_reader \
       :username,
       :variables,
-      :options
+      :options,
+      :mode
 
-    def initialize authentication, options={}
+    def initialize authentication, mode, options={}
       @logger = Logger.new self.class.name
 
       @authentication = authentication
+      @mode = mode
       @options = options
 
       @global_request_handler = GlobalRequestHandler.new self
@@ -38,21 +40,31 @@ module HrrRbSsh
     def assign_channel
       i = 0
       res = nil
-      loop do
+      while true
         break unless @channels.keys.include?(i)
         i += 1
       end
       i
     end
 
-    def start
+    def start foreground: true
+      @logger.info { "start connection" }
       @authentication.start
       @closed = false
-      connection_loop
+      @connection_loop_thread = connection_loop_thread
+      if foreground
+        @connection_loop_thread.join
+      end
+    end
+
+    def loop
+      @connection_loop_thread.join
     end
 
     def close
+      @logger.info { "closing connection" }
       @closed = true
+      @authentication.close
       @channels.values.each do |channel|
         begin
           channel.close
@@ -62,47 +74,58 @@ module HrrRbSsh
       end
       @channels.clear
       @global_request_handler.close
+      @connection_loop_thread.join unless @connection_loop_thread == Thread.current
+      @logger.info { "connection closed" }
     end
 
     def closed?
       @closed
     end
 
-    def connection_loop
-      @logger.info { "start connection" }
-      loop do
+    def connection_loop_thread
+      @logger.info { "start connection loop" }
+      Thread.new do
         begin
-          payload = @authentication.receive
-        rescue Error::ClosedAuthentication => e
+          while true
+            begin
+              payload = @authentication.receive
+            rescue Error::ClosedAuthentication => e
+              @logger.info { "authentication closed" }
+              break
+            end
+            @username ||= @authentication.username
+            @variables ||= @authentication.variables
+            case payload[0,1].unpack("C")[0]
+            when Message::SSH_MSG_GLOBAL_REQUEST::VALUE
+              global_request payload
+            when Message::SSH_MSG_CHANNEL_OPEN::VALUE
+              channel_open payload
+            when Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE
+              channel_open_confirmation payload
+            when Message::SSH_MSG_CHANNEL_REQUEST::VALUE
+              channel_request payload
+            when Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
+              channel_window_adjust payload
+            when Message::SSH_MSG_CHANNEL_DATA::VALUE
+              channel_data payload
+            when Message::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE
+              channel_extended_data payload
+            when Message::SSH_MSG_CHANNEL_EOF::VALUE
+              channel_eof payload
+            when Message::SSH_MSG_CHANNEL_CLOSE::VALUE
+              channel_close payload
+            else
+              @logger.warn { "received unsupported message: id: #{payload[0,1].unpack("C")[0]}" }
+            end
+          end
+        rescue => e
+          @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        ensure
           @logger.info { "closing connection loop" }
-          break
-        end
-        @username ||= @authentication.username
-        @variables ||= @authentication.variables
-        case payload[0,1].unpack("C")[0]
-        when Message::SSH_MSG_GLOBAL_REQUEST::VALUE
-          global_request payload
-        when Message::SSH_MSG_CHANNEL_OPEN::VALUE
-          channel_open payload
-        when Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE
-          channel_open_confirmation payload
-        when Message::SSH_MSG_CHANNEL_REQUEST::VALUE
-          channel_request payload
-        when Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
-          channel_window_adjust payload
-        when Message::SSH_MSG_CHANNEL_DATA::VALUE
-          channel_data payload
-        when Message::SSH_MSG_CHANNEL_EOF::VALUE
-          channel_eof payload
-        when Message::SSH_MSG_CHANNEL_CLOSE::VALUE
-          channel_close payload
-        else
-          @logger.warn { "received unsupported message: id: #{payload[0,1].unpack("C")[0]}" }
+          close
+          @logger.info { "connection loop closed" }
         end
       end
-      @logger.info { "closing connection" }
-      close
-      @logger.info { "connection closed" }
     end
 
     def global_request payload
@@ -149,8 +172,37 @@ module HrrRbSsh
         channel.start
         send_channel_open_confirmation channel
       rescue => e
+        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         recipient_channel = message[:'sender channel']
         send_channel_open_failure recipient_channel, Message::SSH_MSG_CHANNEL_OPEN_FAILURE::ReasonCode::SSH_OPEN_CONNECT_FAILED, e.message
+      end
+    end
+
+    def request_channel_open channel_type, channel_specific_message={}, wait_response=true
+      @logger.info { 'request channel open' }
+      case channel_type
+      when "session"
+        channel = Channel.new self, {:'channel type' => channel_type}
+        @channels[channel.local_channel] = channel
+      end
+      message = {
+        :'message number'             => Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+        :'channel type'               => channel_type,
+        :'sender channel'             => channel.local_channel,
+        :'initial window size'        => channel.local_window_size,
+        :'maximum packet size'        => channel.local_maximum_packet_size,
+      }
+      send_channel_open message.merge(channel_specific_message)
+      @logger.info { 'sent channel open' }
+      if wait_response
+        @logger.info { 'wait response' }
+        channel.wait_until_started
+      end
+      unless channel.closed?
+        @logger.info { 'channel opened' }
+        channel
+      else
+        raise "Faild opening channel"
       end
     end
 
@@ -183,12 +235,18 @@ module HrrRbSsh
       @channels[local_channel].receive_message_queue.enq message
     end
 
+    def channel_extended_data payload
+      @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_EXTENDED_DATA::ID }
+      message = Message::SSH_MSG_CHANNEL_EXTENDED_DATA.decode payload
+      local_channel = message[:'recipient channel']
+      @channels[local_channel].receive_message_queue.enq message
+    end
+
     def channel_eof payload
       @logger.info { 'received ' + Message::SSH_MSG_CHANNEL_EOF::ID }
       message = Message::SSH_MSG_CHANNEL_EOF.decode payload
       local_channel = message[:'recipient channel']
-      channel = @channels[local_channel]
-      channel.receive_message_queue.close
+      @channels[local_channel].receive_message_queue.enq message
     end
 
     def channel_close payload
@@ -197,6 +255,9 @@ module HrrRbSsh
       local_channel = message[:'recipient channel']
       channel = @channels[local_channel]
       channel.close
+      @logger.info { "wait until threads closed in channel" }
+      channel.wait_until_closed
+      @logger.info { "channel closed" }
       @logger.info { "deleting channel" }
       @channels.delete local_channel
       @logger.info { "channel deleted" }

@@ -31,6 +31,9 @@ module HrrRbSsh
               if @sender_thread_finished && @receiver_thread_finished
                 @logger.info { "closing direct-tcpip" }
                 @socket.close
+                @logger.info { "closing channel IOs" }
+                @channel.io.each{ |io| io.close rescue nil }
+                @logger.info { "channel IOs closed" }
                 @channel.close from=:channel_type_instance
                 @logger.info { "direct-tcpip closed" }
               end

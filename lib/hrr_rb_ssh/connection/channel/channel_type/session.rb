@@ -18,7 +18,10 @@ module HrrRbSsh
           end
 
           def start
-            @proc_chain_thread = proc_chain_thread
+            case @connection.mode
+            when Mode::SERVER
+              @proc_chain_thread = proc_chain_thread
+            end
           end
 
           def close
@@ -42,6 +45,9 @@ module HrrRbSsh
                 exitstatus = 1
               ensure
                 @logger.info { "closing proc chain thread" }
+                @logger.info { "closing channel IOs" }
+                @channel.io.each{ |io| io.close rescue nil }
+                @logger.info { "channel IOs closed" }
                 @logger.info { "wait for sending output" }
                 @channel.wait_until_senders_closed
                 @logger.info { "sending output finished" }
