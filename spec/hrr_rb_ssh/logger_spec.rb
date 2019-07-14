@@ -73,7 +73,7 @@ RSpec.describe HrrRbSsh::Logger do
         HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #fatal method of @@logger with '#\{name\}: ' prefix" do
-        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "p#{Process.pid}.t#{Thread.current.object_id}: #{name}: #{method}"
       end
     end
   end
@@ -95,7 +95,7 @@ RSpec.describe HrrRbSsh::Logger do
         HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #error method of @@logger with '#\{name\}: ' prefix" do
-        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "p#{Process.pid}.t#{Thread.current.object_id}: #{name}: #{method}"
       end
     end
   end
@@ -117,7 +117,7 @@ RSpec.describe HrrRbSsh::Logger do
         HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #warn method of @@logger with '#\{name\}: ' prefix" do
-        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "p#{Process.pid}.t#{Thread.current.object_id}: #{name}: #{method}"
       end
     end
   end
@@ -139,7 +139,7 @@ RSpec.describe HrrRbSsh::Logger do
         HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #info method of @@logger with '#\{name\}: ' prefix" do
-        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "p#{Process.pid}.t#{Thread.current.object_id}: #{name}: #{method}"
       end
     end
   end
@@ -161,7 +161,7 @@ RSpec.describe HrrRbSsh::Logger do
         HrrRbSsh::Logger.initialize internal_logger
       end
       it "calls #debug method of @@logger with '#\{name\}: ' prefix" do
-        expect(logger.send(method){ method }).to eq "#{name}: #{method}"
+        expect(logger.send(method){ method }).to eq "p#{Process.pid}.t#{Thread.current.object_id}: #{name}: #{method}"
       end
     end
   end

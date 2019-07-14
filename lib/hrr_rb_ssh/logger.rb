@@ -25,31 +25,31 @@ module HrrRbSsh
 
     def fatal
       if @@logger
-        @@logger.fatal { "#{@name}: #{yield}" }
+        @@logger.fatal { "p#{Process.pid}.t#{Thread.current.object_id}: #{@name}: #{yield}" }
       end
     end
 
     def error
       if @@logger
-        @@logger.error { "#{@name}: #{yield}" }
+        @@logger.error { "p#{Process.pid}.t#{Thread.current.object_id}: #{@name}: #{yield}" }
       end
     end
 
     def warn
       if @@logger
-        @@logger.warn { "#{@name}: #{yield}" }
+        @@logger.warn { "p#{Process.pid}.t#{Thread.current.object_id}: #{@name}: #{yield}" }
       end
     end
 
     def info
       if @@logger
-        @@logger.info { "#{@name}: #{yield}" }
+        @@logger.info { "p#{Process.pid}.t#{Thread.current.object_id}: #{@name}: #{yield}" }
       end
     end
 
     def debug
       if @@logger
-        @@logger.debug { "#{@name}: #{yield}" }
+        @@logger.debug { "p#{Process.pid}.t#{Thread.current.object_id}: #{@name}: #{yield}" }
       end
     end
   end
