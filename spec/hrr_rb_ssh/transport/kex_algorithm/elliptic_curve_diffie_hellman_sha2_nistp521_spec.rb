@@ -12,22 +12,22 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
     dh.generate_key
     dh
   }
-  let(:remote_dh_public_key){ 
+  let(:remote_dh_public_key){
     remote_dh.public_key.to_bn.to_i
   }
 
   it "can be looked up in HrrRbSsh::Transport::KexAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::KexAlgorithm[name] ).to eq described_class
-  end       
+  end
 
   it "is registered in HrrRbSsh::Transport::KexAlgorithm.list_supported" do
     expect( HrrRbSsh::Transport::KexAlgorithm.list_supported ).to include name
-  end         
+  end
 
   it "appears in HrrRbSsh::Transport::KexAlgorithm.list_preferred" do
     expect( HrrRbSsh::Transport::KexAlgorithm.list_preferred ).to include name
   end
- 
+
   describe '::DIGEST' do
     it "has correct digest" do
       expect(described_class::DIGEST).to eq digest
@@ -49,55 +49,90 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
   describe '#start' do
     let(:mock_t){ double('mock transport') }
 
-    let(:remote_kexecdh_init_message){
-      {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT::VALUE,
-        :'Q_C'            => remote_dh_public_key,
-      }
-    }
-    let(:remote_kexecdh_init_payload){
-      HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT.encode remote_kexecdh_init_message
-    }
-    let(:server_host_key_algorithm){ double('server host key algorithm') }
-    let(:server_public_host_key){ 'server public host key' }
-    let(:sign){ 'sign' }
-    let(:local_kexecdh_reply_message){
-      {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY::VALUE,
-        :'K_S'            => server_public_host_key,
-        :'Q_S'            => kex_algorithm.public_key,
-        :'signature of H' => sign,
-      }
-    }
-    let(:local_kexecdh_reply_payload){
-      HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY.encode local_kexecdh_reply_message
-    }
-
     context "when transport mode is server" do
+      let(:mode){ HrrRbSsh::Mode::SERVER }
+      let(:remote_kexecdh_init_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT::VALUE,
+          :'Q_C'            => remote_dh_public_key,
+        }
+      }
+      let(:remote_kexecdh_init_payload){
+        HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT.encode remote_kexecdh_init_message
+      }
+      let(:server_host_key_algorithm){ double('server host key algorithm') }
+      let(:server_public_host_key){ 'server public host key' }
+      let(:sign){ 'sign' }
+      let(:local_kexecdh_reply_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY::VALUE,
+          :'K_S'            => server_public_host_key,
+          :'Q_S'            => kex_algorithm.instance_variable_get('@public_key'),
+          :'signature of H' => sign,
+        }
+      }
+      let(:local_kexecdh_reply_payload){
+        HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY.encode local_kexecdh_reply_message
+      }
+
       it "exchanges public keys and gets shared secret" do
+        expect(mock_t).to receive(:mode).with(no_args).and_return(mode).once
         expect(mock_t).to receive(:receive).with(no_args).and_return(remote_kexecdh_init_payload).once
         expect(mock_t).to receive(:send).with(local_kexecdh_reply_payload).once
         expect(mock_t).to receive(:server_host_key_algorithm).with(no_args).and_return(server_host_key_algorithm).once
         expect(server_host_key_algorithm).to receive(:server_public_host_key).with(no_args).and_return(server_public_host_key).once
         expect(kex_algorithm).to receive(:sign).with(mock_t).and_return(sign).once
 
-        kex_algorithm.start mock_t, HrrRbSsh::Mode::SERVER
+        kex_algorithm.start mock_t
 
-        expect(kex_algorithm.shared_secret).to eq OpenSSL::BN.new(remote_dh.dh_compute_key(OpenSSL::PKey::EC::Point.new(OpenSSL::PKey::EC.new(curve_name).group, OpenSSL::BN.new(kex_algorithm.public_key))), 2).to_i
+        expect(kex_algorithm.shared_secret).to eq OpenSSL::BN.new(remote_dh.dh_compute_key(OpenSSL::PKey::EC::Point.new(OpenSSL::PKey::EC.new(curve_name).group, OpenSSL::BN.new(kex_algorithm.instance_variable_get('@public_key')))), 2).to_i
+      end
+    end
+
+    context "when transport mode is client" do
+      let(:mode){ HrrRbSsh::Mode::CLIENT }
+      let(:local_kexecdh_init_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT::VALUE,
+          :'Q_C'            => kex_algorithm.instance_variable_get('@public_key'),
+        }
+      }
+      let(:local_kexecdh_init_payload){
+        HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT.encode local_kexecdh_init_message
+      }
+      let(:server_host_key_algorithm){ double('server host key algorithm') }
+      let(:server_public_host_key){ 'server public host key' }
+      let(:sign){ 'sign' }
+      let(:remote_kexecdh_reply_message){
+        {
+          :'message number' => HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY::VALUE,
+          :'K_S'            => server_public_host_key,
+          :'Q_S'            => remote_dh_public_key,
+          :'signature of H' => sign,
+        }
+      }
+      let(:remote_kexecdh_reply_payload){
+        HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY.encode remote_kexecdh_reply_message
+      }
+
+      it "exchanges public keys and gets shared secret" do
+        expect(mock_t).to receive(:mode).with(no_args).and_return(mode).once
+        expect(mock_t).to receive(:send).with(local_kexecdh_init_payload).once
+        expect(mock_t).to receive(:receive).with(no_args).and_return(remote_kexecdh_reply_payload).once
+
+        kex_algorithm.start mock_t
+
+        expect(kex_algorithm.shared_secret).to eq OpenSSL::BN.new(remote_dh.dh_compute_key(OpenSSL::PKey::EC::Point.new(OpenSSL::PKey::EC.new(curve_name).group, OpenSSL::BN.new(kex_algorithm.instance_variable_get('@public_key')))), 2).to_i
       end
     end
   end
 
-  describe '#set_q_c' do
-    it "updates remote_dh_public_key" do
-      expect { kex_algorithm.set_q_c remote_dh_public_key }.to change { kex_algorithm.instance_variable_get('@q_c') }.from( nil ).to( remote_dh_public_key )
-    end
-  end
-
   describe '#shared_secret' do
-    it "generates shared secret" do
-      kex_algorithm.set_q_c remote_dh_public_key
-      expect(kex_algorithm.shared_secret).to eq OpenSSL::BN.new(remote_dh.dh_compute_key(OpenSSL::PKey::EC::Point.new(OpenSSL::PKey::EC.new(curve_name).group, OpenSSL::BN.new(kex_algorithm.public_key))), 2).to_i
+    let(:shared_secret){ 'shared secret value' }
+
+    it "returns @shared_secret value" do
+      kex_algorithm.instance_variable_set('@shared_secret', shared_secret)
+      expect( kex_algorithm.shared_secret ).to be shared_secret
     end
   end
 
@@ -108,13 +143,15 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
       let(:server_host_key_algorithm){ HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa.new }
 
       it "returns hash" do
-        kex_algorithm.set_q_c remote_dh_public_key
+        kex_algorithm.instance_variable_set('@k_s', server_host_key_algorithm.server_public_host_key)
+        kex_algorithm.instance_variable_set('@q_c', remote_dh_public_key)
+        kex_algorithm.instance_variable_set('@q_s', kex_algorithm.instance_variable_get('@public_key'))
+        kex_algorithm.instance_variable_set('@shared_secret', OpenSSL::BN.new(kex_algorithm.instance_variable_get('@dh').dh_compute_key(OpenSSL::PKey::EC::Point.new(OpenSSL::PKey::EC.new(curve_name).group, OpenSSL::BN.new(remote_dh_public_key))), 2).to_i)
 
         expect(mock_t).to receive(:v_c).with(no_args).and_return("v_c").once
         expect(mock_t).to receive(:v_s).with(no_args).and_return("v_s").once
         expect(mock_t).to receive(:i_c).with(no_args).and_return("i_c").once
         expect(mock_t).to receive(:i_s).with(no_args).and_return("i_s").once
-        expect(mock_t).to receive(:server_host_key_algorithm).with(no_args).and_return(server_host_key_algorithm).once
 
         expect( kex_algorithm.hash(mock_t).length ).to eq digest_length
       end
@@ -128,13 +165,16 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
       let(:server_host_key_algorithm){ HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa.new }
 
       it "returns encoded \"ssh-rsa\" || signed hash" do
-        kex_algorithm.set_q_c remote_dh_public_key
+        kex_algorithm.instance_variable_set('@k_s', server_host_key_algorithm.server_public_host_key)
+        kex_algorithm.instance_variable_set('@q_c', remote_dh_public_key)
+        kex_algorithm.instance_variable_set('@q_s', kex_algorithm.instance_variable_get('@public_key'))
+        kex_algorithm.instance_variable_set('@shared_secret', OpenSSL::BN.new(kex_algorithm.instance_variable_get('@dh').dh_compute_key(OpenSSL::PKey::EC::Point.new(OpenSSL::PKey::EC.new(curve_name).group, OpenSSL::BN.new(remote_dh_public_key))), 2).to_i)
 
         expect(mock_t).to receive(:v_c).with(no_args).and_return("v_c").twice
         expect(mock_t).to receive(:v_s).with(no_args).and_return("v_s").twice
         expect(mock_t).to receive(:i_c).with(no_args).and_return("i_c").twice
         expect(mock_t).to receive(:i_s).with(no_args).and_return("i_s").twice
-        expect(mock_t).to receive(:server_host_key_algorithm).with(no_args).and_return(server_host_key_algorithm).exactly(3).times
+        expect(mock_t).to receive(:server_host_key_algorithm).with(no_args).and_return(server_host_key_algorithm).once
 
         expect( kex_algorithm.sign(mock_t) ).to eq server_host_key_algorithm.sign(kex_algorithm.hash(mock_t))
       end
