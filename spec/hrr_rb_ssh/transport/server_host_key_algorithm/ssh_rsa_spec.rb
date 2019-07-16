@@ -6,11 +6,11 @@ RSpec.describe HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa do
 
   it "can be looked up in HrrRbSsh::Transport::ServerHostKeyAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm[name] ).to eq described_class
-  end       
+  end
 
   it "is registered in HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported" do
     expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported ).to include name
-  end         
+  end
 
   it "appears in HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred" do
     expect( HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred ).to include name

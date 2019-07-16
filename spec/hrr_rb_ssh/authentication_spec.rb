@@ -258,7 +258,7 @@ RSpec.describe HrrRbSsh::Authentication do
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
-          :'FALSE'              => false, 
+          :'FALSE'              => false,
           :'plaintext password' => "password"
         }
       }
@@ -302,7 +302,7 @@ RSpec.describe HrrRbSsh::Authentication do
           :'user name'                 => username,
           :'service name'              => "ssh-connection",
           :'method name'               => "publickey",
-          :'with signature'            => false, 
+          :'with signature'            => false,
           :'public key algorithm name' => "ssh-rsa",
           :'public key blob'           => "dummy",
         }
@@ -316,7 +316,7 @@ RSpec.describe HrrRbSsh::Authentication do
           :'user name'                 => username,
           :'service name'              => "ssh-connection",
           :'method name'               => "publickey",
-          :'with signature'            => true, 
+          :'with signature'            => true,
           :'public key algorithm name' => "ssh-rsa",
           :'public key blob'           => "dummy",
           :'signature'                 => "dummy",
@@ -379,7 +379,7 @@ RSpec.describe HrrRbSsh::Authentication do
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
-          :'FALSE'              => false, 
+          :'FALSE'              => false,
           :'plaintext password' => "password"
         }
       }
@@ -448,7 +448,7 @@ RSpec.describe HrrRbSsh::Authentication do
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
-          :'FALSE'              => false, 
+          :'FALSE'              => false,
           :'plaintext password' => "password"
         }
       }
@@ -609,7 +609,7 @@ RSpec.describe HrrRbSsh::Authentication do
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
-          :'FALSE'              => false, 
+          :'FALSE'              => false,
           :'plaintext password' => "password"
         }
       }
@@ -661,7 +661,7 @@ RSpec.describe HrrRbSsh::Authentication do
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
-          :'FALSE'              => false, 
+          :'FALSE'              => false,
           :'plaintext password' => "password"
         }
       }

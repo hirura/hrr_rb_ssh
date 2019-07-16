@@ -15,7 +15,7 @@ RSpec.describe HrrRbSsh::Connection::RequestHandler do
   describe "#run" do
     let(:proc){ Proc.new do |context| context.to_s end }
     let(:request_handler){ described_class.new &proc }
-    
+
     it "calls proc with context argument" do
       expect( request_handler.run 123 ).to eq "123"
     end

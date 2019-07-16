@@ -14,11 +14,11 @@ RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Ctr do
 
   it "can be looked up in HrrRbSsh::Transport::EncryptionAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::EncryptionAlgorithm[name] ).to eq described_class
-  end       
+  end
 
   it "is registered in HrrRbSsh::Transport::EncryptionAlgorithm.list_supported" do
     expect( HrrRbSsh::Transport::EncryptionAlgorithm.list_supported ).to include name
-  end         
+  end
 
   it "appears in HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred" do
     expect( HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred ).to include name

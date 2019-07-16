@@ -13,15 +13,15 @@ RSpec.describe HrrRbSsh::Transport::MacAlgorithm::HmacSha1 do
 
   it "can be looked up in HrrRbSsh::Transport::MacAlgorithm dictionary" do
     expect( HrrRbSsh::Transport::MacAlgorithm[name] ).to eq described_class
-  end       
+  end
 
   it "is registered in HrrRbSsh::Transport::MacAlgorithm.list_supported" do
     expect( HrrRbSsh::Transport::MacAlgorithm.list_supported ).to include name
-  end         
+  end
 
   it "appears in HrrRbSsh::Transport::MacAlgorithm.list_preferred" do
     expect( HrrRbSsh::Transport::MacAlgorithm.list_preferred ).to include name
-  end           
+  end
 
   describe '#digest_length' do
     it "returns expected digest length" do

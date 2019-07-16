@@ -504,7 +504,7 @@ RSpec.describe HrrRbSsh::Connection do
         :'address that was connected' => address,
         :'port that was connected'    => port,
         :'originator IP address'      => socket.remote_address.ip_address,
-        :'originator port'            => socket.remote_address.ip_port, 
+        :'originator port'            => socket.remote_address.ip_port,
       }
     }
     let(:channel_open_payload){

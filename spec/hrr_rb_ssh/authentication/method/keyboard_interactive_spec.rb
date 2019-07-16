@@ -7,20 +7,20 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
 
   it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
     expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
-  end                              
+  end
 
   it "is registered in HrrRbSsh::Authentication::Method.list_supported" do
     expect( HrrRbSsh::Authentication::Method.list_supported ).to include name
-  end         
+  end
 
   it "appears in HrrRbSsh::Authentication::Method.list_preferred" do
     expect( HrrRbSsh::Authentication::Method.list_preferred ).to include name
-  end           
+  end
 
   describe ".new" do
     it "takes three arguments: transport, options, variables, and authentication_methods" do
       expect { described_class.new(transport, {}, {}, []) }.not_to raise_error
-    end     
+    end
   end
 
   describe "#authenticate" do
@@ -155,26 +155,26 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
 
   describe "#request_authentication" do
     let(:options){
-      { 
+      {
         'client_authentication_keyboard_interactive' => ['password1', 'password2']
-      } 
-    } 
+      }
+    }
     let(:keyboard_interactive_method){ described_class.new transport, options, {}, [] }
     let(:username){ "username" }
     let(:service_name){ "ssh-connection" }
     let(:userauth_request_with_keyboard_interactive_method_message){
-      {             
+      {
         :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
-        :'user name'      => username,    
+        :'user name'      => username,
         :'service name'   => service_name,
         :'method name'    => "keyboard-interactive",
         :"language tag"   => "",
         :'submethods'     => "",
-      }                                                               
-    }                     
+      }
+    }
     let(:userauth_request_with_keyboard_interactive_method_payload){
       HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_keyboard_interactive_method_message
-    }                           
+    }
 
     context "when response message is info request" do
       let(:userauth_info_request_message){
@@ -211,8 +211,8 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
         expect( transport ).to receive(:receive).with(no_args).and_return(userauth_info_request_payload, "payload").twice
 
         expect( keyboard_interactive_method.request_authentication username, service_name ).to eq "payload"
-      end                  
-    end                    
+      end
+    end
 
     context "when response message is other than info request" do
       it "sends userauth request for keyboard_interactive method" do
@@ -220,7 +220,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
         expect( transport ).to receive(:receive).with(no_args).and_return("payload").once
 
         expect( keyboard_interactive_method.request_authentication username, service_name ).to eq "payload"
-      end                  
-    end                    
+      end
+    end
   end
 end

@@ -10,11 +10,11 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Algorithm::EcdsaSha2
 
   it "can be looked up in HrrRbSsh::Authentication::Method::Publickey::Algorithm dictionary" do
     expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm[name] ).to eq described_class
-  end       
+  end
 
   it "is registered in HrrRbSsh::Authentication::Method::Publickey::Algorithm.list_supported" do
     expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm.list_supported ).to include name
-  end         
+  end
 
   it "appears in HrrRbSsh::Authentication::Method::Publickey::Algorithm.list_preferred" do
     expect( HrrRbSsh::Authentication::Method::Publickey::Algorithm.list_preferred ).to include name

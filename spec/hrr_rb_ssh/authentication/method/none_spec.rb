@@ -7,11 +7,11 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
 
   it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
     expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
-  end       
+  end
 
   it "is registered in HrrRbSsh::Authentication::Method.list_supported" do
     expect( HrrRbSsh::Authentication::Method.list_supported ).to include name
-  end         
+  end
 
   it "appears in HrrRbSsh::Authentication::Method.list_preferred" do
     expect( HrrRbSsh::Authentication::Method.list_preferred ).not_to include name

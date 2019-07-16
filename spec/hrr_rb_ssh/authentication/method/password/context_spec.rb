@@ -56,7 +56,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
     let(:context_username){ "username" }
     let(:context_password){ "password" }
     let(:context){ described_class.new context_username, context_password, context_variables, context_authentication_methods }
-    
+
     context "with \"username\" and \"password\"" do
       let(:username){ "username" }
       let(:password){ "password" }
@@ -65,7 +65,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
         expect( context.verify username, password ).to be true
       end
     end
-    
+
     context "with \"username\" and \"mismatch\"" do
       let(:username){ "username" }
       let(:password){ "mismatch" }
@@ -74,7 +74,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
         expect( context.verify username, password ).to be false
       end
     end
-    
+
     context "with \"mismatch\" and \"password\"" do
       let(:username){ "mismatch" }
       let(:password){ "password" }
@@ -83,7 +83,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Password::Context do
         expect( context.verify username, password ).to be false
       end
     end
-    
+
     context "with \"mismatch\" and \"mismatch\"" do
       let(:username){ "mismatch" }
       let(:password){ "mismatch" }

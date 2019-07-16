@@ -15,7 +15,7 @@ RSpec.describe HrrRbSsh::Authentication::Authenticator do
   describe "#authenticate" do
     let(:proc){ Proc.new do |context| context.to_s end }
     let(:authenticator){ described_class.new &proc }
-    
+
     it "calls proc with context argument" do
       expect( authenticator.authenticate 123 ).to eq "123"
     end

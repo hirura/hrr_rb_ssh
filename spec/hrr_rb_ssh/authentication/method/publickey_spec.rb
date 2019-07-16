@@ -7,15 +7,15 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
 
   it "can be looked up in HrrRbSsh::Authentication::Method dictionary" do
     expect( HrrRbSsh::Authentication::Method[name] ).to eq described_class
-  end                              
+  end
 
   it "is registered in HrrRbSsh::Authentication::Method.list_supported" do
     expect( HrrRbSsh::Authentication::Method.list_supported ).to include name
-  end         
+  end
 
   it "appears in HrrRbSsh::Authentication::Method.list_preferred" do
     expect( HrrRbSsh::Authentication::Method.list_preferred ).to include name
-  end           
+  end
 
   let(:session_id){ 'session id' }
   let(:authentication_publickey_authenticator){ 'authentication_publickey_authenticator' }
@@ -32,7 +32,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
   describe ".new" do
     it "takes three arguments: transport, options, variables, and authentication_methods" do
       expect { described_class.new(transport, {}, {}, []) }.not_to raise_error
-    end     
+    end
 
     it "stores @session_id" do
       expect(publickey.instance_variable_get('@session_id')).to be session_id
@@ -161,7 +161,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
 
   describe "#request_authentication" do
     let(:options){
-      { 
+      {
         'session id' => session_id,
         'client_authentication_publickey' => [
           "ssh-rsa",
@@ -195,8 +195,8 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
 -----END RSA PRIVATE KEY-----
           EOB
         ]
-      } 
-    } 
+      }
+    }
     let(:publickey_method){ described_class.new transport, options, {}, [] }
     let(:session_id){ '1' }
     let(:username){ "username" }
@@ -210,19 +210,19 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
       algorithm.generate_signature(session_id, username, service_name, 'publickey', options['client_authentication_publickey'][1])
     }
     let(:userauth_request_with_publickey_method_without_signature_message){
-      {             
+      {
         :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
-        :'user name'                 => username,    
+        :'user name'                 => username,
         :'service name'              => service_name,
         :'method name'               => "publickey",
         :'with signature'            => false,
         :'public key algorithm name' => "ssh-rsa",
         :'public key blob'           => public_key_blob,
-      }                                                               
-    }                     
+      }
+    }
     let(:userauth_request_with_publickey_method_without_signature_payload){
       HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_publickey_method_without_signature_message
-    }                           
+    }
     let(:userauth_request_with_publickey_method_with_signature_message){
       {
         :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
@@ -237,7 +237,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
     }
     let(:userauth_request_with_publickey_method_with_signature_payload){
       HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_publickey_method_with_signature_message
-    }                           
+    }
 
     context "when response for with signature false message is pk_ok" do
       let(:userauth_pk_ok_message){
@@ -257,8 +257,8 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
         expect( transport ).to receive(:receive).with(no_args).and_return(userauth_pk_ok_payload, "payload").twice
 
         expect( publickey_method.request_authentication username, service_name ).to eq "payload"
-      end                  
-    end                    
+      end
+    end
 
     context "when response for with signature false message is other than pk_ok" do
       it "sends userauth request for publickey method" do
@@ -266,7 +266,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
         expect( transport ).to receive(:receive).with(no_args).and_return("payload").once
 
         expect( publickey_method.request_authentication username, service_name ).to eq "payload"
-      end                  
-    end                    
+      end
+    end
   end
 end

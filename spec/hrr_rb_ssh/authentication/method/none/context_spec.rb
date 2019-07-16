@@ -43,7 +43,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None::Context do
   describe "#verify" do
     let(:context_username){ "username" }
     let(:context){ described_class.new context_username, context_variables, context_authentication_methods }
-    
+
     context "with \"username\"" do
       let(:username){ "username" }
 
@@ -51,7 +51,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None::Context do
         expect( context.verify username ).to be true
       end
     end
-    
+
     context "with \"mismatch\"" do
       let(:username){ "mismatch" }
 
