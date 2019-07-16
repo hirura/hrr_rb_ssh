@@ -478,6 +478,16 @@ conn.shell do |io_in, io_out, io_err|
 end
 ```
 
+##### subsystem method
+
+The `subsystem` method is to start a subsystem on a remote host. The method takes a subsystem name argument and a block. Its block variable is also `io_in, io_out, io_err`. `subsystem` doesn't take `pty` nor `env` optional argument.
+
+```ruby
+conn.subsystem("echo") do |io_in, io_out, io_err|
+  # Do something here
+end
+```
+
 ### Demo
 
 The `demo/server.rb` shows a good example on how to use the hrr_rb_ssh library in SSH server mode. And the `demo/client.rb` shows an example on how to use the hrr_rb_ssh library in SSH client mode.
