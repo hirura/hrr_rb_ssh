@@ -194,5 +194,32 @@ module HrrRbSsh
       end
       channel_exit_status = channel.exit_status rescue nil
     end
+
+    def subsystem name
+      @logger.debug { "start subsystem" }
+      begin
+        @logger.info { "Opning channel" }
+        channel = @connection.request_channel_open "session"
+        @logger.info { "Channel opened" }
+        channel.send_channel_request_subsystem name
+        yield channel.io
+      rescue => e
+        @logger.error { "Failed opening channel" }
+        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        raise "Error in subsystem"
+      ensure
+        if channel
+          @logger.info { "closing channel IOs" }
+          channel.io.each{ |io| io.close rescue nil }
+          @logger.info { "channel IOs closed" }
+          @logger.info { "closing channel" }
+          @logger.info { "wait until threads closed in channel" }
+          channel.wait_until_closed
+          channel.close
+          @logger.info { "channel closed" }
+        end
+      end
+      channel_exit_status = channel.exit_status rescue nil
+    end
   end
 end
