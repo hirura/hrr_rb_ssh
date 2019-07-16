@@ -55,4 +55,13 @@ HrrRbSsh::Client.start(address, options){ |conn|
     io_in.puts "exit"
     t.join
   }
+
+  conn.subsystem("echo"){ |io_in, io_out, io_err| # => exit status
+    t = Thread.new {
+      print io_out.readpartial(10240) rescue nil
+    }
+    io_in.puts "string"
+    t.join
+    io_in.close
+  }
 }
