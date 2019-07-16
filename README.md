@@ -13,10 +13,10 @@ With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible
 
 - [Installation](#installation)
 - [Usage](#usage)
+    - [Requiring hrr\_rb\_ssh library](#requiring-hrr_rb_ssh-library)
+    - [Logging](#logging)
     - [Writing standard SSH server](#writing-standard-ssh-server)
-        - [Requiring hrr\_rb\_ssh library](#requiring-hrr_rb_ssh-library)
         - [Starting server application](#starting-server-application)
-        - [Logging](#logging)
         - [Registering pre\-generated secret keys for server host key](#registering-pre-generated-secret-keys-for-server-host-key)
         - [Defining authentications](#defining-authentications)
             - [Single authentication](#single-authentication)
@@ -32,6 +32,11 @@ With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible
         - [Defining preferred algorithms (optional)](#defining-preferred-algorithms-optional)
         - [Hiding and/or simulating local SSH version](#hiding-and-or-simulating-local-ssh-version)
     - [Writing SSH client (Experimental)](#writing-ssh-client-experimental)
+        - [Starting SSH connection](#starting-ssh-connection)
+        - [Executing remote commands](#executing-remote-commands)
+            - [exec method](#exec-method)
+            - [shell method](#shell-method)
+            - [subsystem method](#subsystem-method)
     - [Demo](#demo)
 - [Supported Features](#supported-features)
     - [Connection layer](#connection-layer)
@@ -63,15 +68,40 @@ $ gem install hrr_rb_ssh
 
 ## Usage
 
-### Writing standard SSH server
-
-#### Requiring `hrr_rb_ssh` library
+### Requiring `hrr_rb_ssh` library
 
 First of all, `hrr_rb_ssh` library needs to be loaded.
 
 ```ruby
 require 'hrr_rb_ssh'
 ```
+
+### Logging
+
+__IMPORTANT__: DEBUG log level outputs all communications between local and remote in human-readable plain-text including password and any secret. Be careful to use logging.
+
+The library provides logging functionality. To enable logging of the library, you are to initialize `HrrRbSsh::Logger` class.
+
+```ruby
+HrrRbSsh::Logger.initialize logger
+```
+
+Where, the `logger` variable can be an instance of standard Logger class or user-defined logger class. What `HrrRbSsh::Logger` class requires for `logger` variable is that the `logger` instance responds to `#fatal`, `#error`, `#warn`, `#info` and `#debug`.
+
+For instance, `logger` variable can be prepared like below.
+
+```ruby
+logger = Logger.new STDOUT
+logger.level = Logger::INFO
+```
+
+To disable logging, you can un-initialize `HrrRbSsh::Logger`.
+
+```ruby
+HrrRbSsh::Logger.uninitialize
+```
+
+### Writing standard SSH server
 
 #### Starting server application
 
@@ -97,31 +127,6 @@ end
 ```
 
 Where, an `options` variable is an instance of `Hash`, which has optional (or sometimes almost necessary) values.
-
-#### Logging
-
-__IMPORTANT__: DEBUG log level outputs all communications between local and remote in human-readable plain-text including password and any secret. Be careful to use logging.
-
-The library provides logging functionality. To enable logging of the library, you are to initialize `HrrRbSsh::Logger` class.
-
-```ruby
-HrrRbSsh::Logger.initialize logger
-```
-
-Where, the `logger` variable can be an instance of standard Logger class or user-defined logger class. What `HrrRbSsh::Logger` class requires for `logger` variable is that the `logger` instance responds to `#fatal`, `#error`, `#warn`, `#info` and `#debug`.
-
-For instance, `logger` variable can be prepared like below.
-
-```ruby
-logger = Logger.new STDOUT
-logger.level = Logger::INFO
-```
-
-To disable logging, you can un-initialize `HrrRbSsh::Logger`.
-
-```ruby
-HrrRbSsh::Logger.uninitialize
-```
 
 #### Registering pre-generated secret keys for server host key
 
@@ -423,14 +428,6 @@ Please note that the beginning of the string must be `SSH-2.0-`. Otherwise SSH 2
 
 ### Writing SSH client (Experimental)
 
-#### Requiring `hrr_rb_ssh` library
-
-First of all, `hrr_rb_ssh` library needs to be loaded.
-
-```ruby
-require 'hrr_rb_ssh'
-```
-
 #### Starting SSH connection
 
 The client mode can be started with `HrrRbSsh::Client.start`. The method takes `address` and `options` arguments. The `address` is the target host address that the SSH client connects to. And the `options` contains various parameters for the SSH connection. At least `username` key must be set in the `options`. Also at least one of `password`, `publickey`, or `keyboard-interactive` needs to be set for authentication instead of authenticators that are used in server mode. Also as similar to server mode, it is possible to specify preferred transport algorithms and preferred authentication methods with the same keywords.
@@ -459,6 +456,10 @@ There are some methods supported in client mode. The methods works as a receiver
 The `exec` and `exec!` methods execute command on a remote host. Both takes a command argument that is executed in the remote host. And they can take optional `pty` and `env` arguments. When `pty: true` is set, then the command will be executed on a pseudo-TTY. When `env: {'key' => 'value'}` is set, then the environmental variables are set before the command is executed.
 
 The `exec!` method returns `[stdout, stderr]` outputs. Once the command is executed and the outputs are completed, then the method returns the value.
+
+```ruby
+conn.exec! "command" # => [stdout, stderr]
+```
 
 On the other hand, `exec` method takes block like the below example and returns exit status of the command. When the command is executed and the outputs and reading them are finished, then `io_out` and `io_err` return EOF.
 
