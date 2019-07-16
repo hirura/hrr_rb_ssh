@@ -20,7 +20,7 @@ options = {
   port: 10022,
   username: 'user1',
   password: 'password1',
-  publickey: ['ssh-rsa', "/home/user1/.ssh/id_rsa")],
+  publickey: ['ssh-rsa', "/home/user1/.ssh/id_rsa"],
   keyboard_interactive: [
     'password1',
     #'password2' # when keyboard-interactive authentication requires 2nd response
