@@ -125,6 +125,8 @@ module HrrRbSsh
             else
               @logger.warn { "skip sending exit-status because exitstatus is not an instance of Integer" }
             end
+          elsif from == :sender_thread
+            send_channel_eof
           end
           send_channel_close
         rescue Error::ClosedConnection => e
@@ -389,9 +391,9 @@ module HrrRbSsh
             rescue => e
               @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
               @r_io_in.close rescue nil
-              close
             end
           end
+          close from=:sender_thread
           @logger.info { "sender thread closed" }
         }
       end
