@@ -13,7 +13,6 @@ RSpec.describe HrrRbSsh::Client do
     let(:connection){ double('connection') }
 
     it "must take at least one argument: address" do
-      options['port'] = port
       options['username'] = nil
       options['authentication_preferred_authentication_methods'] = nil
       options['client_authentication_password']                  = nil
@@ -29,11 +28,10 @@ RSpec.describe HrrRbSsh::Client do
       expect(HrrRbSsh::Transport).to receive(:new).with(tcpsocket, HrrRbSsh::Mode::CLIENT, options).and_return(transport)
       expect(HrrRbSsh::Authentication).to receive(:new).with(transport, HrrRbSsh::Mode::CLIENT, options).and_return(authentication)
       expect(HrrRbSsh::Connection).to receive(:new).with(authentication, HrrRbSsh::Mode::CLIENT, options).and_return(connection)
-      expect { described_class.new(address) }.not_to raise_error
+      expect { described_class.new([address, port]) }.not_to raise_error
     end
 
     it "can take optional arguments" do
-      options['port'] = port
       options['username'] = username
       options['authentication_preferred_authentication_methods'] = nil
       options['client_authentication_password']                  = nil
@@ -49,8 +47,7 @@ RSpec.describe HrrRbSsh::Client do
       expect(HrrRbSsh::Transport).to receive(:new).with(tcpsocket, HrrRbSsh::Mode::CLIENT, options).and_return(transport)
       expect(HrrRbSsh::Authentication).to receive(:new).with(transport, HrrRbSsh::Mode::CLIENT, options).and_return(authentication)
       expect(HrrRbSsh::Connection).to receive(:new).with(authentication, HrrRbSsh::Mode::CLIENT, options).and_return(connection)
-      expect { described_class.new(address, username: username) }.not_to raise_error
+      expect { described_class.new([address, port], username: username) }.not_to raise_error
     end
-
   end
 end
