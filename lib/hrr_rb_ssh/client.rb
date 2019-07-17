@@ -11,8 +11,8 @@ require 'hrr_rb_ssh/connection'
 
 module HrrRbSsh
   class Client
-    def self.start address, options={}
-      client = self.new address, options
+    def self.start target, options={}
+      client = self.new target, options
       client.start
       if block_given?
         begin
@@ -25,11 +25,19 @@ module HrrRbSsh
       end
     end
 
-    def initialize address, tmp_options={}
+    def initialize target, tmp_options={}
       @logger = Logger.new self.class.name
       @closed = true
       options = initialize_options tmp_options
-      io = TCPSocket.new address, options['port']
+      io = case target
+           when IO
+             target
+           when Array
+             io = TCPSocket.new *target
+           when String
+             port = 22
+             io = TCPSocket.new target, port
+           end
       transport      = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::CLIENT, options
       authentication = HrrRbSsh::Authentication.new transport, HrrRbSsh::Mode::CLIENT, options
       @connection    = HrrRbSsh::Connection.new     authentication, HrrRbSsh::Mode::CLIENT, options
@@ -38,7 +46,6 @@ module HrrRbSsh
     def initialize_options tmp_options
       tmp_options = Hash[tmp_options.map{|k, v| [k.to_s, v]}]
       options = {}
-      options['port'] = tmp_options['port'] || 22
       options['username'] = tmp_options['username']
       options['authentication_preferred_authentication_methods'] = tmp_options['authentication_preferred_authentication_methods']
       options['client_authentication_password']             = tmp_options['password']

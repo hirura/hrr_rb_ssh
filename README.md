@@ -430,18 +430,23 @@ Please note that the beginning of the string must be `SSH-2.0-`. Otherwise SSH 2
 
 #### Starting SSH connection
 
-The client mode can be started with `HrrRbSsh::Client.start`. The method takes `address` and `options` arguments. The `address` is the target host address that the SSH client connects to. And the `options` contains various parameters for the SSH connection. At least `username` key must be set in the `options`. Also at least one of `password`, `publickey`, or `keyboard-interactive` needs to be set for authentication instead of authenticators that are used in server mode. Also as similar to server mode, it is possible to specify preferred transport algorithms and preferred authentication methods with the same keywords.
+The client mode can be started with `HrrRbSsh::Client.start`. The method takes `target` and `options` arguments. The `target` that the SSH client connects to can be one of:
+
+- (IO) An io that is open for input and output
+- (Array) An array of the target host address or host name and its service port number
+- (String) The target host address or host name; in this case the target service port number will be 22
+
+And the `options` contains various parameters for the SSH connection. At least `username` key must be set in the `options`. Also at least one of `password`, `publickey`, or `keyboard-interactive` needs to be set for authentication instead of authenticators that are used in server mode. Also as similar to server mode, it is possible to specify preferred transport algorithms and preferred authentication methods with the same keywords.
 
 ```ruby
-address = 'remotehost'
+target = ['remotehost', 22]
 options = {
-  port: 22,
   username: 'user1',
   password: 'password1',
   publickey: ['ssh-rsa', "/home/user1/.ssh/id_rsa")],
   authentication_preferred_authentication_methods = ['publickey', 'password'],
 }
-HrrRbSsh::Client.start(address, options) do |conn|
+HrrRbSsh::Client.start(target, options) do |conn|
   # Do something here
   # For instance: conn.exec "command"
 end

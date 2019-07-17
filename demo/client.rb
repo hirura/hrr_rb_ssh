@@ -15,9 +15,8 @@ logger.level = Logger::INFO
 logger.level = Logger::DEBUG
 HrrRbSsh::Logger.initialize logger
 
-address = 'localhost'
+target = ['localhost', 10022]
 options = {
-  port: 10022,
   username: 'user1',
   password: 'password1',
   publickey: ['ssh-rsa', "/home/user1/.ssh/id_rsa"],
@@ -26,7 +25,7 @@ options = {
     #'password2' # when keyboard-interactive authentication requires 2nd response
   ],
 }
-HrrRbSsh::Client.start(address, options){ |conn|
+HrrRbSsh::Client.start(target, options){ |conn|
   puts conn.exec!('ls -l') # => [out, err]
 
   puts conn.exec!('ls -l', pty: true) # => [out, err] # "ls -l" command will be run on PTY
