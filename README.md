@@ -9,6 +9,8 @@ hrr_rb_ssh is a pure Ruby SSH 2.0 server and client implementation.
 
 With hrr_rb_ssh, it is possible to write an SSH server easily, and also possible to write an original server side application on secure connection provided by SSH protocol. And it supports to write SSH client as well.
 
+NOTE: ED25519 public key algorithm is now separated from hrr_rb_ssh. Please refer to [hrr_rb_ssh-ed25519](https://github.com/hirura/hrr_rb_ssh-ed25519).
+
 ## Table of Contents
 
 - [Installation](#installation)
@@ -389,9 +391,9 @@ p HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
 # => ["aes128-ctr", "aes192-ctr", "aes256-ctr", "aes128-cbc", "3des-cbc", "blowfish-cbc", "cast128-cbc", "aes192-cbc", "aes256-cbc", "arcfour"]
 
 p HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported
-# => ["ssh-dss", "ssh-rsa", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521", "ssh-ed25519"]
+# => ["ssh-dss", "ssh-rsa", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521"]
 p HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
-# => ["ssh-ed25519", "ecdsa-sha2-nistp521", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp256", "ssh-rsa", "ssh-dss"]
+# => ["ecdsa-sha2-nistp521", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp256", "ssh-rsa", "ssh-dss"]
 
 p HrrRbSsh::Transport::KexAlgorithm.list_supported
 # => ["diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group-exchange-sha256", "diffie-hellman-group14-sha256", "diffie-hellman-group15-sha512", "diffie-hellman-group16-sha512", "diffie-hellman-group17-sha512", "diffie-hellman-group18-sha512", "ecdh-sha2-nistp256", "ecdh-sha2-nistp384", "ecdh-sha2-nistp521"]
@@ -521,7 +523,6 @@ The following features are currently supported.
     - ecdsa-sha2-nistp256
     - ecdsa-sha2-nistp384
     - ecdsa-sha2-nistp521
-    - ssh-ed25519
 - Keyboard interactive (generic interactive / challenge response) authentication
 
 ### Transport layer
@@ -544,7 +545,6 @@ The following features are currently supported.
     - ecdsa-sha2-nistp256
     - ecdsa-sha2-nistp384
     - ecdsa-sha2-nistp521
-    - ssh-ed25519
 - Kex algorithm
     - diffie-hellman-group1-sha1
     - diffie-hellman-group14-sha1
