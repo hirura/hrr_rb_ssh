@@ -3,7 +3,7 @@
 
 require 'monitor'
 require 'hrr_rb_ssh/version'
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/message'
 require 'hrr_rb_ssh/error/closed_transport'
@@ -20,6 +20,7 @@ require 'hrr_rb_ssh/transport/compression_algorithm'
 
 module HrrRbSsh
   class Transport
+    include Loggable
     include Constant
 
     attr_reader \
@@ -50,20 +51,20 @@ module HrrRbSsh
       :i_s,
       :session_id
 
-    def initialize io, mode, options={}
+    def initialize io, mode, options={}, logger: nil
+      self.logger = logger
+
       @io = io
       @mode = mode
       @options = options
-
-      @logger = Logger.new self.class.name
 
       @closed = nil
       @disconnected = nil
 
       @in_kex = false
 
-      @sender   = Sender.new
-      @receiver = Receiver.new
+      @sender   = Sender.new logger: logger
+      @receiver = Receiver.new logger: logger
 
       @sender_monitor   = Monitor.new
       @receiver_monitor = Monitor.new
@@ -91,11 +92,11 @@ module HrrRbSsh
         begin
           @sender.send self, payload
         rescue Errno::EPIPE => e
-          @logger.warn { "IO is Broken PIPE" }
+          log_warn { "IO is Broken PIPE" }
           close
           raise Error::ClosedTransport
         rescue => e
-          @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+          log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           close
           raise Error::ClosedTransport
         end
@@ -109,25 +110,25 @@ module HrrRbSsh
           payload = @receiver.receive self
           case payload[0,1].unpack("C")[0]
           when Message::SSH_MSG_DISCONNECT::VALUE
-            message = Message::SSH_MSG_DISCONNECT.decode payload
-            @logger.debug { "received disconnect message: #{message.inspect}" }
+            message = Message::SSH_MSG_DISCONNECT.decode payload, logger: logger
+            log_debug { "received disconnect message: #{message.inspect}" }
             @disconnected = true
             close
             raise Error::ClosedTransport
           when Message::SSH_MSG_IGNORE::VALUE
-            message = Message::SSH_MSG_IGNORE.decode payload
-            @logger.debug { "received ignore message: #{message.inspect}" }
+            message = Message::SSH_MSG_IGNORE.decode payload, logger: logger
+            log_debug { "received ignore message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_UNIMPLEMENTED::VALUE
-            message = Message::SSH_MSG_UNIMPLEMENTED.decode payload
-            @logger.debug { "received unimplemented message: #{message.inspect}" }
+            message = Message::SSH_MSG_UNIMPLEMENTED.decode payload, logger: logger
+            log_debug { "received unimplemented message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_DEBUG::VALUE
-            message = Message::SSH_MSG_DEBUG.decode payload
-            @logger.debug { "received debug message: #{message.inspect}" }
+            message = Message::SSH_MSG_DEBUG.decode payload, logger: logger
+            log_debug { "received debug message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_KEXINIT::VALUE
-            @logger.debug { "received kexinit message" }
+            log_debug { "received kexinit message" }
             if @in_kex
               payload
             else
@@ -143,15 +144,15 @@ module HrrRbSsh
           close
           raise Error::ClosedTransport
         rescue IOError => e
-          @logger.warn { "IO is closed" }
+          log_warn { "IO is closed" }
           close
           raise Error::ClosedTransport
         rescue Errno::ECONNRESET => e
-          @logger.warn { "IO is RESET" }
+          log_warn { "IO is RESET" }
           close
           raise Error::ClosedTransport
         rescue => e
-          @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+          log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           close
           raise Error::ClosedTransport
         end
@@ -159,7 +160,7 @@ module HrrRbSsh
     end
 
     def start
-      @logger.info { "start transport" }
+      log_info { "start transport" }
 
       begin
         exchange_version
@@ -176,21 +177,21 @@ module HrrRbSsh
       rescue EOFError => e
         close
       rescue => e
-        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         close
       else
-        @logger.info { "transport started" }
+        log_info { "transport started" }
       end
     end
 
     def close
       return if @closed
-      @logger.info { "close transport" }
+      log_info { "close transport" }
       @closed = true
       disconnect
       @incoming_compression_algorithm.close
       @outgoing_compression_algorithm.close
-      @logger.info { "transport closed" }
+      log_info { "transport closed" }
     end
 
     def closed?
@@ -199,16 +200,16 @@ module HrrRbSsh
 
     def disconnect
       return if @disconnected
-      @logger.info { "disconnect transport" }
+      log_info { "disconnect transport" }
       @disconnected = true
       begin
         send_disconnect
       rescue IOError
-        @logger.warn { "IO is closed" }
+        log_warn { "IO is closed" }
       rescue => e
-        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
       end
-      @logger.info { "transport disconnected" }
+      log_info { "transport disconnected" }
     end
 
     def exchange_version
@@ -317,10 +318,10 @@ module HrrRbSsh
         if str_io.string[-2..-1] == "#{CR}#{LF}"
           if str_io.string[0..3] == "SSH-"
             @remote_version = str_io.string[0..-3]
-            @logger.info { "received remote version string: #{@remote_version}" }
+            log_info { "received remote version string: #{@remote_version}" }
             break
           else
-            @logger.info { "received message before remote version string: #{str_io.string}" }
+            log_info { "received message before remote version string: #{str_io.string}" }
             str_io.rewind
             str_io.truncate(0)
           end
@@ -346,7 +347,7 @@ module HrrRbSsh
         :'description'    => "disconnected by user",
         :'language tag'   => ""
       }
-      payload = Message::SSH_MSG_DISCONNECT.encode message
+      payload = Message::SSH_MSG_DISCONNECT.encode message, logger: logger
       send payload
     end
 
@@ -367,7 +368,7 @@ module HrrRbSsh
         :'first_kex_packet_follows'                => false,
         :'0 (reserved for future extension)'       => 0,
       }
-      payload = Message::SSH_MSG_KEXINIT.encode message
+      payload = Message::SSH_MSG_KEXINIT.encode message, logger: logger
       send payload
 
       case @mode
@@ -385,7 +386,7 @@ module HrrRbSsh
       when Mode::CLIENT
         @i_s = payload
       end
-      message = Message::SSH_MSG_KEXINIT.decode payload
+      message = Message::SSH_MSG_KEXINIT.decode payload, logger: logger
       update_remote_algorithms message
     end
 
@@ -393,12 +394,12 @@ module HrrRbSsh
         message = {
           :'message number' => Message::SSH_MSG_NEWKEYS::VALUE,
         }
-        payload = Message::SSH_MSG_NEWKEYS.encode message
+        payload = Message::SSH_MSG_NEWKEYS.encode message, logger: logger
         send payload
     end
 
     def receive_newkeys payload
-      message = Message::SSH_MSG_NEWKEYS.decode payload
+      message = Message::SSH_MSG_NEWKEYS.decode payload, logger: logger
     end
 
     def send_service_request
@@ -406,16 +407,16 @@ module HrrRbSsh
         :'message number' => Message::SSH_MSG_SERVICE_REQUEST::VALUE,
         :'service name' => 'ssh-userauth',
       }
-      payload = Message::SSH_MSG_SERVICE_REQUEST.encode message
+      payload = Message::SSH_MSG_SERVICE_REQUEST.encode message, logger: logger
       send payload
 
       payload = @receiver.receive self
-      message = Message::SSH_MSG_SERVICE_ACCEPT.decode payload
+      message = Message::SSH_MSG_SERVICE_ACCEPT.decode payload, logger: logger
     end
 
     def receive_service_request
       payload = @receiver.receive self
-      message = Message::SSH_MSG_SERVICE_REQUEST.decode payload
+      message = Message::SSH_MSG_SERVICE_REQUEST.decode payload, logger: logger
 
       message
     end
@@ -425,7 +426,7 @@ module HrrRbSsh
         :'message number' => Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
         :'service name'   => service_name,
       }
-      payload = Message::SSH_MSG_SERVICE_ACCEPT.encode message
+      payload = Message::SSH_MSG_SERVICE_ACCEPT.encode message, logger: logger
       send payload
     end
 

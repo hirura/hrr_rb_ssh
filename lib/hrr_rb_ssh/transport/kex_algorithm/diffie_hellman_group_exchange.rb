@@ -2,7 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'openssl'
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/transport/kex_algorithm/iv_computable'
 
@@ -10,10 +10,11 @@ module HrrRbSsh
   class Transport
     class KexAlgorithm
       module DiffieHellmanGroupExchange
+        include Loggable
         include IvComputable
 
-        def initialize
-          @logger = Logger.new(self.class.name)
+        def initialize logger: nil
+          self.logger = logger
         end
 
         def start transport
@@ -91,7 +92,7 @@ module HrrRbSsh
             :'f'   => @f,
             :'k'   => @shared_secret,
           }
-          h0 = H0.encode h0_payload
+          h0 = H0.encode h0_payload, logger: logger
           h = OpenSSL::Digest.digest self.class::DIGEST, h0
         end
 
@@ -101,7 +102,7 @@ module HrrRbSsh
         end
 
         def receive_kex_dh_gex_request payload
-          Message::SSH_MSG_KEX_DH_GEX_REQUEST.decode payload
+          Message::SSH_MSG_KEX_DH_GEX_REQUEST.decode payload, logger: logger
         end
 
         def send_kex_dh_gex_group transport
@@ -110,12 +111,12 @@ module HrrRbSsh
             :'p'              => @p,
             :'g'              => @g,
           }
-          payload = Message::SSH_MSG_KEX_DH_GEX_GROUP.encode message
+          payload = Message::SSH_MSG_KEX_DH_GEX_GROUP.encode message, logger: logger
           transport.send payload
         end
 
         def receive_kex_dh_gex_init payload
-          Message::SSH_MSG_KEX_DH_GEX_INIT.decode payload
+          Message::SSH_MSG_KEX_DH_GEX_INIT.decode payload, logger: logger
         end
 
         def send_kex_dh_gex_reply transport
@@ -125,7 +126,7 @@ module HrrRbSsh
             :'f'                                             => @f,
             :'signature of H'                                => sign(transport),
           }
-          payload = Message::SSH_MSG_KEX_DH_GEX_REPLY.encode message
+          payload = Message::SSH_MSG_KEX_DH_GEX_REPLY.encode message, logger: logger
           transport.send payload
         end
 
@@ -136,12 +137,12 @@ module HrrRbSsh
             :'n'              => @n,
             :'max'            => @max,
           }
-          payload = Message::SSH_MSG_KEX_DH_GEX_REQUEST.encode message
+          payload = Message::SSH_MSG_KEX_DH_GEX_REQUEST.encode message, logger: logger
           transport.send payload
         end
 
         def receive_kex_dh_gex_group payload
-          Message::SSH_MSG_KEX_DH_GEX_GROUP.decode payload
+          Message::SSH_MSG_KEX_DH_GEX_GROUP.decode payload, logger: logger
         end
 
         def send_kex_dh_gex_init transport
@@ -149,12 +150,12 @@ module HrrRbSsh
             :'message number' => Message::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
             :'e'              => @e,
           }
-          payload = Message::SSH_MSG_KEX_DH_GEX_INIT.encode message
+          payload = Message::SSH_MSG_KEX_DH_GEX_INIT.encode message, logger: logger
           transport.send payload
         end
 
         def receive_kex_dh_gex_reply payload
-          Message::SSH_MSG_KEX_DH_GEX_REPLY.decode payload
+          Message::SSH_MSG_KEX_DH_GEX_REPLY.decode payload, logger: logger
         end
       end
     end

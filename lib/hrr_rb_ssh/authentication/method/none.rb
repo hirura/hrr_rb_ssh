@@ -1,27 +1,29 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Authentication
     class Method
       class None < Method
+        include Loggable
+
         NAME = 'none'
         PREFERENCE = 0
 
-        def initialize transport, options, variables, authentication_methods
-          @logger = Logger.new(self.class.name)
+        def initialize transport, options, variables, authentication_methods, logger: nil
+          self.logger = logger
           @transport = transport
-          @authenticator = options.fetch( 'authentication_none_authenticator', Authenticator.new { false } )
+          @authenticator = options.fetch( 'authentication_none_authenticator', Authenticator.new{ false } )
           @variables = variables
           @authentication_methods = authentication_methods
         end
 
         def authenticate userauth_request_message
-          @logger.info { "authenticate" }
-          @logger.debug { "userauth request: " + userauth_request_message.inspect }
-          context = Context.new(userauth_request_message[:'user name'], @variables, @authentication_methods)
+          log_info { "authenticate" }
+          log_debug { "userauth request: " + userauth_request_message.inspect }
+          context = Context.new(userauth_request_message[:'user name'], @variables, @authentication_methods, logger: logger)
           @authenticator.authenticate context
         end
 
@@ -32,7 +34,7 @@ module HrrRbSsh
             :"service name"   => service_name,
             :"method name"    => NAME,
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.encode message
+          payload = Message::SSH_MSG_USERAUTH_REQUEST.encode message, logger: logger
           @transport.send payload
           payload = @transport.receive
         end

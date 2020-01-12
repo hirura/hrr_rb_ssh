@@ -1,14 +1,16 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Transport
     class MacAlgorithm
       module Unfunctionable
-        def initialize key=nil
-          @logger = Logger.new(self.class.name)
+        include Loggable
+
+        def initialize key=nil, logger: nil
+          self.logger = logger
         end
 
         def digest_length

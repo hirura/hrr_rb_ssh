@@ -1,17 +1,19 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Connection
     class Channel
       class ChannelType
         class ForwardedTcpip < ChannelType
+          include Loggable
+
           NAME = 'forwarded-tcpip'
 
-          def initialize connection, channel, message, socket
-            @logger = Logger.new self.class.name
+          def initialize connection, channel, message, socket, logger: nil
+            self.logger = logger
             @connection = connection
             @channel = channel
             @socket = socket
@@ -25,16 +27,16 @@ module HrrRbSsh
           def close
             begin
               if @sender_thread_finished && @receiver_thread_finished
-                @logger.info { "closing forwarded-tcpip" }
+                log_info { "closing forwarded-tcpip" }
                 @socket.close
-                @logger.info { "closing channel IOs" }
+                log_info { "closing channel IOs" }
                 @channel.io.each{ |io| io.close rescue nil }
-                @logger.info { "channel IOs closed" }
+                log_info { "channel IOs closed" }
                 @channel.close from=:channel_type_instance
-                @logger.info { "forwarded-tcpip closed" }
+                log_info { "forwarded-tcpip closed" }
               end
             rescue => e
-              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+              log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
             end
           end
 
@@ -45,24 +47,24 @@ module HrrRbSsh
                   begin
                     @channel.io[1].write s.readpartial(10240)
                   rescue EOFError
-                    @logger.info { "socket is EOF" }
+                    log_info { "socket is EOF" }
                     @channel.io[1].close rescue nil
                     break
                   rescue IOError
-                    @logger.info { "socket is closed" }
+                    log_info { "socket is closed" }
                     @channel.io[1].close rescue nil
                     break
                   rescue => e
-                    @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+                    log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                     @channel.io[1].close rescue nil
                     break
                   end
                 end
-                @logger.info { "finishing sender thread" }
+                log_info { "finishing sender thread" }
                 @sender_thread_finished = true
                 close
               ensure
-                @logger.info { "sender thread finished" }
+                log_info { "sender thread finished" }
               end
             }
           end
@@ -74,23 +76,23 @@ module HrrRbSsh
                   begin
                     s.write @channel.io[0].readpartial(10240)
                   rescue EOFError
-                    @logger.info { "io is EOF" }
+                    log_info { "io is EOF" }
                     s.close_write
                     break
                   rescue IOError
-                    @logger.info { "socket is closed" }
+                    log_info { "socket is closed" }
                     break
                   rescue => e
-                    @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+                    log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                     s.close_write
                     break
                   end
                 end
-                @logger.info { "finishing receiver thread" }
+                log_info { "finishing receiver thread" }
                 @receiver_thread_finished = true
                 close
               ensure
-                @logger.info { "receiver thread finished" }
+                log_info { "receiver thread finished" }
               end
             }
           end

@@ -38,13 +38,13 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS do
 
   describe ".encode" do
     it "returns payload encoded" do
-      expect(described_class.encode(message, complementary_message)).to eq payload
+      expect(described_class.encode(message, complementary_message, logger: nil)).to eq payload
     end
   end
 
   describe ".decode" do
     it "returns message decoded" do
-      expect(described_class.decode(payload, complementary_message)).to eq message
+      expect(described_class.decode(payload, complementary_message, logger: nil)).to eq message
     end
   end
 end

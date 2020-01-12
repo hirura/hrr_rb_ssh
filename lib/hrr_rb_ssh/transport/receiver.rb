@@ -1,14 +1,16 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 #require 'hrr_rb_ssh/transport/packet'
 
 module HrrRbSsh
   class Transport
     class Receiver
-      def initialize
-        @logger = Logger.new self.class.name
+      include Loggable
+
+      def initialize logger: nil
+        self.logger = logger
       end
 
       def depacketize transport, packet
@@ -34,7 +36,7 @@ module HrrRbSsh
         block_size = [transport.incoming_encryption_algorithm.block_size, minimum_block_size].max
         encrypted_packet.push transport.io.read(block_size)
         if (encrypted_packet.last == nil) || (encrypted_packet.last.length != block_size)
-          @logger.warn { "IO is EOF" }
+          log_warn { "IO is EOF" }
           raise EOFError
         end
         unencrypted_packet.push transport.incoming_encryption_algorithm.decrypt(encrypted_packet.last)
@@ -43,7 +45,7 @@ module HrrRbSsh
         following_packet_length = packet_length_field_length + packet_length - block_size
         encrypted_packet.push transport.io.read(following_packet_length)
         if (encrypted_packet.last == nil) || (encrypted_packet.last.length != following_packet_length)
-          @logger.warn { "IO is EOF" }
+          log_warn { "IO is EOF" }
           raise EOFError
         end
         unencrypted_packet.push transport.incoming_encryption_algorithm.decrypt(encrypted_packet.last)
@@ -55,7 +57,7 @@ module HrrRbSsh
         mac_length = transport.incoming_mac_algorithm.digest_length
         mac = transport.io.read mac_length
         if (mac == nil) || (mac.length != mac_length)
-          @logger.warn { "IO is EOF" }
+          log_warn { "IO is EOF" }
           raise EOFError
         end
         mac

@@ -52,12 +52,6 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
     end
   end
 
-  describe "#logger" do
-    it "returns an instance of HrrRbSsh::Logger" do
-      expect(context.logger).to be_an_instance_of HrrRbSsh::Logger
-    end
-  end
-
   describe "#io" do
     it "returns 'io' object" do
       expect(context.io).to be io

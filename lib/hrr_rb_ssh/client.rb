@@ -3,7 +3,7 @@
 
 require 'socket'
 require 'stringio'
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/mode'
 require 'hrr_rb_ssh/transport'
 require 'hrr_rb_ssh/authentication'
@@ -11,6 +11,8 @@ require 'hrr_rb_ssh/connection'
 
 module HrrRbSsh
   class Client
+    include Loggable
+
     def self.start target, options={}
       client = self.new target, options
       client.start
@@ -26,7 +28,6 @@ module HrrRbSsh
     end
 
     def initialize target, tmp_options={}
-      @logger = Logger.new self.class.name
       @closed = true
       options = initialize_options tmp_options
       io = case target
@@ -38,24 +39,25 @@ module HrrRbSsh
              port = 22
              io = TCPSocket.new target, port
            end
-      transport      = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::CLIENT, options
-      authentication = HrrRbSsh::Authentication.new transport, HrrRbSsh::Mode::CLIENT, options
-      @connection    = HrrRbSsh::Connection.new     authentication, HrrRbSsh::Mode::CLIENT, options
+      transport      = HrrRbSsh::Transport.new      io, HrrRbSsh::Mode::CLIENT, options, logger: logger
+      authentication = HrrRbSsh::Authentication.new transport, HrrRbSsh::Mode::CLIENT, options, logger: logger
+      @connection    = HrrRbSsh::Connection.new     authentication, HrrRbSsh::Mode::CLIENT, options, logger: logger
     end
 
     def initialize_options tmp_options
       tmp_options = Hash[tmp_options.map{|k, v| [k.to_s, v]}]
+      self.logger = tmp_options['logger']
       options = {}
       options['username'] = tmp_options['username']
       options['authentication_preferred_authentication_methods'] = tmp_options['authentication_preferred_authentication_methods']
-      options['client_authentication_password']             = tmp_options['password']
-      options['client_authentication_publickey']            = tmp_options['publickey']
-      options['client_authentication_keyboard_interactive'] = tmp_options['keyboard_interactive']
-      options['transport_preferred_encryption_algorithms']      = tmp_options['transport_preferred_encryption_algorithms']
-      options['transport_preferred_server_host_key_algorithms'] = tmp_options['transport_preferred_server_host_key_algorithms']
-      options['transport_preferred_kex_algorithms']             = tmp_options['transport_preferred_kex_algorithms']
-      options['transport_preferred_mac_algorithms']             = tmp_options['transport_preferred_mac_algorithms']
-      options['transport_preferred_compression_algorithms']     = tmp_options['transport_preferred_compression_algorithms']
+      options['client_authentication_password']                  = tmp_options['password']
+      options['client_authentication_publickey']                 = tmp_options['publickey']
+      options['client_authentication_keyboard_interactive']      = tmp_options['keyboard_interactive']
+      options['transport_preferred_encryption_algorithms']       = tmp_options['transport_preferred_encryption_algorithms']
+      options['transport_preferred_server_host_key_algorithms']  = tmp_options['transport_preferred_server_host_key_algorithms']
+      options['transport_preferred_kex_algorithms']              = tmp_options['transport_preferred_kex_algorithms']
+      options['transport_preferred_mac_algorithms']              = tmp_options['transport_preferred_mac_algorithms']
+      options['transport_preferred_compression_algorithms']      = tmp_options['transport_preferred_compression_algorithms']
       options
     end
 
@@ -73,20 +75,20 @@ module HrrRbSsh
     end
 
     def close
-      @logger.debug { "closing client" }
+      log_debug { "closing client" }
       @closed = true
       @connection.close
-      @logger.debug { "client closed" }
+      log_debug { "client closed" }
     end
 
     def exec! command, pty: false, env: {}
-      @logger.debug { "start exec!: #{command}" }
+      log_debug { "start exec!: #{command}" }
       out_buf = StringIO.new
       err_buf = StringIO.new
       begin
-        @logger.info { "Opning channel" }
+        log_info { "Opning channel" }
         channel = @connection.request_channel_open "session"
-        @logger.info { "Channel opened" }
+        log_info { "Channel opened" }
         if pty
           channel.send_channel_request_pty_req 'xterm', 80, 24, 580, 336, ''
         end
@@ -116,34 +118,34 @@ module HrrRbSsh
           begin
             t.join
           rescue => e
-            @logger.warn { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+            log_warn { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           end
         }
       rescue => e
-        @logger.error { "Failed opening channel" }
-        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        log_error { "Failed opening channel" }
+        log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         raise "Error in exec!"
       ensure
         if channel
-          @logger.info { "closing channel IOs" }
+          log_info { "closing channel IOs" }
           channel.io.each{ |io| io.close rescue nil }
-          @logger.info { "channel IOs closed" }
-          @logger.info { "closing channel" }
-          @logger.info { "wait until threads closed in channel" }
+          log_info { "channel IOs closed" }
+          log_info { "closing channel" }
+          log_info { "wait until threads closed in channel" }
           channel.wait_until_closed
           channel.close
-          @logger.info { "channel closed" }
+          log_info { "channel closed" }
         end
       end
       [out_buf.string, err_buf.string]
     end
 
     def exec command, pty: false, env: {}
-      @logger.debug { "start exec: #{command}" }
+      log_debug { "start exec: #{command}" }
       begin
-        @logger.info { "Opning channel" }
+        log_info { "Opning channel" }
         channel = @connection.request_channel_open "session"
-        @logger.info { "Channel opened" }
+        log_info { "Channel opened" }
         if pty
           channel.send_channel_request_pty_req 'xterm', 80, 24, 580, 336, ''
         end
@@ -153,30 +155,30 @@ module HrrRbSsh
         channel.send_channel_request_exec command
         yield channel.io
       rescue => e
-        @logger.error { "Failed opening channel" }
-        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        log_error { "Failed opening channel" }
+        log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         raise "Error in shell"
       ensure
         if channel
-          @logger.info { "closing channel IOs" }
+          log_info { "closing channel IOs" }
           channel.io.each{ |io| io.close rescue nil }
-          @logger.info { "channel IOs closed" }
-          @logger.info { "closing channel" }
-          @logger.info { "wait until threads closed in channel" }
+          log_info { "channel IOs closed" }
+          log_info { "closing channel" }
+          log_info { "wait until threads closed in channel" }
           channel.wait_until_closed
           channel.close
-          @logger.info { "channel closed" }
+          log_info { "channel closed" }
         end
       end
       channel_exit_status = channel.exit_status rescue nil
     end
 
     def shell env: {}
-      @logger.debug { "start shell" }
+      log_debug { "start shell" }
       begin
-        @logger.info { "Opning channel" }
+        log_info { "Opning channel" }
         channel = @connection.request_channel_open "session"
-        @logger.info { "Channel opened" }
+        log_info { "Channel opened" }
         channel.send_channel_request_pty_req 'xterm', 80, 24, 580, 336, ''
         env.each{ |variable_name, variable_value|
           channel.send_channel_request_env variable_name, variable_value
@@ -184,46 +186,46 @@ module HrrRbSsh
         channel.send_channel_request_shell
         yield channel.io
       rescue => e
-        @logger.error { "Failed opening channel" }
-        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        log_error { "Failed opening channel" }
+        log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         raise "Error in shell"
       ensure
         if channel
-          @logger.info { "closing channel IOs" }
+          log_info { "closing channel IOs" }
           channel.io.each{ |io| io.close rescue nil }
-          @logger.info { "channel IOs closed" }
-          @logger.info { "closing channel" }
-          @logger.info { "wait until threads closed in channel" }
+          log_info { "channel IOs closed" }
+          log_info { "closing channel" }
+          log_info { "wait until threads closed in channel" }
           channel.wait_until_closed
           channel.close
-          @logger.info { "channel closed" }
+          log_info { "channel closed" }
         end
       end
       channel_exit_status = channel.exit_status rescue nil
     end
 
     def subsystem name
-      @logger.debug { "start subsystem" }
+      log_debug { "start subsystem" }
       begin
-        @logger.info { "Opning channel" }
+        log_info { "Opning channel" }
         channel = @connection.request_channel_open "session"
-        @logger.info { "Channel opened" }
+        log_info { "Channel opened" }
         channel.send_channel_request_subsystem name
         yield channel.io
       rescue => e
-        @logger.error { "Failed opening channel" }
-        @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        log_error { "Failed opening channel" }
+        log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         raise "Error in subsystem"
       ensure
         if channel
-          @logger.info { "closing channel IOs" }
+          log_info { "closing channel IOs" }
           channel.io.each{ |io| io.close rescue nil }
-          @logger.info { "channel IOs closed" }
-          @logger.info { "closing channel" }
-          @logger.info { "wait until threads closed in channel" }
+          log_info { "channel IOs closed" }
+          log_info { "closing channel" }
+          log_info { "wait until threads closed in channel" }
           channel.wait_until_closed
           channel.close
-          @logger.info { "channel closed" }
+          log_info { "channel closed" }
         end
       end
       channel_exit_status = channel.exit_status rescue nil

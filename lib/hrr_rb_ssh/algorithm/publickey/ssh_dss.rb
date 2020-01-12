@@ -1,16 +1,19 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   module Algorithm
     class Publickey
       class SshDss < Publickey
+        include Loggable
+
         NAME = 'ssh-dss'
         DIGEST = 'sha1'
 
-        def initialize arg
+        def initialize arg, logger: nil
+          self.logger = logger
           begin
             new_by_key_str arg
           rescue OpenSSL::PKey::DSAError
@@ -23,7 +26,7 @@ module HrrRbSsh
         end
 
         def new_by_public_key_blob public_key_blob
-          public_key_blob_h = PublicKeyBlob.decode(public_key_blob)
+          public_key_blob_h = PublicKeyBlob.decode public_key_blob, logger: logger
           @publickey = OpenSSL::PKey::DSA.new
           if @publickey.respond_to?(:set_pqg)
             @publickey.set_pqg public_key_blob_h[:'p'], public_key_blob_h[:'q'], public_key_blob_h[:'g']
@@ -51,24 +54,24 @@ module HrrRbSsh
             :'g'                         => @publickey.g.to_i,
             :'y'                         => @publickey.pub_key.to_i,
           }
-          PublicKeyBlob.encode(public_key_blob_h)
+          PublicKeyBlob.encode public_key_blob_h, logger: logger
         end
 
         def sign signature_blob
           hash = OpenSSL::Digest.digest(self.class::DIGEST, signature_blob)
           sign_der = @publickey.syssign(hash)
-          sign_asn1 = OpenSSL::ASN1.decode(sign_der)
+          sign_asn1 = OpenSSL::ASN1.decode sign_der
           sign_r = sign_asn1.value[0].value.to_s(2).rjust(20, ["00"].pack("H"))
           sign_s = sign_asn1.value[1].value.to_s(2).rjust(20, ["00"].pack("H"))
           signature_h = {
             :'public key algorithm name' => self.class::NAME,
             :'signature blob'            => (sign_r + sign_s),
           }
-          Signature.encode signature_h
+          Signature.encode signature_h, logger: logger
         end
 
         def verify signature, signature_blob
-          signature_h = Signature.decode signature
+          signature_h = Signature.decode signature, logger: logger
           sign_r = signature_h[:'signature blob'][ 0, 20]
           sign_s = signature_h[:'signature blob'][20, 20]
           sign_asn1 = OpenSSL::ASN1::Sequence.new(

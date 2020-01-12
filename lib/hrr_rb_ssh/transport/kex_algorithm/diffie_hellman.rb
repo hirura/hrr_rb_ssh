@@ -2,7 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'openssl'
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/transport/kex_algorithm/iv_computable'
 
@@ -10,10 +10,11 @@ module HrrRbSsh
   class Transport
     class KexAlgorithm
       module DiffieHellman
+        include Loggable
         include IvComputable
 
-        def initialize
-          @logger = Logger.new(self.class.name)
+        def initialize logger: nil
+          self.logger = logger
           @dh = OpenSSL::PKey::DH.new
           if @dh.respond_to?(:set_pqg)
             @dh.set_pqg OpenSSL::BN.new(self.class::P, 16), nil, OpenSSL::BN.new(self.class::G)
@@ -59,7 +60,7 @@ module HrrRbSsh
             :'f'   => @f,
             :'k'   => @shared_secret,
           }
-          h0 = H0.encode h0_payload
+          h0 = H0.encode h0_payload, logger: logger
           h  = OpenSSL::Digest.digest self.class::DIGEST, h0
         end
 
@@ -69,7 +70,7 @@ module HrrRbSsh
         end
 
         def receive_kexdh_init payload
-          Message::SSH_MSG_KEXDH_INIT.decode payload
+          Message::SSH_MSG_KEXDH_INIT.decode payload, logger: logger
         end
 
         def send_kexdh_reply transport
@@ -79,7 +80,7 @@ module HrrRbSsh
             :'f'                                             => @f,
             :'signature of H'                                => sign(transport),
           }
-          payload = Message::SSH_MSG_KEXDH_REPLY.encode message
+          payload = Message::SSH_MSG_KEXDH_REPLY.encode message, logger: logger
           transport.send payload
         end
 
@@ -88,12 +89,12 @@ module HrrRbSsh
             :'message number' => Message::SSH_MSG_KEXDH_INIT::VALUE,
             :'e'              => @e,
           }
-          payload = Message::SSH_MSG_KEXDH_INIT.encode message
+          payload = Message::SSH_MSG_KEXDH_INIT.encode message, logger: logger
           transport.send payload
         end
 
         def receive_kexdh_reply payload
-          Message::SSH_MSG_KEXDH_REPLY.decode payload
+          Message::SSH_MSG_KEXDH_REPLY.decode payload, logger: logger
         end
       end
     end

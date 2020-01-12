@@ -12,8 +12,6 @@ def start_service io, logger=nil
     require 'hrr_rb_ssh'
   end
 
-  HrrRbSsh::Logger.initialize logger if logger
-
   auth_password = HrrRbSsh::Authentication::Authenticator.new { |context|
     true # accept any user and password
   }
@@ -39,7 +37,7 @@ def start_service io, logger=nil
   options['authentication_password_authenticator'] = auth_password
   options['connection_channel_request_shell']      = conn_echo
 
-  server = HrrRbSsh::Server.new options
+  server = HrrRbSsh::Server.new options, logger: logger
   server.start io
 end
 

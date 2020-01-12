@@ -2,7 +2,7 @@
 # vim: et ts=2 sw=2
 
 require 'openssl'
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/transport/kex_algorithm/iv_computable'
 
@@ -10,10 +10,11 @@ module HrrRbSsh
   class Transport
     class KexAlgorithm
       module EllipticCurveDiffieHellman
+        include Loggable
         include IvComputable
 
-        def initialize
-          @logger = Logger.new(self.class.name)
+        def initialize logger: nil
+          self.logger = logger
           @dh = OpenSSL::PKey::EC.new(self.class::CURVE_NAME)
           @dh.generate_key
           @public_key = @dh.public_key.to_bn.to_i
@@ -53,7 +54,7 @@ module HrrRbSsh
             :'Q_S' => @q_s,
             :'K'   => @shared_secret,
           }
-          h0 = H0.encode h0_payload
+          h0 = H0.encode h0_payload, logger: logger
           h  = OpenSSL::Digest.digest self.class::DIGEST, h0
         end
 
@@ -63,7 +64,7 @@ module HrrRbSsh
         end
 
         def receive_kexecdh_init payload
-          Message::SSH_MSG_KEXECDH_INIT.decode payload
+          Message::SSH_MSG_KEXECDH_INIT.decode payload, logger: logger
         end
 
         def send_kexecdh_reply transport
@@ -73,7 +74,7 @@ module HrrRbSsh
             :'Q_S'            => @q_s,
             :'signature of H' => sign(transport),
           }
-          payload = Message::SSH_MSG_KEXECDH_REPLY.encode message
+          payload = Message::SSH_MSG_KEXECDH_REPLY.encode message, logger: logger
           transport.send payload
         end
 
@@ -82,12 +83,12 @@ module HrrRbSsh
             :'message number' => Message::SSH_MSG_KEXECDH_INIT::VALUE,
             :'Q_C'            => @q_c,
           }
-          payload = Message::SSH_MSG_KEXECDH_INIT.encode message
+          payload = Message::SSH_MSG_KEXECDH_INIT.encode message, logger: logger
           transport.send payload
         end
 
         def receive_kexecdh_reply payload
-          Message::SSH_MSG_KEXECDH_REPLY.decode payload
+          Message::SSH_MSG_KEXECDH_REPLY.decode payload, logger: logger
         end
       end
     end

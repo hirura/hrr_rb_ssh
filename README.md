@@ -82,25 +82,33 @@ require 'hrr_rb_ssh'
 
 __IMPORTANT__: DEBUG log level outputs all communications between local and remote in human-readable plain-text including password and any secret. Be careful to use logging.
 
-The library provides logging functionality. To enable logging of the library, you are to initialize `HrrRbSsh::Logger` class.
+The library provides logging functionality. To enable logging in the library, you are to give a `logger` to `Server.new` or `Client.new`.
 
 ```ruby
-HrrRbSsh::Logger.initialize logger
+HrrRbSsh::Server.new options, logger: logger
 ```
 
-Where, the `logger` variable can be an instance of standard Logger class or user-defined logger class. What `HrrRbSsh::Logger` class requires for `logger` variable is that the `logger` instance responds to `#fatal`, `#error`, `#warn`, `#info` and `#debug`.
+or
+
+```ruby
+HrrRbSsh::Client.new target, options, logger: logger
+```
+
+Where, the `logger` variable can be an instance of standard Logger class or user-defined logger class. What the library requires for `logger` variable is that the `logger` instance responds to `#fatal`, `#error`, `#warn`, `#info` and `#debug` with the following syntax.
+
+```ruby
+logger.fatal(progname){ message }
+logger.error(progname){ message }
+logger.warn(progname){ message }
+logger.info(progname){ message }
+logger.debug(progname){ message }
+```
 
 For instance, `logger` variable can be prepared like below.
 
 ```ruby
 logger = Logger.new STDOUT
 logger.level = Logger::INFO
-```
-
-To disable logging, you can un-initialize `HrrRbSsh::Logger`.
-
-```ruby
-HrrRbSsh::Logger.uninitialize
 ```
 
 ### Writing standard SSH server

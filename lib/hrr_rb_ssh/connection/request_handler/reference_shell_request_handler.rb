@@ -3,7 +3,6 @@
 
 require 'etc'
 require 'timeout'
-require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/request_handler'
 
 module HrrRbSsh
@@ -11,7 +10,6 @@ module HrrRbSsh
     class RequestHandler
       class ReferenceShellRequestHandler < RequestHandler
         def initialize
-          @logger = Logger.new self.class.name
           @proc = Proc.new { |context|
             ptm = context.vars[:ptm]
             pts = context.vars[:pts]
@@ -49,22 +47,22 @@ module HrrRbSsh
 
               begin
                 pid, status = Process.waitpid2 pid
-                context.logger.info { "shell exited with status #{status.inspect}" }
+                context.log_info { "shell exited with status #{status.inspect}" }
                 status.exitstatus
               ensure
                 unless status
-                  context.logger.info { "exiting shell" }
+                  context.log_info { "exiting shell" }
                   Process.kill :TERM, pid
                   begin
                     Timeout.timeout(1) do
                       pid, status = Process.waitpid2 pid
                     end
                   rescue Timeout::Error
-                    context.logger.warn { "force exiting shell" }
+                    context.log_warn { "force exiting shell" }
                     Process.kill :KILL, pid
                     pid, status = Process.waitpid2 pid
                   end
-                  context.logger.info { "shell exited with status #{status.inspect}" }
+                  context.log_info { "shell exited with status #{status.inspect}" }
                 end
               end
             }

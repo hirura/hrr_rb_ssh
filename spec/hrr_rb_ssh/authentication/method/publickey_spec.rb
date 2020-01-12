@@ -61,6 +61,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
         Class.new do
           const_set(:NAME, 'supported')
           const_set(:PREFERENCE, 100)
+          include HrrRbSsh::Authentication::Method::Publickey::Algorithm::Functionable
         end
       }
       before :example do

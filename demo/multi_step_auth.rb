@@ -15,8 +15,6 @@ def start_service io, logger=nil
     require 'hrr_rb_ssh'
   end
 
-  HrrRbSsh::Logger.initialize logger if logger
-
   auth_publickey = HrrRbSsh::Authentication::Authenticator.new { |context|
     users = ['user1', 'user2']
     is_verified = users.any?{ |username|
@@ -60,7 +58,7 @@ def start_service io, logger=nil
   options['connection_channel_request_exec']          = HrrRbSsh::Connection::RequestHandler::ReferenceExecRequestHandler.new
   options['connection_channel_request_window_change'] = HrrRbSsh::Connection::RequestHandler::ReferenceWindowChangeRequestHandler.new
 
-  server = HrrRbSsh::Server.new options
+  server = HrrRbSsh::Server.new options, logger: logger
   server.start io
 end
 

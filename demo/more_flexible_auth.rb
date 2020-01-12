@@ -15,8 +15,6 @@ def start_service io, logger=nil
     require 'hrr_rb_ssh'
   end
 
-  HrrRbSsh::Logger.initialize logger if logger
-
   auth_none = HrrRbSsh::Authentication::Authenticator.new { |context|
     context.authentication_methods.push 'publickey'
     HrrRbSsh::Authentication::PARTIAL_SUCCESS
@@ -66,7 +64,7 @@ def start_service io, logger=nil
   options['connection_channel_request_exec']          = HrrRbSsh::Connection::RequestHandler::ReferenceExecRequestHandler.new
   options['connection_channel_request_window_change'] = HrrRbSsh::Connection::RequestHandler::ReferenceWindowChangeRequestHandler.new
 
-  server = HrrRbSsh::Server.new options
+  server = HrrRbSsh::Server.new options, logger: logger
   server.start io
 end
 
