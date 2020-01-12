@@ -8,10 +8,8 @@ module HrrRbSsh
   module Algorithm
     class Publickey
       module EcdsaSha2
-        module EcdsaSignatureBlob
-          class << self
-            include Codable
-          end
+        class EcdsaSignatureBlob
+          include Codable
           DEFINITION = [
             [DataType::Mpint, :'r'],
             [DataType::Mpint, :'s'],

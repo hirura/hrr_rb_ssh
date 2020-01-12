@@ -110,21 +110,21 @@ module HrrRbSsh
           payload = @receiver.receive self
           case payload[0,1].unpack("C")[0]
           when Message::SSH_MSG_DISCONNECT::VALUE
-            message = Message::SSH_MSG_DISCONNECT.decode payload, logger: logger
+            message = Message::SSH_MSG_DISCONNECT.new(logger: logger).decode payload
             log_debug { "received disconnect message: #{message.inspect}" }
             @disconnected = true
             close
             raise Error::ClosedTransport
           when Message::SSH_MSG_IGNORE::VALUE
-            message = Message::SSH_MSG_IGNORE.decode payload, logger: logger
+            message = Message::SSH_MSG_IGNORE.new(logger: logger).decode payload
             log_debug { "received ignore message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_UNIMPLEMENTED::VALUE
-            message = Message::SSH_MSG_UNIMPLEMENTED.decode payload, logger: logger
+            message = Message::SSH_MSG_UNIMPLEMENTED.new(logger: logger).decode payload
             log_debug { "received unimplemented message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_DEBUG::VALUE
-            message = Message::SSH_MSG_DEBUG.decode payload, logger: logger
+            message = Message::SSH_MSG_DEBUG.new(logger: logger).decode payload
             log_debug { "received debug message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_KEXINIT::VALUE
@@ -347,7 +347,7 @@ module HrrRbSsh
         :'description'    => "disconnected by user",
         :'language tag'   => ""
       }
-      payload = Message::SSH_MSG_DISCONNECT.encode message, logger: logger
+      payload = Message::SSH_MSG_DISCONNECT.new(logger: logger).encode message
       send payload
     end
 
@@ -368,7 +368,7 @@ module HrrRbSsh
         :'first_kex_packet_follows'                => false,
         :'0 (reserved for future extension)'       => 0,
       }
-      payload = Message::SSH_MSG_KEXINIT.encode message, logger: logger
+      payload = Message::SSH_MSG_KEXINIT.new(logger: logger).encode message
       send payload
 
       case @mode
@@ -386,7 +386,7 @@ module HrrRbSsh
       when Mode::CLIENT
         @i_s = payload
       end
-      message = Message::SSH_MSG_KEXINIT.decode payload, logger: logger
+      message = Message::SSH_MSG_KEXINIT.new(logger: logger).decode payload
       update_remote_algorithms message
     end
 
@@ -394,12 +394,12 @@ module HrrRbSsh
         message = {
           :'message number' => Message::SSH_MSG_NEWKEYS::VALUE,
         }
-        payload = Message::SSH_MSG_NEWKEYS.encode message, logger: logger
+        payload = Message::SSH_MSG_NEWKEYS.new(logger: logger).encode message
         send payload
     end
 
     def receive_newkeys payload
-      message = Message::SSH_MSG_NEWKEYS.decode payload, logger: logger
+      message = Message::SSH_MSG_NEWKEYS.new(logger: logger).decode payload
     end
 
     def send_service_request
@@ -407,16 +407,16 @@ module HrrRbSsh
         :'message number' => Message::SSH_MSG_SERVICE_REQUEST::VALUE,
         :'service name' => 'ssh-userauth',
       }
-      payload = Message::SSH_MSG_SERVICE_REQUEST.encode message, logger: logger
+      payload = Message::SSH_MSG_SERVICE_REQUEST.new(logger: logger).encode message
       send payload
 
       payload = @receiver.receive self
-      message = Message::SSH_MSG_SERVICE_ACCEPT.decode payload, logger: logger
+      message = Message::SSH_MSG_SERVICE_ACCEPT.new(logger: logger).decode payload
     end
 
     def receive_service_request
       payload = @receiver.receive self
-      message = Message::SSH_MSG_SERVICE_REQUEST.decode payload, logger: logger
+      message = Message::SSH_MSG_SERVICE_REQUEST.new(logger: logger).decode payload
 
       message
     end
@@ -426,7 +426,7 @@ module HrrRbSsh
         :'message number' => Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
         :'service name'   => service_name,
       }
-      payload = Message::SSH_MSG_SERVICE_ACCEPT.encode message, logger: logger
+      payload = Message::SSH_MSG_SERVICE_ACCEPT.new(logger: logger).encode message
       send payload
     end
 

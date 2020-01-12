@@ -43,15 +43,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
       }
     }
 
-    describe ".encode" do
+    describe "#encode" do
       it "returns payload encoded" do
-        expect(described_class.encode(message, complementary_message)).to eq payload
+        expect(described_class.new.encode(message, complementary_message)).to eq payload
       end
     end
 
-    describe ".decode" do
+    describe "#decode" do
       it "returns message decoded" do
-        expect(described_class.decode(payload, complementary_message)).to eq message
+        expect(described_class.new.decode(payload, complementary_message)).to eq message
       end
     end
   end
@@ -82,15 +82,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
       }
     }
 
-    describe ".encode" do
+    describe "#encode" do
       it "returns payload encoded" do
-        expect(described_class.encode(message, complementary_message)).to eq payload
+        expect(described_class.new.encode(message, complementary_message)).to eq payload
       end
     end
 
-    describe ".decode" do
+    describe "#decode" do
       it "returns message decoded" do
-        expect(described_class.decode(payload, complementary_message)).to eq message
+        expect(described_class.new.decode(payload, complementary_message)).to eq message
       end
     end
   end
@@ -121,15 +121,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
       }
     }
 
-    describe ".encode" do
+    describe "#encode" do
       it "returns payload encoded" do
-        expect(described_class.encode(message, complementary_message)).to eq payload
+        expect(described_class.new.encode(message, complementary_message)).to eq payload
       end
     end
 
-    describe ".decode" do
+    describe "#decode" do
       it "returns message decoded" do
-        expect(described_class.decode(payload, complementary_message)).to eq message
+        expect(described_class.new.decode(payload, complementary_message)).to eq message
       end
     end
   end
@@ -160,15 +160,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
       }
     }
 
-    describe ".encode" do
+    describe "#encode" do
       it "returns payload encoded" do
-        expect(described_class.encode(message, complementary_message)).to eq payload
+        expect(described_class.new.encode(message, complementary_message)).to eq payload
       end
     end
 
-    describe ".decode" do
+    describe "#decode" do
       it "returns message decoded" do
-        expect(described_class.decode(payload, complementary_message)).to eq message
+        expect(described_class.new.decode(payload, complementary_message)).to eq message
       end
     end
   end

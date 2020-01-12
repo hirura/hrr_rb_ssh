@@ -6,7 +6,7 @@ require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
-    module SSH_MSG_DISCONNECT
+    class SSH_MSG_DISCONNECT
       module ReasonCode
         SSH_DISCONNECT_HOST_NOT_ALLOWED_TO_CONNECT    =  1
         SSH_DISCONNECT_PROTOCOL_ERROR                 =  2
@@ -25,9 +25,7 @@ module HrrRbSsh
         SSH_DISCONNECT_ILLEGAL_USER_NAME              = 15
       end
 
-      class << self
-        include Codable
-      end
+      include Codable
 
       ID    = self.name.split('::').last
       VALUE = 1

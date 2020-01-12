@@ -9,10 +9,8 @@ module HrrRbSsh
     class Method
       class Publickey
         class Algorithm
-          module SignatureBlob
-            class << self
-              include Codable
-            end
+          class SignatureBlob
+            include Codable
             DEFINITION = [
               [DataType::String,  :'session identifier'],
               [DataType::Byte,    :'message number'],

@@ -89,7 +89,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
           }
         }
         let(:userauth_pk_ok_payload){
-          HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.encode userauth_pk_ok_message
+          HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.new.encode userauth_pk_ok_message
         }
 
         it "returns userauth_pk_ok payload" do
@@ -222,7 +222,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
       }
     }
     let(:userauth_request_with_publickey_method_without_signature_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_publickey_method_without_signature_message
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_without_signature_message
     }
     let(:userauth_request_with_publickey_method_with_signature_message){
       {
@@ -237,7 +237,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
       }
     }
     let(:userauth_request_with_publickey_method_with_signature_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_publickey_method_with_signature_message
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_with_signature_message
     }
 
     context "when response for with signature false message is pk_ok" do
@@ -249,7 +249,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
         }
       }
       let(:userauth_pk_ok_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.encode userauth_pk_ok_message
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.new.encode userauth_pk_ok_message
       }
 
       it "sends userauth request for publickey method" do

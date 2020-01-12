@@ -97,7 +97,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
       }
     }
     let(:userauth_request_with_none_method_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_none_method_message
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
     }
 
     it "sends userauth request for none method" do

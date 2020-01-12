@@ -6,10 +6,8 @@ require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
-    module SSH_MSG_REQUEST_SUCCESS
-      class << self
-        include Codable
-      end
+    class SSH_MSG_REQUEST_SUCCESS
+      include Codable
 
       ID    = self.name.split('::').last
       VALUE = 81

@@ -5,39 +5,34 @@ require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   module Codable
-    class LoggableClass
-      include Loggable
+    include Loggable
 
-      def initialize logger
-        self.logger = logger
-      end
+    def initialize logger: nil
+      self.logger = logger
     end
 
     def common_definition
-      self::DEFINITION
+      self.class::DEFINITION
     end
 
     def conditional_definition message
-      return [] unless self.const_defined? :CONDITIONAL_DEFINITION
+      return [] unless self.class.const_defined? :CONDITIONAL_DEFINITION
       message.inject([]){ |a, (k,v)|
         field_name  = k
         field_value = if v.instance_of? ::Proc then v.call else v end
-        a + (self::CONDITIONAL_DEFINITION.fetch(field_name, {})[field_value] || [])
+        a + (self.class::CONDITIONAL_DEFINITION.fetch(field_name, {})[field_value] || [])
       }
     end
 
-    def encode message, complementary_message={}, logger: nil
-      loggable_instalce = LoggableClass.new(logger)
-      loggable_instalce.log_key = self.to_s
-
-      loggable_instalce.log_debug { 'encoding message: ' + message.inspect }
+    def encode message, complementary_message={}
+      log_debug { 'encoding message: ' + message.inspect }
       definition = common_definition + conditional_definition(message.merge complementary_message)
       definition.map{ |data_type, field_name|
         begin
           field_value = if message[field_name].instance_of? ::Proc then message[field_name].call else message[field_name] end
           data_type.encode field_value
         rescue => e
-          loggable_instalce.log_debug { "'field_name', 'field_value': #{field_name.inspect}, #{field_value.inspect}" }
+          log_debug { "'field_name', 'field_value': #{field_name.inspect}, #{field_value.inspect}" }
           raise e
         end
       }.join
@@ -63,16 +58,13 @@ module HrrRbSsh
       end
     end
 
-    def decode payload, complementary_message={}, logger: nil
-      loggable_instalce = LoggableClass.new(logger)
-      loggable_instalce.log_key = self.to_s
-
+    def decode payload, complementary_message={}
       payload_io = StringIO.new payload
       decoded_message = decode_recursively(payload_io).inject(Hash.new){ |h, (k, v)| h.update({k => v}) }
       if complementary_message.any?
         decoded_message.merge! decode_recursively(payload_io, complementary_message.to_a).inject(Hash.new){ |h, (k, v)| h.update({k => v}) }
       end
-      loggable_instalce.log_debug { 'decoded message: ' + decoded_message.inspect }
+      log_debug { 'decoded message: ' + decoded_message.inspect }
       decoded_message
     end
   end

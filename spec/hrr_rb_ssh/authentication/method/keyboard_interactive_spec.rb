@@ -72,7 +72,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
         }
       }
       let(:userauth_info_request_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST.encode userauth_info_request_message
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST.new.encode userauth_info_request_message
       }
       let(:userauth_info_response_message){
         {
@@ -83,7 +83,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
         }
       }
       let(:userauth_info_response_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE.encode userauth_info_response_message
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE.new.encode userauth_info_response_message
       }
 
       context "when authenticator returns true" do
@@ -173,7 +173,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
       }
     }
     let(:userauth_request_with_keyboard_interactive_method_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.encode userauth_request_with_keyboard_interactive_method_message
+      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_keyboard_interactive_method_message
     }
 
     context "when response message is info request" do
@@ -191,7 +191,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
         }
       }
       let(:userauth_info_request_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST.encode userauth_info_request_message
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST.new.encode userauth_info_request_message
       }
       let(:userauth_info_response_message){
         {
@@ -202,7 +202,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
         }
       }
       let(:userauth_info_response_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE.encode userauth_info_response_message
+        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE.new.encode userauth_info_response_message
       }
 
       it "sends userauth request for keyboard_interactive method" do

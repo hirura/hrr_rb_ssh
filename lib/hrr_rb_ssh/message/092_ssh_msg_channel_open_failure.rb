@@ -6,7 +6,7 @@ require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
-    module SSH_MSG_CHANNEL_OPEN_FAILURE
+    class SSH_MSG_CHANNEL_OPEN_FAILURE
       module ReasonCode
         SSH_OPEN_ADMINISTRATIVELY_PROHIBITED = 1
         SSH_OPEN_CONNECT_FAILED              = 2
@@ -14,9 +14,7 @@ module HrrRbSsh
         SSH_OPEN_RESOURCE_SHORTAGE           = 4
       end
 
-      class << self
-        include Codable
-      end
+      include Codable
 
       ID    = self.name.split('::').last
       VALUE = 92

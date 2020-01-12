@@ -37,7 +37,7 @@ module HrrRbSsh
           end
 
           def to_payload
-            Message::SSH_MSG_USERAUTH_INFO_REQUEST.encode self.to_message, logger: logger
+            Message::SSH_MSG_USERAUTH_INFO_REQUEST.new(logger: logger).encode self.to_message
           end
         end
       end

@@ -87,7 +87,7 @@ module HrrRbSsh
         payload = @transport.receive
         case payload[0,1].unpack("C")[0]
         when Message::SSH_MSG_USERAUTH_REQUEST::VALUE
-          userauth_request_message = Message::SSH_MSG_USERAUTH_REQUEST.decode payload, logger: logger
+          userauth_request_message = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).decode payload
           method_name = userauth_request_message[:'method name']
           log_info { "authentication method: #{method_name}" }
           method = Method[method_name].new(@transport, {'session id' => @transport.session_id}.merge(@options), @variables, authentication_methods, logger: logger)
@@ -143,7 +143,7 @@ module HrrRbSsh
           @closed = false
           break
         when Message::SSH_MSG_USERAUTH_FAILURE::VALUE
-          message = Message::SSH_MSG_USERAUTH_FAILURE.decode payload, logger: logger
+          message = Message::SSH_MSG_USERAUTH_FAILURE.new(logger: logger).decode payload
           partial_success = message[:'partial success']
           if partial_success
             log_info { "partially verified" }
@@ -169,7 +169,7 @@ module HrrRbSsh
         :'authentications that can continue' => authentication_methods,
         :'partial success'                   => partial_success,
       }
-      payload = Message::SSH_MSG_USERAUTH_FAILURE.encode message, logger: logger
+      payload = Message::SSH_MSG_USERAUTH_FAILURE.new(logger: logger).encode message
       @transport.send payload
     end
 
@@ -177,7 +177,7 @@ module HrrRbSsh
       message = {
         :'message number' => Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
-      payload = Message::SSH_MSG_USERAUTH_SUCCESS.encode message, logger: logger
+      payload = Message::SSH_MSG_USERAUTH_SUCCESS.new(logger: logger).encode message
       @transport.send payload
     end
 

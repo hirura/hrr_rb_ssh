@@ -266,7 +266,7 @@ RSpec.describe HrrRbSsh::Transport do
           }
         }
         let(:disconnect_payload){
-          HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+          HrrRbSsh::Message::SSH_MSG_DISCONNECT.new.encode disconnect_message
         }
 
         it "closes transport and raises Error::ClosedTransport" do
@@ -284,7 +284,7 @@ RSpec.describe HrrRbSsh::Transport do
           }
         }
         let(:ignore_payload){
-          HrrRbSsh::Message::SSH_MSG_IGNORE.encode ignore_message
+          HrrRbSsh::Message::SSH_MSG_IGNORE.new.encode ignore_message
         }
 
         it "ignores message" do
@@ -302,7 +302,7 @@ RSpec.describe HrrRbSsh::Transport do
           }
         }
         let(:unimplemented_payload){
-          HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.encode unimplemented_message
+          HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED.new.encode unimplemented_message
         }
 
         it "receives unimplemented message and is finished" do
@@ -322,7 +322,7 @@ RSpec.describe HrrRbSsh::Transport do
           }
         }
         let(:debug_payload){
-          HrrRbSsh::Message::SSH_MSG_DEBUG.encode debug_message
+          HrrRbSsh::Message::SSH_MSG_DEBUG.new.encode debug_message
         }
 
         it "receive debug message and is finished" do
@@ -340,7 +340,7 @@ RSpec.describe HrrRbSsh::Transport do
           }
         }
         let(:service_request_payload){
-          HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.encode service_request_message
+          HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.new.encode service_request_message
         }
 
         it "receive service_request message and is finished" do
@@ -448,7 +448,7 @@ RSpec.describe HrrRbSsh::Transport do
         }
       }
       let(:disconnect_payload){
-        HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+        HrrRbSsh::Message::SSH_MSG_DISCONNECT.new.encode disconnect_message
       }
       let(:mock_sender  ){ double("mock sender") }
 
@@ -547,13 +547,13 @@ RSpec.describe HrrRbSsh::Transport do
           :'0 (reserved for future extension)'       => 0
         }
       }
-      let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
+      let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.new.encode remote_kexinit_message }
       let(:remote_newkeys_message){
         {
           :'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
         }
       }
-      let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode remote_newkeys_message }
+      let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.new.encode remote_newkeys_message }
 
       before :example do
         transport.instance_variable_set('@sender',   mock_sender  )
@@ -692,7 +692,7 @@ RSpec.describe HrrRbSsh::Transport do
         }
       }
       let(:service_request_payload){
-        HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.encode service_request_message
+        HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.new.encode service_request_message
       }
 
       let(:service_accept_message){
@@ -702,7 +702,7 @@ RSpec.describe HrrRbSsh::Transport do
         }
       }
       let(:service_accept_payload){
-        HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode service_accept_message
+        HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.new.encode service_accept_message
       }
 
       before :example do
@@ -732,7 +732,7 @@ RSpec.describe HrrRbSsh::Transport do
           }
         }
         let(:disconnect_payload){
-          HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+          HrrRbSsh::Message::SSH_MSG_DISCONNECT.new.encode disconnect_message
         }
 
         before :example do
@@ -815,7 +815,7 @@ RSpec.describe HrrRbSsh::Transport do
         }
       }
       let(:disconnect_payload){
-        HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+        HrrRbSsh::Message::SSH_MSG_DISCONNECT.new.encode disconnect_message
       }
       let(:mock_sender  ){ double("mock sender") }
 
@@ -914,13 +914,13 @@ RSpec.describe HrrRbSsh::Transport do
           :'0 (reserved for future extension)'       => 0
         }
       }
-      let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.encode remote_kexinit_message }
+      let(:remote_kexinit_payload){ HrrRbSsh::Message::SSH_MSG_KEXINIT.new.encode remote_kexinit_message }
       let(:remote_newkeys_message){
         {
           :'message number' => HrrRbSsh::Message::SSH_MSG_NEWKEYS::VALUE,
         }
       }
-      let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.encode remote_newkeys_message }
+      let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.new.encode remote_newkeys_message }
 
       before :example do
         transport.instance_variable_set('@sender',   mock_sender  )
@@ -947,7 +947,7 @@ RSpec.describe HrrRbSsh::Transport do
           :'first_kex_packet_follows'                => false,
           :'0 (reserved for future extension)'       => 0
         }
-        local_kexinit_payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.encode(local_kexinit_message)
+        local_kexinit_payload = HrrRbSsh::Message::SSH_MSG_KEXINIT.new.encode(local_kexinit_message)
 
         expect(transport.i_c).to be nil
         expect(transport.i_s).to be nil
@@ -1077,7 +1077,7 @@ RSpec.describe HrrRbSsh::Transport do
         }
       }
       let(:service_request_payload){
-        HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.encode service_request_message
+        HrrRbSsh::Message::SSH_MSG_SERVICE_REQUEST.new.encode service_request_message
       }
 
       let(:service_accept_message){
@@ -1087,7 +1087,7 @@ RSpec.describe HrrRbSsh::Transport do
         }
       }
       let(:service_accept_payload){
-        HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.encode service_accept_message
+        HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT.new.encode service_accept_message
       }
 
       before :example do
@@ -1114,7 +1114,7 @@ RSpec.describe HrrRbSsh::Transport do
           }
         }
         let(:disconnect_payload){
-          HrrRbSsh::Message::SSH_MSG_DISCONNECT.encode disconnect_message
+          HrrRbSsh::Message::SSH_MSG_DISCONNECT.new.encode disconnect_message
         }
 
         before :example do

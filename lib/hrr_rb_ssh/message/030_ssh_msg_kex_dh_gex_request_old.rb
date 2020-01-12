@@ -6,10 +6,8 @@ require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
-    module SSH_MSG_KEX_DH_GEX_REQUEST_OLD
-      class << self
-        include Codable
-      end
+    class SSH_MSG_KEX_DH_GEX_REQUEST_OLD
+      include Codable
 
       ID    = self.name.split('::').last
       VALUE = 30

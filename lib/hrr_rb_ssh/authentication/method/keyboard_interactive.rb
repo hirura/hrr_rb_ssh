@@ -39,13 +39,13 @@ module HrrRbSsh
             :"language tag"   => "",
             :'submethods'     => "",
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.encode message, logger: logger
+          payload = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
           @transport.send payload
 
           payload = @transport.receive
           case payload[0,1].unpack("C")[0]
           when Message::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE
-            message = Message::SSH_MSG_USERAUTH_INFO_REQUEST.decode payload, logger: logger
+            message = Message::SSH_MSG_USERAUTH_INFO_REQUEST.new(logger: logger).decode payload
             num_responses = @options['client_authentication_keyboard_interactive'].size
             message = {
               :'message number' => Message::SSH_MSG_USERAUTH_INFO_RESPONSE::VALUE,
@@ -55,7 +55,7 @@ module HrrRbSsh
               {:"response[#{i+1}]" => response}
             }.inject(Hash.new){ |a, b| a.merge(b) }
             message.update(message_responses)
-            payload = Message::SSH_MSG_USERAUTH_INFO_RESPONSE.encode message, logger: logger
+            payload = Message::SSH_MSG_USERAUTH_INFO_RESPONSE.new(logger: logger).encode message
             @transport.send payload
             @transport.receive
           else

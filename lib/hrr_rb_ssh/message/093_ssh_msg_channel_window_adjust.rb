@@ -6,10 +6,8 @@ require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
-    module SSH_MSG_CHANNEL_WINDOW_ADJUST
-      class << self
-        include Codable
-      end
+    class SSH_MSG_CHANNEL_WINDOW_ADJUST
+      include Codable
 
       ID    = self.name.split('::').last
       VALUE = 93

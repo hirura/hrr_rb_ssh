@@ -88,7 +88,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
         }
       }
       let(:remote_kexdh_init_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.encode remote_kexdh_init_message
+        HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.new.encode remote_kexdh_init_message
       }
       let(:server_host_key_algorithm){ double('server host key algorithm') }
       let(:server_public_host_key){ 'server public host key' }
@@ -102,7 +102,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
         }
       }
       let(:local_kexdh_reply_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.encode local_kexdh_reply_message
+        HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.new.encode local_kexdh_reply_message
       }
 
       it "exchanges public keys and gets shared secret" do
@@ -131,7 +131,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
         }
       }
       let(:local_kexdh_init_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.encode local_kexdh_init_message
+        HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.new.encode local_kexdh_init_message
       }
       let(:server_public_host_key){ 'server public host key' }
       let(:sign){ 'sign' }
@@ -144,7 +144,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1 do
         }
       }
       let(:remote_kexdh_reply_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.encode remote_kexdh_reply_message
+        HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.new.encode remote_kexdh_reply_message
       }
 
       it "exchanges public keys and gets shared secret" do

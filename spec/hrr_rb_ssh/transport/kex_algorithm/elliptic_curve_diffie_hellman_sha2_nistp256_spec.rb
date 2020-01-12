@@ -58,7 +58,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
         }
       }
       let(:remote_kexecdh_init_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT.encode remote_kexecdh_init_message
+        HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT.new.encode remote_kexecdh_init_message
       }
       let(:server_host_key_algorithm){ double('server host key algorithm') }
       let(:server_public_host_key){ 'server public host key' }
@@ -72,7 +72,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
         }
       }
       let(:local_kexecdh_reply_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY.encode local_kexecdh_reply_message
+        HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY.new.encode local_kexecdh_reply_message
       }
 
       it "exchanges public keys and gets shared secret" do
@@ -98,7 +98,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
         }
       }
       let(:local_kexecdh_init_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT.encode local_kexecdh_init_message
+        HrrRbSsh::Message::SSH_MSG_KEXECDH_INIT.new.encode local_kexecdh_init_message
       }
       let(:server_host_key_algorithm){ double('server host key algorithm') }
       let(:server_public_host_key){ 'server public host key' }
@@ -112,7 +112,7 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2
         }
       }
       let(:remote_kexecdh_reply_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY.encode remote_kexecdh_reply_message
+        HrrRbSsh::Message::SSH_MSG_KEXECDH_REPLY.new.encode remote_kexecdh_reply_message
       }
 
       it "exchanges public keys and gets shared secret" do

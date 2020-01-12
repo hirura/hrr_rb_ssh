@@ -6,14 +6,12 @@ require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
-    module SSH_MSG_CHANNEL_EXTENDED_DATA
+    class SSH_MSG_CHANNEL_EXTENDED_DATA
       module DataTypeCode
         SSH_EXTENDED_DATA_STDERR = 1
       end
 
-      class << self
-        include Codable
-      end
+      include Codable
 
       ID    = self.name.split('::').last
       VALUE = 95

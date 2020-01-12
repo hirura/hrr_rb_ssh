@@ -24,7 +24,7 @@ module HrrRbSsh
         end
 
         def new_by_public_key_blob public_key_blob
-          public_key_blob_h = PublicKeyBlob.decode public_key_blob, logger: logger
+          public_key_blob_h = PublicKeyBlob.new(logger: logger).decode public_key_blob
           @publickey = OpenSSL::PKey::EC.new(self.class::CURVE_NAME)
           @publickey.public_key = OpenSSL::PKey::EC::Point.new(@publickey.group, OpenSSL::BN.new(public_key_blob_h[:'Q'], 2))
         end
@@ -39,7 +39,7 @@ module HrrRbSsh
             :'identifier'                => self.class::IDENTIFIER,
             :'Q'                         => @publickey.public_key.to_bn.to_s(2)
           }
-          PublicKeyBlob.encode public_key_blob_h, logger: logger
+          PublicKeyBlob.new(logger: logger).encode public_key_blob_h
         end
 
         def ecdsa_signature_blob signature_blob
@@ -52,7 +52,7 @@ module HrrRbSsh
             :'r' => r,
             :'s' => s,
           }
-          EcdsaSignatureBlob.encode ecdsa_signature_blob_h, logger: logger
+          EcdsaSignatureBlob.new(logger: logger).encode ecdsa_signature_blob_h
         end
 
         def sign signature_blob
@@ -60,12 +60,12 @@ module HrrRbSsh
             :'public key algorithm name' => self.class::NAME,
             :'ecdsa signature blob'      => ecdsa_signature_blob(signature_blob),
           }
-          Signature.encode signature_h, logger: logger
+          Signature.new(logger: logger).encode signature_h
         end
 
         def verify signature, signature_blob
-          signature_h = Signature.decode signature, logger: logger
-          ecdsa_signature_blob_h = EcdsaSignatureBlob.decode signature_h[:'ecdsa signature blob'], logger: logger
+          signature_h = Signature.new(logger: logger).decode signature
+          ecdsa_signature_blob_h = EcdsaSignatureBlob.new(logger: logger).decode signature_h[:'ecdsa signature blob']
           r = ecdsa_signature_blob_h[:'r']
           s = ecdsa_signature_blob_h[:'s']
           sign_asn1 = OpenSSL::ASN1::Sequence.new(

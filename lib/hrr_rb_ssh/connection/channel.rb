@@ -405,7 +405,7 @@ module HrrRbSsh
           :'message number'    => Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
           :'recipient channel' => @remote_channel,
         }
-        payload = Message::SSH_MSG_CHANNEL_SUCCESS.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_SUCCESS.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -414,7 +414,7 @@ module HrrRbSsh
           :'message number'    => Message::SSH_MSG_CHANNEL_FAILURE::VALUE,
           :'recipient channel' => @remote_channel,
         }
-        payload = Message::SSH_MSG_CHANNEL_FAILURE.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_FAILURE.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -424,7 +424,7 @@ module HrrRbSsh
           :'recipient channel' => @remote_channel,
           :'bytes to add'      => INITIAL_WINDOW_SIZE,
         }
-        payload = Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -434,7 +434,7 @@ module HrrRbSsh
           :'recipient channel' => @remote_channel,
           :'data'              => data,
         }
-        payload = Message::SSH_MSG_CHANNEL_DATA.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_DATA.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -445,7 +445,7 @@ module HrrRbSsh
           :'data type code'    => code,
           :'data'              => data,
         }
-        payload = Message::SSH_MSG_CHANNEL_EXTENDED_DATA.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_EXTENDED_DATA.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -462,7 +462,7 @@ module HrrRbSsh
           :'terminal height, pixels'         => term_height_pixel,
           :'encoded terminal modes'          => encoded_term_modes,
         }
-        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -475,7 +475,7 @@ module HrrRbSsh
           :'variable name'     => variable_name,
           :'variable value'    => variable_value,
         }
-        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -486,7 +486,7 @@ module HrrRbSsh
           :'request type'      => "shell",
           :'want reply'        => false,
         }
-        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -498,7 +498,7 @@ module HrrRbSsh
           :'want reply'        => false,
           :'command'           => command,
         }
-        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -510,7 +510,7 @@ module HrrRbSsh
           :'want reply'        => false,
           :'subsystem name'    => subsystem_name,
         }
-        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -525,7 +525,7 @@ module HrrRbSsh
           :'terminal width, pixels'  => term_width_pixel,
           :'terminal height, pixels' => term_height_pixel,
         }
-        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -537,7 +537,7 @@ module HrrRbSsh
           :'want reply'        => false,
           :'signal name'       => signal_name,
         }
-        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -549,7 +549,7 @@ module HrrRbSsh
           :'want reply'        => false,
           :'exit status'       => exitstatus,
         }
-        payload = Message::SSH_MSG_CHANNEL_REQUEST.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -558,7 +558,7 @@ module HrrRbSsh
           :'message number'    => Message::SSH_MSG_CHANNEL_EOF::VALUE,
           :'recipient channel' => @remote_channel,
         }
-        payload = Message::SSH_MSG_CHANNEL_EOF.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_EOF.new(logger: logger).encode message
         @connection.send payload
       end
 
@@ -567,7 +567,7 @@ module HrrRbSsh
           :'message number'    => Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
           :'recipient channel' => @remote_channel,
         }
-        payload = Message::SSH_MSG_CHANNEL_CLOSE.encode message, logger: logger
+        payload = Message::SSH_MSG_CHANNEL_CLOSE.new(logger: logger).encode message
         @connection.send payload
       end
     end

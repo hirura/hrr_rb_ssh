@@ -26,7 +26,7 @@ module HrrRbSsh
         end
 
         def new_by_public_key_blob public_key_blob
-          public_key_blob_h = PublicKeyBlob.decode public_key_blob, logger: logger
+          public_key_blob_h = PublicKeyBlob.new(logger: logger).decode public_key_blob
           @publickey = OpenSSL::PKey::DSA.new
           if @publickey.respond_to?(:set_pqg)
             @publickey.set_pqg public_key_blob_h[:'p'], public_key_blob_h[:'q'], public_key_blob_h[:'g']
@@ -54,7 +54,7 @@ module HrrRbSsh
             :'g'                         => @publickey.g.to_i,
             :'y'                         => @publickey.pub_key.to_i,
           }
-          PublicKeyBlob.encode public_key_blob_h, logger: logger
+          PublicKeyBlob.new(logger: logger).encode public_key_blob_h
         end
 
         def sign signature_blob
@@ -67,11 +67,11 @@ module HrrRbSsh
             :'public key algorithm name' => self.class::NAME,
             :'signature blob'            => (sign_r + sign_s),
           }
-          Signature.encode signature_h, logger: logger
+          Signature.new(logger: logger).encode signature_h
         end
 
         def verify signature, signature_blob
-          signature_h = Signature.decode signature, logger: logger
+          signature_h = Signature.new(logger: logger).decode signature
           sign_r = signature_h[:'signature blob'][ 0, 20]
           sign_s = signature_h[:'signature blob'][20, 20]
           sign_asn1 = OpenSSL::ASN1::Sequence.new(

@@ -8,10 +8,8 @@ module HrrRbSsh
   class Transport
     class KexAlgorithm
       module EllipticCurveDiffieHellman
-        module H0
-          class << self
-            include Codable
-          end
+        class H0
+          include Codable
           DEFINITION = [
             [DataType::String, :'V_C'],
             [DataType::String, :'V_S'],

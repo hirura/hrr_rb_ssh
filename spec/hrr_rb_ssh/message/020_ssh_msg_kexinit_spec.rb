@@ -77,28 +77,28 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXINIT do
     ].join
   }
 
-  describe ".encode" do
+  describe "#encode" do
     it "returns payload encoded" do
-      expect(described_class.encode(message)[0,1]).to eq payload[0,1]
-      expect(described_class.encode(message)[17,(payload.length-1)]).to eq payload[17,(payload.length-1)]
+      expect(described_class.new.encode(message)[0,1]).to eq payload[0,1]
+      expect(described_class.new.encode(message)[17,(payload.length-1)]).to eq payload[17,(payload.length-1)]
     end
   end
 
-  describe ".decode" do
+  describe "#decode" do
     it "returns message decoded" do
-      expect(described_class.decode(payload)[:'message number']).to eq message[:'message number']
-      expect(described_class.decode(payload)[:'kex_algorithms']).to eq message[:'kex_algorithms']
-      expect(described_class.decode(payload)[:'server_host_key_algorithms']).to eq message[:'server_host_key_algorithms']
-      expect(described_class.decode(payload)[:'encryption_algorithms_client_to_server']).to eq message[:'encryption_algorithms_client_to_server']
-      expect(described_class.decode(payload)[:'encryption_algorithms_server_to_client']).to eq message[:'encryption_algorithms_server_to_client']
-      expect(described_class.decode(payload)[:'mac_algorithms_client_to_server']).to eq message[:'mac_algorithms_client_to_server']
-      expect(described_class.decode(payload)[:'mac_algorithms_server_to_client']).to eq message[:'mac_algorithms_server_to_client']
-      expect(described_class.decode(payload)[:'compression_algorithms_client_to_server']).to eq message[:'compression_algorithms_client_to_server']
-      expect(described_class.decode(payload)[:'compression_algorithms_server_to_client']).to eq message[:'compression_algorithms_server_to_client']
-      expect(described_class.decode(payload)[:'languages_client_to_server']).to eq message[:'languages_client_to_server']
-      expect(described_class.decode(payload)[:'languages_server_to_client']).to eq message[:'languages_server_to_client']
-      expect(described_class.decode(payload)[:'first_kex_packet_follows']).to eq message[:'first_kex_packet_follows']
-      expect(described_class.decode(payload)[:'0 (reserved for future extension)']).to eq message[:'0 (reserved for future extension)']
+      expect(described_class.new.decode(payload)[:'message number']).to eq message[:'message number']
+      expect(described_class.new.decode(payload)[:'kex_algorithms']).to eq message[:'kex_algorithms']
+      expect(described_class.new.decode(payload)[:'server_host_key_algorithms']).to eq message[:'server_host_key_algorithms']
+      expect(described_class.new.decode(payload)[:'encryption_algorithms_client_to_server']).to eq message[:'encryption_algorithms_client_to_server']
+      expect(described_class.new.decode(payload)[:'encryption_algorithms_server_to_client']).to eq message[:'encryption_algorithms_server_to_client']
+      expect(described_class.new.decode(payload)[:'mac_algorithms_client_to_server']).to eq message[:'mac_algorithms_client_to_server']
+      expect(described_class.new.decode(payload)[:'mac_algorithms_server_to_client']).to eq message[:'mac_algorithms_server_to_client']
+      expect(described_class.new.decode(payload)[:'compression_algorithms_client_to_server']).to eq message[:'compression_algorithms_client_to_server']
+      expect(described_class.new.decode(payload)[:'compression_algorithms_server_to_client']).to eq message[:'compression_algorithms_server_to_client']
+      expect(described_class.new.decode(payload)[:'languages_client_to_server']).to eq message[:'languages_client_to_server']
+      expect(described_class.new.decode(payload)[:'languages_server_to_client']).to eq message[:'languages_server_to_client']
+      expect(described_class.new.decode(payload)[:'first_kex_packet_follows']).to eq message[:'first_kex_packet_follows']
+      expect(described_class.new.decode(payload)[:'0 (reserved for future extension)']).to eq message[:'0 (reserved for future extension)']
     end
   end
 end

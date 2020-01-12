@@ -6,10 +6,8 @@ require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
-    module SSH_MSG_USERAUTH_PK_OK
-      class << self
-        include Codable
-      end
+    class SSH_MSG_USERAUTH_PK_OK
+      include Codable
 
       ID    = self.name.split('::').last
       VALUE = 60

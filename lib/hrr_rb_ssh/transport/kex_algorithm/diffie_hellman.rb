@@ -60,7 +60,7 @@ module HrrRbSsh
             :'f'   => @f,
             :'k'   => @shared_secret,
           }
-          h0 = H0.encode h0_payload, logger: logger
+          h0 = H0.new(logger: logger).encode h0_payload
           h  = OpenSSL::Digest.digest self.class::DIGEST, h0
         end
 
@@ -70,7 +70,7 @@ module HrrRbSsh
         end
 
         def receive_kexdh_init payload
-          Message::SSH_MSG_KEXDH_INIT.decode payload, logger: logger
+          Message::SSH_MSG_KEXDH_INIT.new(logger: logger).decode payload
         end
 
         def send_kexdh_reply transport
@@ -80,7 +80,7 @@ module HrrRbSsh
             :'f'                                             => @f,
             :'signature of H'                                => sign(transport),
           }
-          payload = Message::SSH_MSG_KEXDH_REPLY.encode message, logger: logger
+          payload = Message::SSH_MSG_KEXDH_REPLY.new(logger: logger).encode message
           transport.send payload
         end
 
@@ -89,12 +89,12 @@ module HrrRbSsh
             :'message number' => Message::SSH_MSG_KEXDH_INIT::VALUE,
             :'e'              => @e,
           }
-          payload = Message::SSH_MSG_KEXDH_INIT.encode message, logger: logger
+          payload = Message::SSH_MSG_KEXDH_INIT.new(logger: logger).encode message
           transport.send payload
         end
 
         def receive_kexdh_reply payload
-          Message::SSH_MSG_KEXDH_REPLY.decode payload, logger: logger
+          Message::SSH_MSG_KEXDH_REPLY.new(logger: logger).decode payload
         end
       end
     end

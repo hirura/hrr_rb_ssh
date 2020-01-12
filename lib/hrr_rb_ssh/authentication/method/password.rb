@@ -40,7 +40,7 @@ module HrrRbSsh
             :"FALSE"              => false,
             :"plaintext password" => password,
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.encode message, logger: logger
+          payload = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
           @transport.send payload
 
           payload = @transport.receive

@@ -47,7 +47,7 @@ module HrrRbSsh
             :'public key algorithm name from the request' => public_key_algorithm_name,
             :'public key blob from the request'           => public_key_blob,
           }
-          payload = Message::SSH_MSG_USERAUTH_PK_OK.encode message, logger: logger
+          payload = Message::SSH_MSG_USERAUTH_PK_OK.new(logger: logger).encode message
         end
 
         def request_authentication username, service_name
@@ -75,7 +75,7 @@ module HrrRbSsh
             :'public key algorithm name' => public_key_algorithm_name,
             :'public key blob'           => public_key_blob,
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.encode message, logger: logger
+          payload = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
           @transport.send payload
         end
 
@@ -93,7 +93,7 @@ module HrrRbSsh
             :'public key blob'           => public_key_blob,
             :'signature'                 => signature,
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.encode message, logger: logger
+          payload = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
           @transport.send payload
         end
       end

@@ -38,7 +38,7 @@ module HrrRbSsh
                   :'public key algorithm name' => message[:'public key algorithm name'],
                   :'public key blob'           => message[:'public key blob'],
                 }
-                signature_blob = SignatureBlob.encode signature_blob_h, logger: logger
+                signature_blob = SignatureBlob.new(logger: logger).encode signature_blob_h
                 publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new message[:'public key blob'], logger: logger
                 publickey.verify message[:'signature'], signature_blob
               rescue => e
@@ -65,7 +65,7 @@ module HrrRbSsh
                 :'public key algorithm name' => self.class::NAME,
                 :'public key blob'           => publickey_blob
               }
-              signature_blob = SignatureBlob.encode signature_blob_h, logger: logger
+              signature_blob = SignatureBlob.new(logger: logger).encode signature_blob_h
               publickey.sign signature_blob
             end
           end

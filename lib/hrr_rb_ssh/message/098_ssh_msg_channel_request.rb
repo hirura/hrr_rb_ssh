@@ -6,7 +6,7 @@ require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
-    module SSH_MSG_CHANNEL_REQUEST
+    class SSH_MSG_CHANNEL_REQUEST
       module SignalName
         ABRT = 'ABRT'
         ALRM = 'ALRM'
@@ -82,9 +82,7 @@ module HrrRbSsh
         TTY_OP_OSPEED = 129
       end
 
-      class << self
-        include Codable
-      end
+      include Codable
 
       ID    = self.name.split('::').last
       VALUE = 98

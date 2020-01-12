@@ -8,10 +8,8 @@ module HrrRbSsh
   module Algorithm
     class Publickey
       class SshDss
-        module Signature
-          class << self
-            include Codable
-          end
+        class Signature
+          include Codable
           DEFINITION = [
             [DataType::String, :'public key algorithm name'],
             [DataType::String, :'signature blob'],

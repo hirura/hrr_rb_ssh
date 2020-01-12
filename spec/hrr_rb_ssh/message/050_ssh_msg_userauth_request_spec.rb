@@ -35,15 +35,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
       ].join
     }
 
-    describe ".encode" do
+    describe "#encode" do
       it "returns payload encoded" do
-        expect(described_class.encode(message)).to eq payload
+        expect(described_class.new.encode(message)).to eq payload
       end
     end
 
-    describe ".decode" do
+    describe "#decode" do
       it "returns message decoded" do
-        expect(described_class.decode(payload)).to eq message
+        expect(described_class.new.decode(payload)).to eq message
       end
     end
   end
@@ -70,15 +70,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
       ].join
     }
 
-    describe ".encode" do
+    describe "#encode" do
       it "returns payload encoded" do
-        expect(described_class.encode(message)).to eq payload
+        expect(described_class.new.encode(message)).to eq payload
       end
     end
 
-    describe ".decode" do
+    describe "#decode" do
       it "returns message decoded" do
-        expect(described_class.decode(payload)).to eq message
+        expect(described_class.new.decode(payload)).to eq message
       end
     end
   end
@@ -108,15 +108,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
         ].join
       }
 
-      describe ".encode" do
+      describe "#encode" do
         it "returns payload encoded" do
-          expect(described_class.encode(message)).to eq payload
+          expect(described_class.new.encode(message)).to eq payload
         end
       end
 
-      describe ".decode" do
+      describe "#decode" do
         it "returns message decoded" do
-          expect(described_class.decode(payload)).to eq message
+          expect(described_class.new.decode(payload)).to eq message
         end
       end
     end
@@ -148,15 +148,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
       ].join
     }
 
-    describe ".encode" do
+    describe "#encode" do
       it "returns payload encoded" do
-        expect(described_class.encode(message)).to eq payload
+        expect(described_class.new.encode(message)).to eq payload
       end
     end
 
-    describe ".decode" do
+    describe "#decode" do
       it "returns message decoded" do
-        expect(described_class.decode(payload)).to eq message
+        expect(described_class.new.decode(payload)).to eq message
       end
     end
   end
@@ -183,15 +183,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
       ].join
     }
 
-    describe ".encode" do
+    describe "#encode" do
       it "returns payload encoded" do
-        expect(described_class.encode(message)).to eq payload
+        expect(described_class.new.encode(message)).to eq payload
       end
     end
 
-    describe ".decode" do
+    describe "#decode" do
       it "returns message decoded" do
-        expect(described_class.decode(payload)).to eq message
+        expect(described_class.new.decode(payload)).to eq message
       end
     end
   end
