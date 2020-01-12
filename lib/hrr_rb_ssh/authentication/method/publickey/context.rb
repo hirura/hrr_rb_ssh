@@ -1,13 +1,15 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Authentication
     class Method
       class Publickey
         class Context
+          include Loggable
+
           attr_reader \
             :username,
             :session_id,
@@ -22,7 +24,8 @@ module HrrRbSsh
             :public_key_blob,
             :signature
 
-          def initialize username, algorithm, session_id, message, variables, authentication_methods
+          def initialize username, algorithm, session_id, message, variables, authentication_methods, logger: nil
+            self.logger = logger
             @username   = username
             @algorithm  = algorithm
             @session_id = session_id

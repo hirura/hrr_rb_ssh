@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/channel/channel_type/session/proc_chain/chain_context'
 
 module HrrRbSsh
@@ -11,7 +10,6 @@ module HrrRbSsh
         class Session
           class ProcChain
             def initialize
-              @logger = Logger.new self.class.name
               @q = Queue.new
             end
             def connect next_proc

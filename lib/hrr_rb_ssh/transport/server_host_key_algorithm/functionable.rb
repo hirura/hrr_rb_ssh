@@ -1,14 +1,16 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Transport
     class ServerHostKeyAlgorithm
       module Functionable
-        def initialize secret_key=nil
-          @logger = Logger.new(self.class.name)
+        include Loggable
+
+        def initialize secret_key=nil, logger: nil
+          self.logger = logger
           @publickey = Algorithm::Publickey[self.class::NAME].new (secret_key || self.class::SECRET_KEY)
         end
 

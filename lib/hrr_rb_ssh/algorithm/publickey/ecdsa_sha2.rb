@@ -1,14 +1,17 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/data_type'
 
 module HrrRbSsh
   module Algorithm
     class Publickey
       module EcdsaSha2
-        def initialize arg
+        include Loggable
+
+        def initialize arg, logger: nil
+          self.logger = logger
           begin
             new_by_key_str arg
           rescue OpenSSL::PKey::ECError
@@ -21,7 +24,7 @@ module HrrRbSsh
         end
 
         def new_by_public_key_blob public_key_blob
-          public_key_blob_h = PublicKeyBlob.decode(public_key_blob)
+          public_key_blob_h = PublicKeyBlob.decode public_key_blob, logger: logger
           @publickey = OpenSSL::PKey::EC.new(self.class::CURVE_NAME)
           @publickey.public_key = OpenSSL::PKey::EC::Point.new(@publickey.group, OpenSSL::BN.new(public_key_blob_h[:'Q'], 2))
         end
@@ -36,20 +39,20 @@ module HrrRbSsh
             :'identifier'                => self.class::IDENTIFIER,
             :'Q'                         => @publickey.public_key.to_bn.to_s(2)
           }
-          PublicKeyBlob.encode(public_key_blob_h)
+          PublicKeyBlob.encode public_key_blob_h, logger: logger
         end
 
         def ecdsa_signature_blob signature_blob
           hash = OpenSSL::Digest.digest(self.class::DIGEST, signature_blob)
           sign_der = @publickey.dsa_sign_asn1(hash)
-          sign_asn1 = OpenSSL::ASN1.decode(sign_der)
+          sign_asn1 = OpenSSL::ASN1.decode sign_der
           r = sign_asn1.value[0].value.to_i
           s = sign_asn1.value[1].value.to_i
           ecdsa_signature_blob_h = {
             :'r' => r,
             :'s' => s,
           }
-          EcdsaSignatureBlob.encode ecdsa_signature_blob_h
+          EcdsaSignatureBlob.encode ecdsa_signature_blob_h, logger: logger
         end
 
         def sign signature_blob
@@ -57,12 +60,12 @@ module HrrRbSsh
             :'public key algorithm name' => self.class::NAME,
             :'ecdsa signature blob'      => ecdsa_signature_blob(signature_blob),
           }
-          Signature.encode signature_h
+          Signature.encode signature_h, logger: logger
         end
 
         def verify signature, signature_blob
-          signature_h = Signature.decode signature
-          ecdsa_signature_blob_h = EcdsaSignatureBlob.decode signature_h[:'ecdsa signature blob']
+          signature_h = Signature.decode signature, logger: logger
+          ecdsa_signature_blob_h = EcdsaSignatureBlob.decode signature_h[:'ecdsa signature blob'], logger: logger
           r = ecdsa_signature_blob_h[:'r']
           s = ecdsa_signature_blob_h[:'s']
           sign_asn1 = OpenSSL::ASN1::Sequence.new(

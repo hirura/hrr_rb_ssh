@@ -2,7 +2,6 @@
 # vim: et ts=2 sw=2
 
 require 'etc'
-require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/request_handler'
 
 module HrrRbSsh
@@ -10,7 +9,6 @@ module HrrRbSsh
     class RequestHandler
       class ReferenceExecRequestHandler < RequestHandler
         def initialize
-          @logger = Logger.new self.class.name
           @proc = Proc.new { |context|
             ptm = context.vars[:ptm]
             pts = context.vars[:pts]
@@ -58,22 +56,22 @@ module HrrRbSsh
 
                 begin
                   pid, status = Process.waitpid2 pid
-                  context.logger.info { "program exited with status #{status.inspect}" }
+                  context.log_info { "program exited with status #{status.inspect}" }
                   status.exitstatus
                 ensure
                   unless status
-                    context.logger.info { "exiting program" }
+                    context.log_info { "exiting program" }
                     Process.kill :TERM, pid
                     begin
                       Timeout.timeout(1) do
                         pid, status = Process.waitpid2 pid
                       end
                     rescue Timeout::Error
-                      context.logger.warn { "force exiting program" }
+                      context.log_warn { "force exiting program" }
                       Process.kill :KILL, pid
                       pid, status = Process.waitpid2 pid
                     end
-                    context.logger.info { "program exited with status #{status.inspect}" }
+                    context.log_info { "program exited with status #{status.inspect}" }
                   end
                 end
               end

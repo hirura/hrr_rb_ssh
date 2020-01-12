@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
 require 'hrr_rb_ssh/connection/request_handler'
 
 module HrrRbSsh
@@ -13,10 +12,8 @@ module HrrRbSsh
             class Shell < RequestType
               NAME = 'shell'
 
-              def self.run proc_chain, username, io, variables, message, options, session
-                logger = Logger.new self.class.name
-
-                context = Context.new proc_chain, username, io, variables, message, session
+              def self.run proc_chain, username, io, variables, message, options, session, logger: nil
+                context = Context.new proc_chain, username, io, variables, message, session, logger: logger
                 handler = options.fetch('connection_channel_request_shell', RequestHandler.new {})
                 handler.run context
 

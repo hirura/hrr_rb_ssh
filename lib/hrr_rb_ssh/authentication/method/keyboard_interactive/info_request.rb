@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/message'
 
 module HrrRbSsh
@@ -9,13 +9,14 @@ module HrrRbSsh
     class Method
       class KeyboardInteractive
         class InfoRequest
-          def initialize name, instruction, language_tag, prompts
+          include Loggable
+
+          def initialize name, instruction, language_tag, prompts, logger: nil
+            self.logger = logger
             @name         = name
             @instruction  = instruction
             @language_tag = language_tag
             @prompts      = prompts
-
-            @logger = Logger.new self.class.name
           end
 
           def to_message
@@ -36,7 +37,7 @@ module HrrRbSsh
           end
 
           def to_payload
-            Message::SSH_MSG_USERAUTH_INFO_REQUEST.encode self.to_message
+            Message::SSH_MSG_USERAUTH_INFO_REQUEST.encode self.to_message, logger: logger
           end
         end
       end

@@ -11,9 +11,7 @@ rescue LoadError
 end
 
 logger = Logger.new STDOUT
-logger.level = Logger::INFO
 logger.level = Logger::DEBUG
-HrrRbSsh::Logger.initialize logger
 
 target = ['localhost', 10022]
 options = {
@@ -25,7 +23,7 @@ options = {
     #'password2' # when keyboard-interactive authentication requires 2nd response
   ],
 }
-HrrRbSsh::Client.start(target, options){ |conn|
+HrrRbSsh::Client.start(target, options, logger: logger){ |conn|
   puts conn.exec!('ls -l') # => [out, err]
 
   puts conn.exec!('ls -l', pty: true) # => [out, err] # "ls -l" command will be run on PTY

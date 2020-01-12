@@ -92,7 +92,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session do
     }
 
     it "calls RequestType['shell'].run" do
-      expect(HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Shell).to receive(:run).with(*arguments).once
+      expect(HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Shell).to receive(:run).with(*arguments, logger: nil).once
       session.request(channel_request_message)
     end
   end

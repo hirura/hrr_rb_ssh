@@ -25,9 +25,9 @@ RSpec.describe HrrRbSsh::Client do
       options['transport_preferred_compression_algorithms']      = nil
 
       expect(TCPSocket).to receive(:new).with(address, port).and_return(tcpsocket)
-      expect(HrrRbSsh::Transport).to receive(:new).with(tcpsocket, HrrRbSsh::Mode::CLIENT, options).and_return(transport)
-      expect(HrrRbSsh::Authentication).to receive(:new).with(transport, HrrRbSsh::Mode::CLIENT, options).and_return(authentication)
-      expect(HrrRbSsh::Connection).to receive(:new).with(authentication, HrrRbSsh::Mode::CLIENT, options).and_return(connection)
+      expect(HrrRbSsh::Transport).to receive(:new).with(tcpsocket, HrrRbSsh::Mode::CLIENT, options, logger: nil).and_return(transport)
+      expect(HrrRbSsh::Authentication).to receive(:new).with(transport, HrrRbSsh::Mode::CLIENT, options, logger: nil).and_return(authentication)
+      expect(HrrRbSsh::Connection).to receive(:new).with(authentication, HrrRbSsh::Mode::CLIENT, options, logger: nil).and_return(connection)
       expect { described_class.new([address, port]) }.not_to raise_error
     end
 
@@ -44,9 +44,9 @@ RSpec.describe HrrRbSsh::Client do
       options['transport_preferred_compression_algorithms']      = nil
 
       expect(TCPSocket).to receive(:new).with(address, port).and_return(tcpsocket)
-      expect(HrrRbSsh::Transport).to receive(:new).with(tcpsocket, HrrRbSsh::Mode::CLIENT, options).and_return(transport)
-      expect(HrrRbSsh::Authentication).to receive(:new).with(transport, HrrRbSsh::Mode::CLIENT, options).and_return(authentication)
-      expect(HrrRbSsh::Connection).to receive(:new).with(authentication, HrrRbSsh::Mode::CLIENT, options).and_return(connection)
+      expect(HrrRbSsh::Transport).to receive(:new).with(tcpsocket, HrrRbSsh::Mode::CLIENT, options, logger: nil).and_return(transport)
+      expect(HrrRbSsh::Authentication).to receive(:new).with(transport, HrrRbSsh::Mode::CLIENT, options, logger: nil).and_return(authentication)
+      expect(HrrRbSsh::Connection).to receive(:new).with(authentication, HrrRbSsh::Mode::CLIENT, options, logger: nil).and_return(connection)
       expect { described_class.new([address, port], username: username) }.not_to raise_error
     end
   end

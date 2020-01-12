@@ -1,17 +1,19 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Connection
     class Channel
       class ChannelType
         class Session < ChannelType
+          include Loggable
+
           NAME = 'session'
 
-          def initialize connection, channel, message, socket=nil
-            @logger = Logger.new self.class.name
+          def initialize connection, channel, message, socket=nil, logger: nil
+            self.logger = logger
             @connection = connection
             @channel = channel
             @proc_chain = ProcChain.new
@@ -32,27 +34,27 @@ module HrrRbSsh
 
           def request message
             request_type = message[:'request type']
-            RequestType[request_type].run @proc_chain, @connection.username, @channel.io, @connection.variables, message, @connection.options, self
+            RequestType[request_type].run @proc_chain, @connection.username, @channel.io, @connection.variables, message, @connection.options, self, logger: logger
           end
 
           def proc_chain_thread
             Thread.start {
-              @logger.info { "start proc chain thread" }
+              log_info { "start proc chain thread" }
               begin
                 exitstatus = @proc_chain.call_next
               rescue => e
-                @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+                log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                 exitstatus = 1
               ensure
-                @logger.info { "closing proc chain thread" }
-                @logger.info { "closing channel IOs" }
+                log_info { "closing proc chain thread" }
+                log_info { "closing channel IOs" }
                 @channel.io.each{ |io| io.close rescue nil }
-                @logger.info { "channel IOs closed" }
-                @logger.info { "wait for sending output" }
+                log_info { "channel IOs closed" }
+                log_info { "wait for sending output" }
                 @channel.wait_until_senders_closed
-                @logger.info { "sending output finished" }
+                log_info { "sending output finished" }
                 @channel.close from=:channel_type_instance, exitstatus=exitstatus
-                @logger.info { "proc chain thread closed" }
+                log_info { "proc chain thread closed" }
               end
             }
           end

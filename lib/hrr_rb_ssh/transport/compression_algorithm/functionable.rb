@@ -2,14 +2,16 @@
 # vim: et ts=2 sw=2
 
 require 'zlib'
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Transport
     class CompressionAlgorithm
       module Functionable
-        def initialize direction
-          @logger = Logger.new(self.class.name)
+        include Loggable
+
+        def initialize direction, logger: nil
+          self.logger = logger
           case direction
           when Direction::OUTGOING
             @deflator = ::Zlib::Deflate.new

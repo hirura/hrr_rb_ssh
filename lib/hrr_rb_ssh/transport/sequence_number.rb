@@ -1,8 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
-
 module HrrRbSsh
   class Transport
     class SequenceNumber
@@ -10,8 +8,6 @@ module HrrRbSsh
 
       def initialize
         @sequence_number = 0
-
-        @logger = Logger.new self.class.name
       end
 
       def increment

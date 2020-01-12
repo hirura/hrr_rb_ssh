@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/algorithm/publickey'
 
 module HrrRbSsh
@@ -10,16 +10,18 @@ module HrrRbSsh
       class Publickey
         class Algorithm
           module Functionable
-            def initialize
-              @logger = Logger.new(self.class.name)
+            include Loggable
+
+            def initialize logger: nil
+              self.logger = logger
             end
 
             def verify_public_key public_key_algorithm_name, public_key, public_key_blob
               begin
-                publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new public_key
+                publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new public_key, logger: logger
                 public_key_algorithm_name == self.class::NAME && public_key_blob == publickey.to_public_key_blob
               rescue => e
-                @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+                log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                 false
               end
             end
@@ -36,22 +38,22 @@ module HrrRbSsh
                   :'public key algorithm name' => message[:'public key algorithm name'],
                   :'public key blob'           => message[:'public key blob'],
                 }
-                signature_blob = SignatureBlob.encode signature_blob_h
-                publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new message[:'public key blob']
+                signature_blob = SignatureBlob.encode signature_blob_h, logger: logger
+                publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new message[:'public key blob'], logger: logger
                 publickey.verify message[:'signature'], signature_blob
               rescue => e
-                @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+                log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
                 false
               end
             end
 
             def generate_public_key_blob secret_key
-              publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new secret_key
+              publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new secret_key, logger: logger
               publickey.to_public_key_blob
             end
 
             def generate_signature session_id, username, service_name, method_name, secret_key
-              publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new secret_key
+              publickey = HrrRbSsh::Algorithm::Publickey[self.class::NAME].new secret_key, logger: logger
               publickey_blob = publickey.to_public_key_blob
               signature_blob_h = {
                 :'session identifier'        => session_id,
@@ -63,7 +65,7 @@ module HrrRbSsh
                 :'public key algorithm name' => self.class::NAME,
                 :'public key blob'           => publickey_blob
               }
-              signature_blob = SignatureBlob.encode signature_blob_h
+              signature_blob = SignatureBlob.encode signature_blob_h, logger: logger
               publickey.sign signature_blob
             end
           end

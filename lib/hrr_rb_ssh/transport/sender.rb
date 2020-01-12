@@ -1,13 +1,15 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Transport
     class Sender
-      def initialize
-        @logger = Logger.new self.class.name
+      include Loggable
+
+      def initialize logger: nil
+        self.logger = logger
       end
 
       def packetize transport, payload

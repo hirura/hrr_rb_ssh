@@ -1,7 +1,7 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Connection
@@ -11,16 +11,17 @@ module HrrRbSsh
           class RequestType
             class Subsystem
               class Context
+                include Loggable
+
                 attr_reader \
-                  :logger,
                   :username,
                   :io,
                   :variables,
                   :vars,
                   :subsystem_name
 
-                def initialize proc_chain, username, io, variables, message, session
-                  @logger = Logger.new self.class.name
+                def initialize proc_chain, username, io, variables, message, session, logger: nil
+                  self.logger = logger
 
                   @proc_chain = proc_chain
                   @username   = username

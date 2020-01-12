@@ -2,23 +2,25 @@
 # vim: et ts=2 sw=2
 
 require 'socket'
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Connection
     class GlobalRequestHandler
+      include Loggable
+
       attr_reader \
         :accepted
 
-      def initialize connection
-        @logger = Logger.new self.class.name
+      def initialize connection, logger: nil
+        self.logger = logger
         @connection = connection
         @tcpip_forward_servers = Hash.new
         @tcpip_forward_threads = Hash.new
       end
 
       def close
-        @logger.info { "closing tcpip-forward" }
+        log_info { "closing tcpip-forward" }
         @tcpip_forward_threads.values.each(&:exit)
         @tcpip_forward_servers.values.each{ |s|
           begin
@@ -29,7 +31,7 @@ module HrrRbSsh
         }
         @tcpip_forward_threads.clear
         @tcpip_forward_servers.clear
-        @logger.info { "tcpip-forward closed" }
+        log_info { "tcpip-forward closed" }
       end
 
       def request message
@@ -39,13 +41,13 @@ module HrrRbSsh
         when "cancel-tcpip-forward"
           cancel_tcpip_forward message
         else
-          @logger.warn { "unsupported request name: #{message[:'request name']}" }
+          log_warn { "unsupported request name: #{message[:'request name']}" }
           raise
         end
       end
 
       def tcpip_forward message
-        @logger.info { "starting tcpip-forward" }
+        log_info { "starting tcpip-forward" }
         begin
           address_to_bind     = message[:'address to bind']
           port_number_to_bind = message[:'port number to bind']
@@ -60,18 +62,18 @@ module HrrRbSsh
                 }
               end
             rescue => e
-              @logger.error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+              log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
             end
           }
-          @logger.info { "tcpip-forward started" }
+          log_info { "tcpip-forward started" }
         rescue => e
-          @logger.warn { "starting tcpip-forward failed: #{e.message}" }
+          log_warn { "starting tcpip-forward failed: #{e.message}" }
           raise e
         end
       end
 
       def cancel_tcpip_forward message
-        @logger.info { "canceling tcpip-forward" }
+        log_info { "canceling tcpip-forward" }
         address_to_bind     = message[:'address to bind']
         port_number_to_bind = message[:'port number to bind']
         id = "#{address_to_bind}:#{port_number_to_bind}"
@@ -83,7 +85,7 @@ module HrrRbSsh
         end
         @tcpip_forward_threads.delete id
         @tcpip_forward_servers.delete id
-        @logger.info { "tcpip-forward canceled" }
+        log_info { "tcpip-forward canceled" }
       end
     end
   end

@@ -1,19 +1,21 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/logger'
+require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Transport
     class EncryptionAlgorithm
       module Unfunctionable
+        include Loggable
+
         def self.included klass
           klass.const_set(:IV_LENGTH,  0)
           klass.const_set(:KEY_LENGTH, 0)
         end
 
-        def initialize direction=nil, iv=nil, key=nil
-          @logger = Logger.new(self.class.name)
+        def initialize direction=nil, iv=nil, key=nil, logger: nil
+          self.logger = logger
         end
 
         def block_size
