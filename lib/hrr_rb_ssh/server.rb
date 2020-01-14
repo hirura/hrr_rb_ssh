@@ -25,7 +25,11 @@ module HrrRbSsh
       transport      = Transport.new      io, Mode::SERVER, @options, logger: logger
       authentication = Authentication.new transport, Mode::SERVER, @options, logger: logger
       connection     = Connection.new     authentication, Mode::SERVER, @options, logger: logger
-      connection.start
+      begin
+        connection.start
+      rescue Error::ClosedConnection
+      end
+      log_info { "server service finished" }
     end
   end
 end

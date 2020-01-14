@@ -70,7 +70,7 @@ RSpec.describe HrrRbSsh::Connection do
       end
 
       it "calls authentication.send" do
-        expect(transport).to receive(:send).with(payload).once
+        expect(authentication).to receive(:send).with(payload).once
         connection.send payload
       end
     end

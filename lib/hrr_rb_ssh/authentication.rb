@@ -33,6 +33,7 @@ module HrrRbSsh
       begin
         @transport.send payload
       rescue Error::ClosedTransport
+        close
         raise Error::ClosedAuthentication
       end
     end
@@ -42,19 +43,28 @@ module HrrRbSsh
       begin
         @transport.receive
       rescue Error::ClosedTransport
+        close
         raise Error::ClosedAuthentication
       end
     end
 
     def start
-      @transport.start
-      authenticate
+      log_info { "start authentication" }
+      begin
+        @transport.start
+        authenticate
+      rescue Error::ClosedTransport
+        close
+        raise Error::ClosedAuthentication
+      end
     end
 
     def close
       return if @closed
+      log_info { "close authentication" }
       @closed = true
       @transport.close
+      log_info { "authentication closed" }
     end
 
     def closed?
@@ -121,8 +131,8 @@ module HrrRbSsh
             send_userauth_failure authentication_methods, false
           end
         else
-          @closed = true
-          raise
+          close
+          raise Error::ClosedAuthentication
         end
       end
     end

@@ -49,7 +49,12 @@ module HrrRbSsh
 
     def start foreground: true
       log_info { "start connection" }
-      @authentication.start
+      begin
+        @authentication.start
+      rescue Error::ClosedAuthentication
+        close
+        raise Error::ClosedConnection
+      end
       @closed = false
       @connection_loop_thread = connection_loop_thread
       if foreground
@@ -62,7 +67,8 @@ module HrrRbSsh
     end
 
     def close
-      log_info { "closing connection" }
+      return if @closed
+      log_info { "close connection" }
       @closed = true
       @authentication.close
       @channels.values.each do |channel|
@@ -74,7 +80,7 @@ module HrrRbSsh
       end
       @channels.clear
       @global_request_handler.close
-      @connection_loop_thread.join unless @connection_loop_thread == Thread.current
+      @connection_loop_thread.join if @connection_loop_thread && @connection_loop_thread != Thread.current
       log_info { "connection closed" }
     end
 

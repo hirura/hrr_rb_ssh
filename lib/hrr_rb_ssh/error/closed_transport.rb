@@ -3,7 +3,7 @@
 
 module HrrRbSsh
   class Error
-    class ClosedTransport < Error
+    class ClosedTransport < StandardError
     end
   end
 end
