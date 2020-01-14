@@ -10,8 +10,15 @@ rescue LoadError
   require 'hrr_rb_ssh'
 end
 
+class MyLoggerFormatter < ::Logger::Formatter
+  def call severity, time, progname, msg
+    "%s, [%s#%d.%x] %5s -- %s: %s\n" % [severity[0..0], format_datetime(time), Process.pid, Thread.current.object_id, severity, progname, msg2str(msg)]
+  end
+end
+
 logger = Logger.new STDOUT
 logger.level = Logger::DEBUG
+logger.formatter = MyLoggerFormatter.new
 
 target = ['localhost', 10022]
 options = {
