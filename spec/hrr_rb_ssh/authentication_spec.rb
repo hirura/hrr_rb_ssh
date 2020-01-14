@@ -64,7 +64,7 @@ RSpec.describe HrrRbSsh::Authentication do
 
     context "when transport is closed" do
       it "raises Error::ClosedAuthentication" do
-        expect(transport).to receive(:send).with(payload).and_raise(HrrRbSsh::Error::ClosedTransport).once
+        transport.instance_variable_set('@closed', true)
         expect { authentication.send payload }.to raise_error HrrRbSsh::Error::ClosedAuthentication
       end
     end
@@ -502,7 +502,7 @@ RSpec.describe HrrRbSsh::Authentication do
       it "sends userauth failure message and raise error" do
         expect( transport ).to receive(:receive).with(no_args).and_return(not_userauth_request_payload).once
 
-        expect { authentication.respond_to_authentication }.to raise_error RuntimeError
+        expect { authentication.respond_to_authentication }.to raise_error HrrRbSsh::Error::ClosedAuthentication
 
         expect( authentication.closed? ).to be true
       end

@@ -3,7 +3,7 @@
 
 module HrrRbSsh
   class Error
-    class ClosedAuthentication < Error
+    class ClosedAuthentication < StandardError
     end
   end
 end

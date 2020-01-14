@@ -174,11 +174,16 @@ module HrrRbSsh
         end
 
         @closed = false
+      rescue Error::ClosedTransport
+        close
+        raise Error::ClosedTransport
       rescue EOFError => e
         close
+        raise Error::ClosedTransport
       rescue => e
         log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
         close
+        raise Error::ClosedTransport
       else
         log_info { "transport started" }
       end
@@ -204,12 +209,15 @@ module HrrRbSsh
       @disconnected = true
       begin
         send_disconnect
+      rescue Error::ClosedTransport
+        log_warn { "Transport is closed" }
       rescue IOError
         log_warn { "IO is closed" }
       rescue => e
         log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+      ensure
+        log_info { "transport disconnected" }
       end
-      log_info { "transport disconnected" }
     end
 
     def exchange_version
