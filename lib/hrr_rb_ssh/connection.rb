@@ -224,35 +224,35 @@ module HrrRbSsh
       log_info { 'received ' + Message::SSH_MSG_CHANNEL_REQUEST::ID }
       message = Message::SSH_MSG_CHANNEL_REQUEST.new(logger: logger).decode payload
       local_channel = message[:'recipient channel']
-      @channels[local_channel].receive_message_queue.enq message
+      @channels[local_channel].receive_message_queue.enq message if @channels.has_key? local_channel
     end
 
     def channel_window_adjust payload
       log_info { 'received ' + Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::ID }
       message = Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.new(logger: logger).decode payload
       local_channel = message[:'recipient channel']
-      @channels[local_channel].receive_message_queue.enq message
+      @channels[local_channel].receive_message_queue.enq message if @channels.has_key? local_channel
     end
 
     def channel_data payload
       log_info { 'received ' + Message::SSH_MSG_CHANNEL_DATA::ID }
       message = Message::SSH_MSG_CHANNEL_DATA.new(logger: logger).decode payload
       local_channel = message[:'recipient channel']
-      @channels[local_channel].receive_message_queue.enq message
+      @channels[local_channel].receive_message_queue.enq message if @channels.has_key? local_channel
     end
 
     def channel_extended_data payload
       log_info { 'received ' + Message::SSH_MSG_CHANNEL_EXTENDED_DATA::ID }
       message = Message::SSH_MSG_CHANNEL_EXTENDED_DATA.new(logger: logger).decode payload
       local_channel = message[:'recipient channel']
-      @channels[local_channel].receive_message_queue.enq message
+      @channels[local_channel].receive_message_queue.enq message if @channels.has_key? local_channel
     end
 
     def channel_eof payload
       log_info { 'received ' + Message::SSH_MSG_CHANNEL_EOF::ID }
       message = Message::SSH_MSG_CHANNEL_EOF.new(logger: logger).decode payload
       local_channel = message[:'recipient channel']
-      @channels[local_channel].receive_message_queue.enq message
+      @channels[local_channel].receive_message_queue.enq message if @channels.has_key? local_channel
     end
 
     def channel_close payload
