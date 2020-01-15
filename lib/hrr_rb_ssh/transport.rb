@@ -95,6 +95,10 @@ module HrrRbSsh
           log_warn { "IO is Broken PIPE" }
           close
           raise Error::ClosedTransport
+        rescue IOError => e
+          log_warn { "IO is closed" }
+          close
+          raise Error::ClosedTransport
         rescue => e
           log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
           close
