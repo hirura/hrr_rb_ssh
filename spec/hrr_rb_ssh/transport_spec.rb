@@ -453,8 +453,7 @@ RSpec.describe HrrRbSsh::Transport do
       let(:mock_sender  ){ double("mock sender") }
 
       before :example do
-        transport.instance_variable_set('@disconnected', false)
-        transport.instance_variable_set('@sender', mock_sender  )
+        transport.instance_variable_set('@sender', mock_sender)
       end
 
       context "when disconnect message can be sent" do
@@ -465,18 +464,9 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       context "when disconnect message can not be sent" do
-        context "due to IOError" do
-          it "can not send disconnect" do
-            expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(IOError).once
-            expect { transport.disconnect }.not_to raise_error
-          end
-        end
-
-        context "due to other error" do
-          it "can not send disconnect" do
-            expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(RuntimeError).once
-            expect { transport.disconnect }.not_to raise_error
-          end
+        it "can not send disconnect" do
+          expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(StandardError).once
+          expect { transport.disconnect }.not_to raise_error
         end
       end
     end
@@ -556,7 +546,7 @@ RSpec.describe HrrRbSsh::Transport do
       let(:remote_newkeys_payload){ HrrRbSsh::Message::SSH_MSG_NEWKEYS.new.encode remote_newkeys_message }
 
       before :example do
-        transport.instance_variable_set('@sender',   mock_sender  )
+        transport.instance_variable_set('@sender',   mock_sender)
         transport.instance_variable_set('@receiver', mock_receiver)
 
         transport.instance_variable_set('@v_c', remote_version_string)
@@ -820,7 +810,6 @@ RSpec.describe HrrRbSsh::Transport do
       let(:mock_sender  ){ double("mock sender") }
 
       before :example do
-        transport.instance_variable_set('@disconnected', false)
         transport.instance_variable_set('@sender', mock_sender  )
       end
 
@@ -832,18 +821,9 @@ RSpec.describe HrrRbSsh::Transport do
       end
 
       context "when disconnect message can not be sent" do
-        context "due to IOError" do
-          it "can not send disconnect" do
-            expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(IOError).once
-            expect { transport.disconnect }.not_to raise_error
-          end
-        end
-
-        context "due to other error" do
-          it "can not send disconnect" do
-            expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(RuntimeError).once
-            expect { transport.disconnect }.not_to raise_error
-          end
+        it "can not send disconnect" do
+          expect(mock_sender).to receive(:send).with(transport, disconnect_payload).and_raise(RuntimeError).once
+          expect { transport.disconnect }.not_to raise_error
         end
       end
     end
@@ -1119,7 +1099,6 @@ RSpec.describe HrrRbSsh::Transport do
 
         before :example do
           transport.instance_variable_set('@closed',       false)
-          transport.instance_variable_set('@disconnected', false)
         end
 
         it "sends service request and receives disconnect and close" do

@@ -59,7 +59,6 @@ module HrrRbSsh
       @options = options
 
       @closed = nil
-      @disconnected = nil
 
       @in_kex = false
 
@@ -88,15 +87,12 @@ module HrrRbSsh
     end
 
     def send payload
+      raise Error::ClosedTransport if @closed
       @sender_monitor.synchronize do
         begin
           @sender.send self, payload
-        rescue Errno::EPIPE => e
-          log_warn { "IO is Broken PIPE" }
-          close
-          raise Error::ClosedTransport
-        rescue IOError => e
-          log_warn { "IO is closed" }
+        rescue IOError, SystemCallError => e
+          log_info { "#{e.message} (#{e.class})" }
           close
           raise Error::ClosedTransport
         rescue => e
@@ -116,7 +112,6 @@ module HrrRbSsh
           when Message::SSH_MSG_DISCONNECT::VALUE
             message = Message::SSH_MSG_DISCONNECT.new(logger: logger).decode payload
             log_debug { "received disconnect message: #{message.inspect}" }
-            @disconnected = true
             close
             raise Error::ClosedTransport
           when Message::SSH_MSG_IGNORE::VALUE
@@ -143,16 +138,9 @@ module HrrRbSsh
             payload
           end
         rescue Error::ClosedTransport
-          raise Error::ClosedTransport
-        rescue EOFError => e
-          close
-          raise Error::ClosedTransport
-        rescue IOError => e
-          log_warn { "IO is closed" }
-          close
-          raise Error::ClosedTransport
-        rescue Errno::ECONNRESET => e
-          log_warn { "IO is RESET" }
+          raise
+        rescue EOFError, IOError, SystemCallError => e
+          log_info { "#{e.message} (#{e.class})" }
           close
           raise Error::ClosedTransport
         rescue => e
@@ -165,23 +153,20 @@ module HrrRbSsh
 
     def start
       log_info { "start transport" }
-
       begin
         exchange_version
         exchange_key
-
         case @mode
         when Mode::SERVER
           verify_service_request
         when Mode::CLIENT
           send_service_request
         end
-
         @closed = false
       rescue Error::ClosedTransport
-        close
-        raise Error::ClosedTransport
-      rescue EOFError => e
+        raise
+      rescue EOFError, IOError, SystemCallError => e
+        log_info { "#{e.message} (#{e.class})" }
         close
         raise Error::ClosedTransport
       rescue => e
@@ -194,13 +179,20 @@ module HrrRbSsh
     end
 
     def close
-      return if @closed
-      log_info { "close transport" }
-      @closed = true
-      disconnect
-      @incoming_compression_algorithm.close
-      @outgoing_compression_algorithm.close
-      log_info { "transport closed" }
+      @sender_monitor.synchronize do
+        return if @closed
+        log_info { "close transport" }
+        begin
+          disconnect
+          @incoming_compression_algorithm.close
+          @outgoing_compression_algorithm.close
+        rescue => e
+          log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        ensure
+          @closed = true
+          log_info { "transport closed" }
+        end
+      end
     end
 
     def closed?
@@ -208,20 +200,9 @@ module HrrRbSsh
     end
 
     def disconnect
-      return if @disconnected
       log_info { "disconnect transport" }
-      @disconnected = true
-      begin
-        send_disconnect
-      rescue Error::ClosedTransport
-        log_warn { "Transport is closed" }
-      rescue IOError
-        log_warn { "IO is closed" }
-      rescue => e
-        log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
-      ensure
-        log_info { "transport disconnected" }
-      end
+      send_disconnect
+      log_info { "transport disconnected" }
     end
 
     def exchange_version
@@ -360,7 +341,15 @@ module HrrRbSsh
         :'language tag'   => ""
       }
       payload = Message::SSH_MSG_DISCONNECT.new(logger: logger).encode message
-      send payload
+      @sender_monitor.synchronize do
+        begin
+          @sender.send self, payload
+        rescue IOError, SystemCallError => e
+          log_info { "#{e.message} (#{e.class})" }
+        rescue => e
+          log_error { [e.backtrace[0], ": ", e.message, " (", e.class.to_s, ")\n\t", e.backtrace[1..-1].join("\n\t")].join }
+        end
+      end
     end
 
     def send_kexinit
@@ -429,8 +418,6 @@ module HrrRbSsh
     def receive_service_request
       payload = @receiver.receive self
       message = Message::SSH_MSG_SERVICE_REQUEST.new(logger: logger).decode payload
-
-      message
     end
 
     def send_service_accept service_name
