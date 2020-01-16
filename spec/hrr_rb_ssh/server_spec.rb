@@ -22,7 +22,7 @@ RSpec.describe HrrRbSsh::Server do
       expect(HrrRbSsh::Authentication).to receive(:new).with(transport, HrrRbSsh::Mode::SERVER, options, logger: nil).and_return(authentication)
       expect(HrrRbSsh::Connection).to receive(:new).with(authentication, HrrRbSsh::Mode::SERVER, options, logger: nil).and_return(connection)
       expect(connection).to receive(:start).with(no_args).once
-      expect { described_class.start(io, options) }.not_to raise_error
+      expect { described_class.start(io, options, logger: nil) }.not_to raise_error
     end
   end
 
@@ -34,7 +34,7 @@ RSpec.describe HrrRbSsh::Server do
     end
 
     it "can take an arguments: options" do
-      expect { described_class.new(options) }.not_to raise_error
+      expect { described_class.new(options, logger: nil) }.not_to raise_error
     end
   end
 

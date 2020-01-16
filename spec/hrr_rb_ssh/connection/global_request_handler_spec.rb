@@ -8,7 +8,7 @@ RSpec.describe HrrRbSsh::Connection::GlobalRequestHandler do
   let(:transport){ HrrRbSsh::Transport.new io, mode }
   let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
   let(:options){ Hash.new }
-  let(:connection){ HrrRbSsh::Connection.new authentication, mode, options }
+  let(:connection){ HrrRbSsh::Connection.new authentication, mode, options, logger: nil }
   let(:global_request_handler){ described_class.new connection }
 
   describe "#close" do

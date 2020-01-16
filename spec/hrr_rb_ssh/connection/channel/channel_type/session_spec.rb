@@ -8,7 +8,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session do
   let(:transport){ HrrRbSsh::Transport.new io, mode }
   let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
   let(:options){ Hash.new }
-  let(:connection){ HrrRbSsh::Connection.new authentication, mode, options }
+  let(:connection){ HrrRbSsh::Connection.new authentication, mode, options, logger: nil }
   let(:channel_type){ "session" }
   let(:remote_channel){ 0 }
   let(:initial_window_size){ 2097152 }

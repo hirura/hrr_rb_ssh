@@ -16,7 +16,7 @@ RSpec.describe HrrRbSsh::Connection do
       end
 
       it "can take two arguments: authentication and options" do
-        expect { described_class.new(authentication, mode, options) }.not_to raise_error
+        expect { described_class.new(authentication, mode, options, logger: nil) }.not_to raise_error
       end
     end
 
@@ -28,7 +28,7 @@ RSpec.describe HrrRbSsh::Connection do
       end
 
       it "can take two arguments: authentication and options" do
-        expect { described_class.new(authentication, mode, options) }.not_to raise_error
+        expect { described_class.new(authentication, mode, options, logger: nil) }.not_to raise_error
       end
     end
   end
@@ -39,7 +39,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
     let(:payload){ "testing" }
 
     context "when connection is closed" do
@@ -82,7 +82,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when @channels is empty" do
       it "returns 0" do
@@ -117,7 +117,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
     let(:connection_loop_thread){ 'connection_loop_thread' }
 
     it "calls authentication.start and connection_loop_thread" do
@@ -135,7 +135,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:connection_loop_thread){ 'connection_loop_thread' }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
     let(:channel0){ double("channel0") }
     let(:channel1){ double("channel1") }
     let(:channels){
@@ -185,7 +185,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when connection is closed" do
       before :example do
@@ -214,7 +214,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when receives global request message" do
       let(:global_request_message){
@@ -424,7 +424,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when receives supported global request message" do
       let(:global_request_message){
@@ -488,7 +488,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
     let(:address){ 'localhost' }
     let(:port){ 12345 }
     let(:remote_address){ double('mock remote_address') }
@@ -527,7 +527,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when receives valid channel open message" do
       let(:channel_open_message){
@@ -602,7 +602,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when receives valid channel open confirmation message" do
       let(:channel_open_confirmation_message){
@@ -638,7 +638,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when receives valid channel request message" do
       let(:channel_request_message){
@@ -674,7 +674,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when receives valid channel window adjust message" do
       let(:channel_window_adjust_message){
@@ -709,7 +709,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     context "when receives valid channel data message" do
       let(:channel_data_message){
@@ -744,7 +744,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     let(:channel0){ double('channel0') }
     let(:channel0_receive_message_queue){ double('channel0_receive_message_queue') }
@@ -778,7 +778,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
     let(:channel0){ double("channel0") }
     let(:channel1){ double("channel1") }
     let(:channels){
@@ -818,7 +818,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
-    let(:connection){ described_class.new authentication, mode, options }
+    let(:connection){ described_class.new authentication, mode, options, logger: nil }
 
     let(:request_success_message){
       {

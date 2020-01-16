@@ -29,7 +29,7 @@ RSpec.describe HrrRbSsh::Transport do
     context "when options is specified" do
       context "when options has valid algorithm list" do
         it "can take three arguments: io, mode, and options" do
-          expect { described_class.new io, mode, {} }.not_to raise_error
+          expect { described_class.new io, mode, {}, logger: nil }.not_to raise_error
         end
       end
 

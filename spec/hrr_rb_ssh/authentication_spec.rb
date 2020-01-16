@@ -10,7 +10,7 @@ RSpec.describe HrrRbSsh::Authentication do
     end
   end
 
-  describe '#new' do
+  describe '.new' do
     let(:io){ 'dummy' }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:options){ Hash.new }
@@ -18,12 +18,12 @@ RSpec.describe HrrRbSsh::Authentication do
     describe "when mode is server" do
       let(:mode){ HrrRbSsh::Mode::SERVER }
 
-      it "can take one argument: transport" do
+      it "can take two arguments: transport and mode" do
         expect { described_class.new(transport, mode) }.not_to raise_error
       end
 
-      it "can take two arguments: transport and options" do
-        expect { described_class.new(transport, mode, options) }.not_to raise_error
+      it "can take three arguments: transport, mode, and options" do
+        expect { described_class.new(transport, mode, options, logger: nil) }.not_to raise_error
       end
 
       it "registeres ::SERVICE_NAME in transport" do
@@ -38,12 +38,12 @@ RSpec.describe HrrRbSsh::Authentication do
     describe "when mode is client" do
       let(:mode){ HrrRbSsh::Mode::CLIENT }
 
-      it "can take one argument: transport" do
+      it "can take two arguments: transport and mode" do
         expect { described_class.new(transport, mode) }.not_to raise_error
       end
 
-      it "can take two arguments: transport and options" do
-        expect { described_class.new(transport, mode, options) }.not_to raise_error
+      it "can take three arguments: transport, mode, and options" do
+        expect { described_class.new(transport, mode, options, logger: nil) }.not_to raise_error
       end
     end
   end
@@ -176,7 +176,7 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:io){ 'dummy' }
     let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
-    let(:authentication){ described_class.new(transport, mode, options) }
+    let(:authentication){ described_class.new(transport, mode, options, logger: nil) }
     let(:userauth_failure_message){
       {
         :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
@@ -579,7 +579,7 @@ RSpec.describe HrrRbSsh::Authentication do
           expect( transport ).to receive(:send).with(userauth_request_with_none_method_payload).once
           expect( transport ).to receive(:receive).with(no_args).and_return(userauth_failure_payload).once
 
-          expect { authentication.request_authentication }.to raise_error
+          expect { authentication.request_authentication }.to raise_error RuntimeError
 
           expect( authentication.closed? ).to be true
         end
