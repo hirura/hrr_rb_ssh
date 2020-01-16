@@ -86,6 +86,7 @@ RSpec.describe HrrRbSsh::Authentication do
 
     context "when transport is closed" do
       it "raises Error::ClosedAuthentication" do
+        transport.instance_variable_set('@closed', true)
         expect(transport).to receive(:receive).with(no_args).and_raise(HrrRbSsh::Error::ClosedTransport).once
         expect { authentication.receive }.to raise_error HrrRbSsh::Error::ClosedAuthentication
       end
@@ -132,6 +133,7 @@ RSpec.describe HrrRbSsh::Authentication do
       end
 
       it "closes self" do
+        expect(transport).to receive(:close).with(no_args).once
         authentication.close
         expect(authentication.closed?).to be true
       end

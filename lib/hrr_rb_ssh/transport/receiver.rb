@@ -35,7 +35,7 @@ module HrrRbSsh
         block_size = [transport.incoming_encryption_algorithm.block_size, minimum_block_size].max
         encrypted_packet.push transport.io.read(block_size)
         if (encrypted_packet.last == nil) || (encrypted_packet.last.length != block_size)
-          log_warn { "IO is EOF" }
+          log_info { "IO is EOF" }
           raise EOFError
         end
         unencrypted_packet.push transport.incoming_encryption_algorithm.decrypt(encrypted_packet.last)
@@ -44,7 +44,7 @@ module HrrRbSsh
         following_packet_length = packet_length_field_length + packet_length - block_size
         encrypted_packet.push transport.io.read(following_packet_length)
         if (encrypted_packet.last == nil) || (encrypted_packet.last.length != following_packet_length)
-          log_warn { "IO is EOF" }
+          log_info { "IO is EOF" }
           raise EOFError
         end
         unencrypted_packet.push transport.incoming_encryption_algorithm.decrypt(encrypted_packet.last)
@@ -56,7 +56,7 @@ module HrrRbSsh
         mac_length = transport.incoming_mac_algorithm.digest_length
         mac = transport.io.read mac_length
         if (mac == nil) || (mac.length != mac_length)
-          log_warn { "IO is EOF" }
+          log_info { "IO is EOF" }
           raise EOFError
         end
         mac
