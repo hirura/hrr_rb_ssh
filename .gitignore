@@ -21,7 +21,4 @@ Gemfile.lock
 .ruby-gemset
 
 # additional
-.DS_Store
-*~
-*.swp
 /yang/
