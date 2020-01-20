@@ -75,14 +75,14 @@ module HrrRbSsh
     end
 
     def close
-      log_debug { "closing client" }
+      log_info { "closing client" }
       @closed = true
       @connection.close
-      log_debug { "client closed" }
+      log_info { "client closed" }
     end
 
     def exec! command, pty: false, env: {}
-      log_debug { "start exec!: #{command}" }
+      log_info { "start exec!: #{command}" }
       out_buf = StringIO.new
       err_buf = StringIO.new
       begin
@@ -141,7 +141,7 @@ module HrrRbSsh
     end
 
     def exec command, pty: false, env: {}
-      log_debug { "start exec: #{command}" }
+      log_info { "start exec: #{command}" }
       begin
         log_info { "Opning channel" }
         channel = @connection.request_channel_open "session"
@@ -174,7 +174,7 @@ module HrrRbSsh
     end
 
     def shell env: {}
-      log_debug { "start shell" }
+      log_info { "start shell" }
       begin
         log_info { "Opning channel" }
         channel = @connection.request_channel_open "session"
@@ -205,7 +205,7 @@ module HrrRbSsh
     end
 
     def subsystem name
-      log_debug { "start subsystem" }
+      log_info { "start subsystem" }
       begin
         log_info { "Opning channel" }
         channel = @connection.request_channel_open "session"

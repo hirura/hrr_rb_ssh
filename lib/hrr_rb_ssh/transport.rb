@@ -110,24 +110,24 @@ module HrrRbSsh
           payload = @receiver.receive self
           case payload[0,1].unpack("C")[0]
           when Message::SSH_MSG_DISCONNECT::VALUE
+            log_info { "received disconnect message" }
             message = Message::SSH_MSG_DISCONNECT.new(logger: logger).decode payload
-            log_debug { "received disconnect message: #{message.inspect}" }
             close
             raise Error::ClosedTransport
           when Message::SSH_MSG_IGNORE::VALUE
+            log_info { "received ignore message" }
             message = Message::SSH_MSG_IGNORE.new(logger: logger).decode payload
-            log_debug { "received ignore message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_UNIMPLEMENTED::VALUE
+            log_info { "received unimplemented message" }
             message = Message::SSH_MSG_UNIMPLEMENTED.new(logger: logger).decode payload
-            log_debug { "received unimplemented message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_DEBUG::VALUE
+            log_info { "received debug message" }
             message = Message::SSH_MSG_DEBUG.new(logger: logger).decode payload
-            log_debug { "received debug message: #{message.inspect}" }
             receive
           when Message::SSH_MSG_KEXINIT::VALUE
-            log_debug { "received kexinit message" }
+            log_info { "received kexinit message" }
             if @in_kex
               payload
             else

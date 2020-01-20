@@ -85,13 +85,13 @@ module HrrRbSsh
           @channel_type_instance.start
         end
         @closed = false
-        log_debug { "in start: #{@waiting_thread}" }
+        log_debug { "in start: #{@waiting_thread.inspect}" }
         @waiting_thread.wakeup if @waiting_thread
       end
 
       def wait_until_started
         @waiting_thread = Thread.current
-        log_debug { "in wait_until_started: #{@waiting_thread}" }
+        log_debug { "in wait_until_started: #{@waiting_thread.inspect}" }
         Thread.stop
       end
 
@@ -203,7 +203,7 @@ module HrrRbSsh
                   local_channel = message[:'recipient channel']
                   @receive_extended_data_queue.enq message[:'data']
                 when Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE
-                  log_debug { "received channel window adjust" }
+                  log_info { "received channel window adjust" }
                   @remote_window_size = [@remote_window_size + message[:'bytes to add'], 0xffff_ffff].min
                 else
                   log_warn { "received unsupported message: #{message.inspect}" }

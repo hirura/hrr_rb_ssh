@@ -22,7 +22,6 @@ module HrrRbSsh
 
         def authenticate userauth_request_message
           log_info { "authenticate" }
-          log_debug { "userauth request: " + userauth_request_message.inspect }
           context = Context.new(userauth_request_message[:'user name'], @variables, @authentication_methods, logger: logger)
           @authenticator.authenticate context
         end

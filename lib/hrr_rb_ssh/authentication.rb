@@ -112,7 +112,7 @@ module HrrRbSsh
           when PARTIAL_SUCCESS
             log_info { "partially verified" }
             authentication_methods.delete method_name
-            log_debug { "authentication methods that can continue: #{authentication_methods}" }
+            log_info { "authentication methods that can continue: #{authentication_methods}" }
             if authentication_methods.empty?
               log_info { "verified" }
               send_userauth_success
@@ -159,7 +159,7 @@ module HrrRbSsh
             log_info { "partially verified" }
           end
           authentication_methods_that_can_continue = message[:'authentications that can continue']
-          log_debug { "authentication methods that can continue: #{authentication_methods_that_can_continue}" }
+          log_info { "authentication methods that can continue: #{authentication_methods_that_can_continue}" }
           next_method_name = authentication_methods.find{ |local_m| authentication_methods_that_can_continue.find{ |remote_m| local_m == remote_m } }
           if next_method_name
             authentication_methods.delete next_method_name
