@@ -118,7 +118,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
     let(:options){ Hash.new }
     let(:connection){ described_class.new authentication, mode, options, logger: nil }
-    let(:connection_loop_thread){ 'connection_loop_thread' }
+    let(:connection_loop_thread){ double("connection_loop_thread") }
 
     it "calls authentication.start and connection_loop_thread" do
       expect(authentication).to receive(:start).with(no_args).once
@@ -133,7 +133,7 @@ RSpec.describe HrrRbSsh::Connection do
     let(:mode){ HrrRbSsh::Mode::SERVER }
     let(:transport){ HrrRbSsh::Transport.new io, mode }
     let(:authentication){ HrrRbSsh::Authentication.new transport, mode }
-    let(:connection_loop_thread){ 'connection_loop_thread' }
+    let(:connection_loop_thread){ double("connection_loop_thread") }
     let(:options){ Hash.new }
     let(:connection){ described_class.new authentication, mode, options, logger: nil }
     let(:channel0){ double("channel0") }

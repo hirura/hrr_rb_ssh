@@ -68,8 +68,8 @@ module HrrRbSsh
       @sender_monitor   = Monitor.new
       @receiver_monitor = Monitor.new
 
-      @local_version  = @options.delete('local_version') || "SSH-2.0-HrrRbSsh-#{VERSION}".force_encoding(Encoding::ASCII_8BIT)
-      @remote_version = "".force_encoding(Encoding::ASCII_8BIT)
+      @local_version  = (@options.delete('local_version') || "SSH-2.0-HrrRbSsh-#{VERSION}").encode(Encoding::ASCII_8BIT)
+      @remote_version = nil
 
       @incoming_sequence_number = SequenceNumber.new
       @outgoing_sequence_number = SequenceNumber.new
@@ -310,7 +310,7 @@ module HrrRbSsh
         str_io.write @io.read(1)
         if str_io.string[-2..-1] == "#{CR}#{LF}"
           if str_io.string[0..3] == "SSH-"
-            @remote_version = str_io.string[0..-3]
+            @remote_version = str_io.string[0..-3].encode(Encoding::ASCII_8BIT)
             log_info { "received remote version string: #{@remote_version}" }
             break
           else
