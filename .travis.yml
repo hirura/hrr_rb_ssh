@@ -21,8 +21,10 @@ matrix:
 before_install:
   - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
   - gem install bundler -v '< 2'
+  - yes | gem update --system --force
+  - gem update bundler
 install:
-  - bundle install --path vendor/bundle
+  - bundle install
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
