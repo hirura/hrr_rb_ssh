@@ -19,10 +19,10 @@ module HrrRbSsh
           raise ArgumentError, "must be with all elements of String, but got #{arg.inspect}"
         end
         joined_arg = arg.join(',')
-        if joined_arg.length > 0xffff_ffff
-          raise ArgumentError, "must be shorter than or equal to #{0xffff_ffff}, but got length #{joined_arg.length}"
+        if joined_arg.bytesize > 0xffff_ffff
+          raise ArgumentError, "must be shorter than or equal to #{0xffff_ffff}, but got length #{joined_arg.bytesize}"
         end
-        [joined_arg.length, joined_arg].pack("Na*")
+        [joined_arg.bytesize, joined_arg].pack("Na*")
       end
 
       # Convert binary string into a comma-separated list of names.
