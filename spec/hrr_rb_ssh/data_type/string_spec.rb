@@ -29,7 +29,7 @@ RSpec.describe HrrRbSsh::DataType::String do
         str_mock = double('str mock with length (0xffff_ffff + 1)')
 
         expect(str_mock).to receive(:kind_of?).with(::String).and_return(true).once
-        expect(str_mock).to receive(:length).with(no_args).and_return(0xffff_ffff + 1).twice
+        expect(str_mock).to receive(:bytesize).with(no_args).and_return(0xffff_ffff + 1).twice
 
         expect { HrrRbSsh::DataType::String.encode str_mock }.to raise_error ArgumentError
       end

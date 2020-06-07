@@ -15,10 +15,10 @@ module HrrRbSsh
         unless arg.kind_of? ::String
           raise ArgumentError, "must be a kind of String, but got #{arg.inspect}"
         end
-        if arg.length > 0xffff_ffff
-          raise ArgumentError, "must be shorter than or equal to #{0xffff_ffff}, but got length #{arg.length}"
+        if arg.bytesize > 0xffff_ffff
+          raise ArgumentError, "must be shorter than or equal to #{0xffff_ffff}, but got length #{arg.bytesize}"
         end
-        [arg.length, arg].pack("Na*")
+        [arg.bytesize, arg].pack("Na*")
       end
 
       # Convert binary string into Ruby's string value.
