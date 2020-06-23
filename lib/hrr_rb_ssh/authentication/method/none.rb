@@ -28,12 +28,12 @@ module HrrRbSsh
 
         def request_authentication username, service_name
           message = {
-            :'message number' => Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+            :'message number' => Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
             :"user name"      => username,
             :"service name"   => service_name,
             :"method name"    => NAME,
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
           @transport.send payload
           payload = @transport.receive
         end

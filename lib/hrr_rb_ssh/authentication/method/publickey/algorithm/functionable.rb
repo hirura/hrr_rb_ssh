@@ -57,7 +57,7 @@ module HrrRbSsh
               publickey_blob = publickey.to_public_key_blob
               signature_blob_h = {
                 :'session identifier'        => session_id,
-                :'message number'            => Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+                :'message number'            => Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
                 :'user name'                 => username,
                 :'service name'              => service_name,
                 :'method name'               => method_name,

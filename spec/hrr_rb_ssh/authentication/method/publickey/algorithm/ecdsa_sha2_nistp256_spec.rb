@@ -108,7 +108,7 @@ zklAsYaH7z7OcPYRbe24QCG5YfJQZjevJQ==
     let(:message){
       {
         :'session identifier'        => session_id,
-        :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'message number'            => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
         :'user name'                 => username,
         :'service name'              => "ssh-connection",
         :'method name'               => "publickey",
@@ -121,7 +121,7 @@ zklAsYaH7z7OcPYRbe24QCG5YfJQZjevJQ==
     let(:data){
       [
         HrrRbSsh::DataTypes::String.encode(session_id),
-        HrrRbSsh::DataTypes::Byte.encode(HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE),
+        HrrRbSsh::DataTypes::Byte.encode(HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE),
         HrrRbSsh::DataTypes::String.encode(username),
         HrrRbSsh::DataTypes::String.encode("ssh-connection"),
         HrrRbSsh::DataTypes::String.encode("publickey"),

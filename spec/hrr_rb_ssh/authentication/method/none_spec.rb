@@ -90,14 +90,14 @@ RSpec.describe HrrRbSsh::Authentication::Method::None do
     let(:service_name){ "ssh-connection" }
     let(:userauth_request_with_none_method_message){
       {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
         :'user name'      => username,
         :'service name'   => service_name,
         :'method name'    => "none",
       }
     }
     let(:userauth_request_with_none_method_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
     }
 
     it "sends userauth request for none method" do

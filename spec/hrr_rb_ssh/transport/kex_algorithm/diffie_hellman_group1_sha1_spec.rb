@@ -75,26 +75,26 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup1Sha1 do
       let(:mode){ HrrRbSsh::Mode::SERVER }
       let(:remote_kexdh_init_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_INIT::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_KEXDH_INIT::VALUE,
           :'e'              => remote_dh_pub_key,
         }
       }
       let(:remote_kexdh_init_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.new.encode remote_kexdh_init_message
+        HrrRbSsh::Messages::SSH_MSG_KEXDH_INIT.new.encode remote_kexdh_init_message
       }
       let(:server_host_key_algorithm){ double('server host key algorithm') }
       let(:server_public_host_key){ 'server public host key' }
       let(:sign){ 'sign' }
       let(:local_kexdh_reply_message){
         {
-          :'message number'                                => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
+          :'message number'                                => HrrRbSsh::Messages::SSH_MSG_KEXDH_REPLY::VALUE,
           :'server public host key and certificates (K_S)' => server_public_host_key,
           :'f'                                             => kex_algorithm.instance_variable_get('@public_key'),
           :'signature of H'                                => sign,
         }
       }
       let(:local_kexdh_reply_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.new.encode local_kexdh_reply_message
+        HrrRbSsh::Messages::SSH_MSG_KEXDH_REPLY.new.encode local_kexdh_reply_message
       }
 
       it "exchanges public keys and gets shared secret" do
@@ -118,25 +118,25 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup1Sha1 do
       let(:mode){ HrrRbSsh::Mode::CLIENT }
       let(:local_kexdh_init_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_KEXDH_INIT::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_KEXDH_INIT::VALUE,
           :'e'              => kex_algorithm.instance_variable_get('@public_key'),
         }
       }
       let(:local_kexdh_init_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXDH_INIT.new.encode local_kexdh_init_message
+        HrrRbSsh::Messages::SSH_MSG_KEXDH_INIT.new.encode local_kexdh_init_message
       }
       let(:server_public_host_key){ 'server public host key' }
       let(:sign){ 'sign' }
       let(:remote_kexdh_reply_message){
         {
-          :'message number'                                => HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY::VALUE,
+          :'message number'                                => HrrRbSsh::Messages::SSH_MSG_KEXDH_REPLY::VALUE,
           :'server public host key and certificates (K_S)' => server_public_host_key,
           :'f'                                             => remote_dh_pub_key,
           :'signature of H'                                => sign,
         }
       }
       let(:remote_kexdh_reply_payload){
-        HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY.new.encode remote_kexdh_reply_message
+        HrrRbSsh::Messages::SSH_MSG_KEXDH_REPLY.new.encode remote_kexdh_reply_message
       }
 
       it "exchanges public keys and gets shared secret" do

@@ -63,31 +63,31 @@ module HrrRbSsh
         end
 
         def receive_kexecdh_init payload
-          Message::SSH_MSG_KEXECDH_INIT.new(logger: logger).decode payload
+          Messages::SSH_MSG_KEXECDH_INIT.new(logger: logger).decode payload
         end
 
         def send_kexecdh_reply transport
           message = {
-            :'message number' => Message::SSH_MSG_KEXECDH_REPLY::VALUE,
+            :'message number' => Messages::SSH_MSG_KEXECDH_REPLY::VALUE,
             :'K_S'            => @k_s,
             :'Q_S'            => @q_s,
             :'signature of H' => sign(transport),
           }
-          payload = Message::SSH_MSG_KEXECDH_REPLY.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_KEXECDH_REPLY.new(logger: logger).encode message
           transport.send payload
         end
 
         def send_kexecdh_init transport
           message = {
-            :'message number' => Message::SSH_MSG_KEXECDH_INIT::VALUE,
+            :'message number' => Messages::SSH_MSG_KEXECDH_INIT::VALUE,
             :'Q_C'            => @q_c,
           }
-          payload = Message::SSH_MSG_KEXECDH_INIT.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_KEXECDH_INIT.new(logger: logger).encode message
           transport.send payload
         end
 
         def receive_kexecdh_reply payload
-          Message::SSH_MSG_KEXECDH_REPLY.new(logger: logger).decode payload
+          Messages::SSH_MSG_KEXECDH_REPLY.new(logger: logger).decode payload
         end
       end
     end

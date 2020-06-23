@@ -43,11 +43,11 @@ module HrrRbSsh
 
         def userauth_pk_ok_message public_key_algorithm_name, public_key_blob
           message = {
-            :'message number'                             => Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
+            :'message number'                             => Messages::SSH_MSG_USERAUTH_PK_OK::VALUE,
             :'public key algorithm name from the request' => public_key_algorithm_name,
             :'public key blob from the request'           => public_key_blob,
           }
-          payload = Message::SSH_MSG_USERAUTH_PK_OK.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_USERAUTH_PK_OK.new(logger: logger).encode message
         end
 
         def request_authentication username, service_name
@@ -55,7 +55,7 @@ module HrrRbSsh
           send_request_without_signature username, service_name, public_key_algorithm_name, secret_key
           payload = @transport.receive
           case payload[0,1].unpack("C")[0]
-          when Message::SSH_MSG_USERAUTH_PK_OK::VALUE
+          when Messages::SSH_MSG_USERAUTH_PK_OK::VALUE
             send_request_with_signature username, service_name, public_key_algorithm_name, secret_key
             @transport.receive
           else
@@ -67,7 +67,7 @@ module HrrRbSsh
           algorithm = Algorithm[public_key_algorithm_name].new logger: logger
           public_key_blob = algorithm.generate_public_key_blob(secret_key)
           message = {
-            :'message number'            => Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+            :'message number'            => Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
             :"user name"                 => username,
             :"service name"              => service_name,
             :"method name"               => NAME,
@@ -75,7 +75,7 @@ module HrrRbSsh
             :'public key algorithm name' => public_key_algorithm_name,
             :'public key blob'           => public_key_blob,
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
           @transport.send payload
         end
 
@@ -84,7 +84,7 @@ module HrrRbSsh
           public_key_blob = algorithm.generate_public_key_blob(secret_key)
           signature = algorithm.generate_signature(@session_id, username, service_name, 'publickey', secret_key)
           message = {
-            :'message number'            => Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+            :'message number'            => Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
             :"user name"                 => username,
             :"service name"              => service_name,
             :"method name"               => NAME,
@@ -93,7 +93,7 @@ module HrrRbSsh
             :'public key blob'           => public_key_blob,
             :'signature'                 => signature,
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
           @transport.send payload
         end
       end

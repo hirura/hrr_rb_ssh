@@ -15,7 +15,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
   let(:maximum_packet_size){ 32768 }
   let(:channel_open_message){
     {
-      :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+      :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN::VALUE,
       :'channel type'        => channel_type,
       :'sender channel'      => remote_channel,
       :'initial window size' => initial_window_size,
@@ -89,16 +89,16 @@ RSpec.describe HrrRbSsh::Connection::Channel do
         context "when connection is not closed" do
           let(:channel_eof_message){
             {
-              :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+              :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_EOF::VALUE,
               :'recipient channel' => 0,
             }
           }
           let(:channel_eof_payload){
-            HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.new.encode channel_eof_message
+            HrrRbSsh::Messages::SSH_MSG_CHANNEL_EOF.new.encode channel_eof_message
           }
           let(:channel_request_exit_status_message){
             {
-              :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+              :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST::VALUE,
               :'recipient channel' => 0,
               :'request type'      => 'exit-status',
               :'want reply'        => false,
@@ -106,16 +106,16 @@ RSpec.describe HrrRbSsh::Connection::Channel do
             }
           }
           let(:channel_request_exit_status_payload){
-            HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.new.encode channel_request_exit_status_message
+            HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST.new.encode channel_request_exit_status_message
           }
           let(:channel_close_message){
             {
-              :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+              :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_CLOSE::VALUE,
               :'recipient channel' => 0,
             }
           }
           let(:channel_close_payload){
-            HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.new.encode channel_close_message
+            HrrRbSsh::Messages::SSH_MSG_CHANNEL_CLOSE.new.encode channel_close_message
           }
 
           context "when exit-status is an instance of Integer" do
@@ -243,7 +243,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       context "when request is supported" do
         let(:channel_request_message){
           {
-            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+            :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST::VALUE,
             :'recipient channel' => 0,
             :'request type'      => 'shell',
             :'want reply'        => want_reply,
@@ -252,12 +252,12 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
         let(:channel_success_message){
           {
-            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS::VALUE,
+            :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_SUCCESS::VALUE,
             :'recipient channel' => 0,
           }
         }
         let(:channel_success_payload){
-          HrrRbSsh::Message::SSH_MSG_CHANNEL_SUCCESS.new.encode channel_success_message
+          HrrRbSsh::Messages::SSH_MSG_CHANNEL_SUCCESS.new.encode channel_success_message
         }
 
         context "with want reply true" do
@@ -299,7 +299,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       context "when request is not supported" do
         let(:channel_request_message){
           {
-            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+            :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST::VALUE,
             :'recipient channel' => 0,
             :'request type'      => 'unsupported',
             :'want reply'        => want_reply,
@@ -308,12 +308,12 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
         let(:channel_failure_message){
           {
-            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_FAILURE::VALUE,
+            :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_FAILURE::VALUE,
             :'recipient channel' => 0,
           }
         }
         let(:channel_failure_payload){
-          HrrRbSsh::Message::SSH_MSG_CHANNEL_FAILURE.new.encode channel_failure_message
+          HrrRbSsh::Messages::SSH_MSG_CHANNEL_FAILURE.new.encode channel_failure_message
         }
 
         context "with want reply true" do
@@ -356,7 +356,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when channel receives channel data" do
       let(:channel_data_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_DATA::VALUE,
           :'recipient channel' => 0,
           :'data'              => "testing",
         }
@@ -379,7 +379,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when channel receives channel window adjust" do
       let(:channel_window_adjust_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
           :'recipient channel' => 0,
           :'bytes to add'      => 12345,
         }
@@ -422,7 +422,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
     context "when error occurs" do
       let(:channel_data_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_DATA::VALUE,
           :'recipient channel' => 0,
           :'data'              => "testing",
         }
@@ -447,13 +447,13 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
     let(:channel_data_message){
       {
-        :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+        :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_DATA::VALUE,
         :'recipient channel' => 0,
         :'data'              => send_data,
       }
     }
     let(:channel_data_payload){
-      HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.new.encode channel_data_message
+      HrrRbSsh::Messages::SSH_MSG_CHANNEL_DATA.new.encode channel_data_message
     }
 
     before :example do
@@ -500,14 +500,14 @@ RSpec.describe HrrRbSsh::Connection::Channel do
 
     let(:channel_extended_data_message){
       {
-        :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE,
+        :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE,
         :'recipient channel' => 0,
-        :'data type code'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypesCode::SSH_EXTENDED_DATA_STDERR,
+        :'data type code'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypesCode::SSH_EXTENDED_DATA_STDERR,
         :'data'              => send_data,
       }
     }
     let(:channel_extended_data_payload){
-      HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA.new.encode channel_extended_data_message
+      HrrRbSsh::Messages::SSH_MSG_CHANNEL_EXTENDED_DATA.new.encode channel_extended_data_message
     }
 
     before :example do
@@ -578,13 +578,13 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       context "when local window size is not enough" do
         let(:channel_window_adjust_message){
           {
-            :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+            :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
             :'recipient channel' => 0,
             :'bytes to add'      => described_class::INITIAL_WINDOW_SIZE,
           }
         }
         let(:channel_window_adjust_payload){
-          HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.new.encode channel_window_adjust_message
+          HrrRbSsh::Messages::SSH_MSG_CHANNEL_WINDOW_ADJUST.new.encode channel_window_adjust_message
         }
 
         before :example do

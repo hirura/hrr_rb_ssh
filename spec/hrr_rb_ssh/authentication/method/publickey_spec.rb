@@ -83,13 +83,13 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
 
         let(:userauth_pk_ok_message){
           {
-            :'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
+            :'message number'                             => HrrRbSsh::Messages::SSH_MSG_USERAUTH_PK_OK::VALUE,
             :'public key algorithm name from the request' => "supported",
             :'public key blob from the request'           => "dummy",
           }
         }
         let(:userauth_pk_ok_payload){
-          HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.new.encode userauth_pk_ok_message
+          HrrRbSsh::Messages::SSH_MSG_USERAUTH_PK_OK.new.encode userauth_pk_ok_message
         }
 
         it "returns userauth_pk_ok payload" do
@@ -100,7 +100,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
       context "when 'with signature' is true" do
         let(:userauth_request_message){
           {
-            :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+            :'message number'            => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
             :'user name'                 => "username",
             :'service name'              => "ssh-connection",
             :'method name'               => "publickey",
@@ -141,7 +141,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey do
                 (context.instance_variable_get('@algorithm').class           == algorithm_class),
                 (context.instance_variable_get('@session_id')                == session_id),
                 (context.instance_variable_get('@message')                   == userauth_request_message),
-                (context.instance_variable_get('@message_number')            == HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE),
+                (context.instance_variable_get('@message_number')            == HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE),
                 (context.instance_variable_get('@service_name')              == 'ssh-connection'),
                 (context.instance_variable_get('@method_name')               == 'publickey'),
                 (context.instance_variable_get('@with_signature')            == true),
@@ -212,7 +212,7 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
     }
     let(:userauth_request_with_publickey_method_without_signature_message){
       {
-        :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'message number'            => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
         :'user name'                 => username,
         :'service name'              => service_name,
         :'method name'               => "publickey",
@@ -222,11 +222,11 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
       }
     }
     let(:userauth_request_with_publickey_method_without_signature_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_without_signature_message
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_without_signature_message
     }
     let(:userauth_request_with_publickey_method_with_signature_message){
       {
-        :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'message number'            => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
         :'user name'                 => username,
         :'service name'              => service_name,
         :'method name'               => "publickey",
@@ -237,19 +237,19 @@ vzTNM3SFzgt3bHkdEtDLc64aoBX+dHOot6u71XLZrshnHPtiZ0C/ZA==
       }
     }
     let(:userauth_request_with_publickey_method_with_signature_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_with_signature_message
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_with_signature_message
     }
 
     context "when response for with signature false message is pk_ok" do
       let(:userauth_pk_ok_message){
         {
-          :'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
+          :'message number'                             => HrrRbSsh::Messages::SSH_MSG_USERAUTH_PK_OK::VALUE,
           :'public key algorithm name from the request' => "ssh-rsa",
           :'public key blob from the request'           => public_key_blob,
         }
       }
       let(:userauth_pk_ok_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.new.encode userauth_pk_ok_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_PK_OK.new.encode userauth_pk_ok_message
       }
 
       it "sends userauth request for publickey method" do

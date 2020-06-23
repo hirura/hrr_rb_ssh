@@ -179,31 +179,31 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:authentication){ described_class.new(transport, mode, options, logger: nil) }
     let(:userauth_failure_message){
       {
-        :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        :'message number'                    => HrrRbSsh::Messages::SSH_MSG_USERAUTH_FAILURE::VALUE,
         :'authentications that can continue' => preferred_authentication_methods,
         :'partial success'                   => partial_success,
       }
     }
     let(:userauth_failure_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE.new.encode userauth_failure_message
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_FAILURE.new.encode userauth_failure_message
     }
     let(:userauth_failure_message_2){
       {
-        :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        :'message number'                    => HrrRbSsh::Messages::SSH_MSG_USERAUTH_FAILURE::VALUE,
         :'authentications that can continue' => preferred_authentication_methods_2,
         :'partial success'                   => partial_success_2,
       }
     }
     let(:userauth_failure_payload_2){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE.new.encode userauth_failure_message_2
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_FAILURE.new.encode userauth_failure_message_2
     }
     let(:userauth_success_message){
       {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
+        :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
     }
     let(:userauth_success_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS.new.encode userauth_success_message
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_SUCCESS.new.encode userauth_success_message
     }
     let(:username){ "username" }
 
@@ -215,14 +215,14 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'      => username,
           :'service name'   => "ssh-connection",
           :'method name'    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
       }
 
       it "sends userauth success message for none method, and will return authenticated username" do
@@ -245,18 +245,18 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'      => username,
           :'service name'   => "ssh-connection",
           :'method name'    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
       }
       let(:userauth_request_with_password_method_message){
         {
-          :'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number'     => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
@@ -265,7 +265,7 @@ RSpec.describe HrrRbSsh::Authentication do
         }
       }
       let(:userauth_request_with_password_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
       }
       let(:userauth_requests){
         [
@@ -300,7 +300,7 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_publickey_method_with_no_signature_message){
         {
-          :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number'            => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'                 => username,
           :'service name'              => "ssh-connection",
           :'method name'               => "publickey",
@@ -310,11 +310,11 @@ RSpec.describe HrrRbSsh::Authentication do
         }
       }
       let(:userauth_request_with_publickey_method_with_no_signature_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_with_no_signature_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_with_no_signature_message
       }
       let(:userauth_request_with_publickey_method_with_signature_message){
         {
-          :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number'            => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'                 => username,
           :'service name'              => "ssh-connection",
           :'method name'               => "publickey",
@@ -325,17 +325,17 @@ RSpec.describe HrrRbSsh::Authentication do
         }
       }
       let(:userauth_request_with_publickey_method_with_signature_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_with_signature_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_publickey_method_with_signature_message
       }
       let(:userauth_pk_ok_message){
         {
-          :'message number'                             => HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK::VALUE,
+          :'message number'                             => HrrRbSsh::Messages::SSH_MSG_USERAUTH_PK_OK::VALUE,
           :'public key algorithm name from the request' => "ssh-rsa",
           :'public key blob from the request'           => "dummy",
         }
       }
       let(:userauth_pk_ok_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_PK_OK.new.encode userauth_pk_ok_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_PK_OK.new.encode userauth_pk_ok_message
       }
       let(:userauth_requests){
         [
@@ -366,18 +366,18 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'      => username,
           :'service name'   => "ssh-connection",
           :'method name'    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
       }
       let(:userauth_request_with_password_method_message){
         {
-          :'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number'     => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
@@ -386,7 +386,7 @@ RSpec.describe HrrRbSsh::Authentication do
         }
       }
       let(:userauth_request_with_password_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
       }
       let(:userauth_requests){
         [
@@ -435,18 +435,18 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'      => username,
           :'service name'   => "ssh-connection",
           :'method name'    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
       }
       let(:userauth_request_with_password_method_message){
         {
-          :'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number'     => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
@@ -455,7 +455,7 @@ RSpec.describe HrrRbSsh::Authentication do
         }
       }
       let(:userauth_request_with_password_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
       }
       let(:userauth_requests){
         [
@@ -518,21 +518,21 @@ RSpec.describe HrrRbSsh::Authentication do
     let(:authentication){ described_class.new(transport, mode, options) }
     let(:userauth_failure_message){
       {
-        :'message number'                    => HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        :'message number'                    => HrrRbSsh::Messages::SSH_MSG_USERAUTH_FAILURE::VALUE,
         :'authentications that can continue' => authentications_that_can_continue,
         :'partial success'                   => partial_success,
       }
     }
     let(:userauth_failure_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_FAILURE.new.encode userauth_failure_message
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_FAILURE.new.encode userauth_failure_message
     }
     let(:userauth_success_message){
       {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
+        :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
     }
     let(:userauth_success_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_SUCCESS.new.encode userauth_success_message
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_SUCCESS.new.encode userauth_success_message
     }
     let(:username){ "username" }
 
@@ -545,14 +545,14 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'      => username,
           :'service name'   => "ssh-connection",
           :'method name'    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
       }
 
       context "when success" do
@@ -596,18 +596,18 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'      => username,
           :'service name'   => "ssh-connection",
           :'method name'    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
       }
       let(:userauth_request_with_password_method_message){
         {
-          :'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number'     => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
@@ -616,7 +616,7 @@ RSpec.describe HrrRbSsh::Authentication do
         }
       }
       let(:userauth_request_with_password_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
       }
       let(:authentications_that_can_continue){
         ['password', 'publickey', 'keyboard-interactive']
@@ -648,18 +648,18 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:userauth_request_with_none_method_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'      => username,
           :'service name'   => "ssh-connection",
           :'method name'    => "none",
         }
       }
       let(:userauth_request_with_none_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_none_method_message
       }
       let(:userauth_request_with_password_method_message){
         {
-          :'message number'     => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number'     => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'          => username,
           :'service name'       => "ssh-connection",
           :'method name'        => "password",
@@ -668,11 +668,11 @@ RSpec.describe HrrRbSsh::Authentication do
         }
       }
       let(:userauth_request_with_password_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_password_method_message
       }
       let(:userauth_request_with_keyboard_interactive_method_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
           :'user name'      => username,
           :'service name'   => "ssh-connection",
           :'method name'    => "keyboard-interactive",
@@ -681,7 +681,7 @@ RSpec.describe HrrRbSsh::Authentication do
         }
       }
       let(:userauth_request_with_keyboard_interactive_method_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_keyboard_interactive_method_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_keyboard_interactive_method_message
       }
       let(:authentications_that_can_continue){
         ['password', 'publickey', 'keyboard-interactive']

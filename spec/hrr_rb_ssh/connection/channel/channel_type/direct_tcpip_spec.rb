@@ -20,7 +20,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::DirectTcpip do
 
   let(:channel_open_message){
     {
-      :'message number'        => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+      :'message number'        => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN::VALUE,
       :'channel type'          => channel_type,
       :'sender channel'        => remote_channel,
       :'initial window size'   => initial_window_size,

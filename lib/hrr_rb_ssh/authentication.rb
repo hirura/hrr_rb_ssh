@@ -2,7 +2,6 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/loggable'
-require 'hrr_rb_ssh/message'
 require 'hrr_rb_ssh/error/closed_authentication'
 require 'hrr_rb_ssh/authentication/constant'
 require 'hrr_rb_ssh/authentication/authenticator'
@@ -96,8 +95,8 @@ module HrrRbSsh
       loop do
         payload = @transport.receive
         case payload[0,1].unpack("C")[0]
-        when Message::SSH_MSG_USERAUTH_REQUEST::VALUE
-          userauth_request_message = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).decode payload
+        when Messages::SSH_MSG_USERAUTH_REQUEST::VALUE
+          userauth_request_message = Messages::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).decode payload
           method_name = userauth_request_message[:'method name']
           log_info { "authentication method: #{method_name}" }
           method = Method[method_name].new(@transport, {'session id' => @transport.session_id}.merge(@options), @variables, authentication_methods, logger: logger)
@@ -147,13 +146,13 @@ module HrrRbSsh
         method = Method[next_method_name].new(@transport, {'session id' => @transport.session_id}.merge(@options), @variables, authentication_methods, logger: logger)
         payload = method.request_authentication @options['username'], "ssh-connection"
         case payload[0,1].unpack("C")[0]
-        when Message::SSH_MSG_USERAUTH_SUCCESS::VALUE
+        when Messages::SSH_MSG_USERAUTH_SUCCESS::VALUE
           log_info { "verified" }
           @username = @options['username']
           @closed = false
           break
-        when Message::SSH_MSG_USERAUTH_FAILURE::VALUE
-          message = Message::SSH_MSG_USERAUTH_FAILURE.new(logger: logger).decode payload
+        when Messages::SSH_MSG_USERAUTH_FAILURE::VALUE
+          message = Messages::SSH_MSG_USERAUTH_FAILURE.new(logger: logger).decode payload
           partial_success = message[:'partial success']
           if partial_success
             log_info { "partially verified" }
@@ -175,19 +174,19 @@ module HrrRbSsh
 
     def send_userauth_failure authentication_methods, partial_success
       message = {
-        :'message number'                    => Message::SSH_MSG_USERAUTH_FAILURE::VALUE,
+        :'message number'                    => Messages::SSH_MSG_USERAUTH_FAILURE::VALUE,
         :'authentications that can continue' => authentication_methods,
         :'partial success'                   => partial_success,
       }
-      payload = Message::SSH_MSG_USERAUTH_FAILURE.new(logger: logger).encode message
+      payload = Messages::SSH_MSG_USERAUTH_FAILURE.new(logger: logger).encode message
       @transport.send payload
     end
 
     def send_userauth_success
       message = {
-        :'message number' => Message::SSH_MSG_USERAUTH_SUCCESS::VALUE,
+        :'message number' => Messages::SSH_MSG_USERAUTH_SUCCESS::VALUE,
       }
-      payload = Message::SSH_MSG_USERAUTH_SUCCESS.new(logger: logger).encode message
+      payload = Messages::SSH_MSG_USERAUTH_SUCCESS.new(logger: logger).encode message
       @transport.send payload
     end
 

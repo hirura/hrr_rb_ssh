@@ -9,7 +9,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Context do
   let(:public_key_blob){ "dummy" }
   let(:message){
     {
-      :'message number'            => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+      :'message number'            => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
       :'user name'                 => username,
       :'service name'              => "ssh-connection",
       :'method name'               => "publickey",
@@ -42,8 +42,8 @@ RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Context do
   end
 
   describe "#message_number" do
-    it "returns \"#{HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE}\"" do
-      expect( context.message_number ).to be HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE
+    it "returns \"#{HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE}\"" do
+      expect( context.message_number ).to be HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE
     end
   end
 

@@ -8,7 +8,7 @@ RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType:
   let(:variables){ Hash.new }
   let(:message){
     {
-      :'message number'          => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+      :'message number'          => HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST::VALUE,
       :'recipient channel'       => 1,
       :'request type'            => 'window-change',
       :'want reply'              => false,

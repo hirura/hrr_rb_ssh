@@ -4,7 +4,6 @@
 require 'monitor'
 require 'hrr_rb_ssh/version'
 require 'hrr_rb_ssh/loggable'
-require 'hrr_rb_ssh/message'
 require 'hrr_rb_ssh/error/closed_transport'
 require 'hrr_rb_ssh/transport/constant'
 require 'hrr_rb_ssh/transport/direction'
@@ -108,24 +107,24 @@ module HrrRbSsh
         begin
           payload = @receiver.receive self
           case payload[0,1].unpack("C")[0]
-          when Message::SSH_MSG_DISCONNECT::VALUE
+          when Messages::SSH_MSG_DISCONNECT::VALUE
             log_info { "received disconnect message" }
-            message = Message::SSH_MSG_DISCONNECT.new(logger: logger).decode payload
+            message = Messages::SSH_MSG_DISCONNECT.new(logger: logger).decode payload
             close
             raise Error::ClosedTransport
-          when Message::SSH_MSG_IGNORE::VALUE
+          when Messages::SSH_MSG_IGNORE::VALUE
             log_info { "received ignore message" }
-            message = Message::SSH_MSG_IGNORE.new(logger: logger).decode payload
+            message = Messages::SSH_MSG_IGNORE.new(logger: logger).decode payload
             receive
-          when Message::SSH_MSG_UNIMPLEMENTED::VALUE
+          when Messages::SSH_MSG_UNIMPLEMENTED::VALUE
             log_info { "received unimplemented message" }
-            message = Message::SSH_MSG_UNIMPLEMENTED.new(logger: logger).decode payload
+            message = Messages::SSH_MSG_UNIMPLEMENTED.new(logger: logger).decode payload
             receive
-          when Message::SSH_MSG_DEBUG::VALUE
+          when Messages::SSH_MSG_DEBUG::VALUE
             log_info { "received debug message" }
-            message = Message::SSH_MSG_DEBUG.new(logger: logger).decode payload
+            message = Messages::SSH_MSG_DEBUG.new(logger: logger).decode payload
             receive
-          when Message::SSH_MSG_KEXINIT::VALUE
+          when Messages::SSH_MSG_KEXINIT::VALUE
             log_info { "received kexinit message" }
             if @in_kex
               payload
@@ -334,12 +333,12 @@ module HrrRbSsh
 
     def send_disconnect
       message = {
-        :'message number' => Message::SSH_MSG_DISCONNECT::VALUE,
-        :'reason code'    => Message::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
+        :'message number' => Messages::SSH_MSG_DISCONNECT::VALUE,
+        :'reason code'    => Messages::SSH_MSG_DISCONNECT::ReasonCode::SSH_DISCONNECT_BY_APPLICATION,
         :'description'    => "disconnected by user",
         :'language tag'   => ""
       }
-      payload = Message::SSH_MSG_DISCONNECT.new(logger: logger).encode message
+      payload = Messages::SSH_MSG_DISCONNECT.new(logger: logger).encode message
       @sender_monitor.synchronize do
         begin
           @sender.send self, payload
@@ -353,7 +352,7 @@ module HrrRbSsh
 
     def send_kexinit
       message = {
-        :'message number'                          => Message::SSH_MSG_KEXINIT::VALUE,
+        :'message number'                          => Messages::SSH_MSG_KEXINIT::VALUE,
         :'cookie (random byte)'                    => lambda { rand(0x01_00) },
         :'kex_algorithms'                          => @local_kex_algorithms,
         :'server_host_key_algorithms'              => @local_server_host_key_algorithms,
@@ -368,7 +367,7 @@ module HrrRbSsh
         :'first_kex_packet_follows'                => false,
         :'0 (reserved for future extension)'       => 0,
       }
-      payload = Message::SSH_MSG_KEXINIT.new(logger: logger).encode message
+      payload = Messages::SSH_MSG_KEXINIT.new(logger: logger).encode message
       send payload
 
       case @mode
@@ -386,45 +385,45 @@ module HrrRbSsh
       when Mode::CLIENT
         @i_s = payload
       end
-      message = Message::SSH_MSG_KEXINIT.new(logger: logger).decode payload
+      message = Messages::SSH_MSG_KEXINIT.new(logger: logger).decode payload
       update_remote_algorithms message
     end
 
     def send_newkeys
         message = {
-          :'message number' => Message::SSH_MSG_NEWKEYS::VALUE,
+          :'message number' => Messages::SSH_MSG_NEWKEYS::VALUE,
         }
-        payload = Message::SSH_MSG_NEWKEYS.new(logger: logger).encode message
+        payload = Messages::SSH_MSG_NEWKEYS.new(logger: logger).encode message
         send payload
     end
 
     def receive_newkeys payload
-      message = Message::SSH_MSG_NEWKEYS.new(logger: logger).decode payload
+      message = Messages::SSH_MSG_NEWKEYS.new(logger: logger).decode payload
     end
 
     def send_service_request
       message = {
-        :'message number' => Message::SSH_MSG_SERVICE_REQUEST::VALUE,
+        :'message number' => Messages::SSH_MSG_SERVICE_REQUEST::VALUE,
         :'service name' => 'ssh-userauth',
       }
-      payload = Message::SSH_MSG_SERVICE_REQUEST.new(logger: logger).encode message
+      payload = Messages::SSH_MSG_SERVICE_REQUEST.new(logger: logger).encode message
       send payload
 
       payload = @receiver.receive self
-      message = Message::SSH_MSG_SERVICE_ACCEPT.new(logger: logger).decode payload
+      message = Messages::SSH_MSG_SERVICE_ACCEPT.new(logger: logger).decode payload
     end
 
     def receive_service_request
       payload = @receiver.receive self
-      message = Message::SSH_MSG_SERVICE_REQUEST.new(logger: logger).decode payload
+      message = Messages::SSH_MSG_SERVICE_REQUEST.new(logger: logger).decode payload
     end
 
     def send_service_accept service_name
       message = {
-        :'message number' => Message::SSH_MSG_SERVICE_ACCEPT::VALUE,
+        :'message number' => Messages::SSH_MSG_SERVICE_ACCEPT::VALUE,
         :'service name'   => service_name,
       }
-      payload = Message::SSH_MSG_SERVICE_ACCEPT.new(logger: logger).encode message
+      payload = Messages::SSH_MSG_SERVICE_ACCEPT.new(logger: logger).encode message
       send payload
     end
 

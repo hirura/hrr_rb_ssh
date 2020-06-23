@@ -105,47 +105,47 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroupExchangeSha2
           let(:mock_t){ double('mock transport') }
           let(:remote_kex_dh_gex_request_message){
             {
-              :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
+              :'message number' => HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
               :'min'            => 1024,
               :'n'              => requested_n,
               :'max'            => 8192,
             }
           }
           let(:remote_kex_dh_gex_request_payload){
-            HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST.new.encode remote_kex_dh_gex_request_message
+            HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_REQUEST.new.encode remote_kex_dh_gex_request_message
           }
           let(:remote_kex_dh_gex_init_message){
             {
-              :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
+              :'message number' => HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
               :'e'              => remote_dh_pub_key,
             }
           }
           let(:remote_kex_dh_gex_init_payload){
-            HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_INIT.new.encode remote_kex_dh_gex_init_message
+            HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_INIT.new.encode remote_kex_dh_gex_init_message
           }
           let(:local_kex_dh_gex_group_message){
             {
-              :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
+              :'message number' => HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
               :'p'              => dh_p.to_i(16),
               :'g'              => dh_g,
             }
           }
           let(:local_kex_dh_gex_group_payload){
-            HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP.new.encode local_kex_dh_gex_group_message
+            HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_GROUP.new.encode local_kex_dh_gex_group_message
           }
           let(:server_host_key_algorithm){ double('server host key algorithm') }
           let(:server_public_host_key){ 'server public host key' }
           let(:sign){ 'sign' }
           let(:local_kex_dh_gex_reply_message){
             {
-              :'message number'                                => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
+              :'message number'                                => HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
               :'server public host key and certificates (K_S)' => server_public_host_key,
               :'f'                                             => kex_algorithm.instance_variable_get('@public_key'),
               :'signature of H'                                => sign,
             }
           }
           let(:local_kex_dh_gex_reply_payload){
-            HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY.new.encode local_kex_dh_gex_reply_message
+            HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_REPLY.new.encode local_kex_dh_gex_reply_message
           }
 
           it "exchanges public keys and gets shared secret" do
@@ -281,46 +281,46 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroupExchangeSha2
       }
       let(:local_kex_dh_gex_request_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
           :'min'            => 1024,
           :'n'              => 2048,
           :'max'            => 8192,
         }
       }
       let(:local_kex_dh_gex_request_payload){
-        HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST.new.encode local_kex_dh_gex_request_message
+        HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_REQUEST.new.encode local_kex_dh_gex_request_message
       }
       let(:local_kex_dh_gex_init_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
           :'e'              => kex_algorithm.instance_variable_get('@public_key'),
         }
       }
       let(:local_kex_dh_gex_init_payload){
-        HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_INIT.new.encode local_kex_dh_gex_init_message
+        HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_INIT.new.encode local_kex_dh_gex_init_message
       }
       let(:remote_kex_dh_gex_group_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
           :'p'              => dh_p.to_i(16),
           :'g'              => dh_g,
         }
       }
       let(:remote_kex_dh_gex_group_payload){
-        HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP.new.encode remote_kex_dh_gex_group_message
+        HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_GROUP.new.encode remote_kex_dh_gex_group_message
       }
       let(:server_public_host_key){ 'server public host key' }
       let(:sign){ 'sign' }
       let(:remote_kex_dh_gex_reply_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
           :'server public host key and certificates (K_S)' => server_public_host_key,
           :'f'                                             => remote_dh_pub_key,
           :'signature of H'                                => sign,
         }
       }
       let(:remote_kex_dh_gex_reply_payload){
-        HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REPLY.new.encode remote_kex_dh_gex_reply_message
+        HrrRbSsh::Messages::SSH_MSG_KEX_DH_GEX_REPLY.new.encode remote_kex_dh_gex_reply_message
       }
 
       it "exchanges public keys and gets shared secret" do

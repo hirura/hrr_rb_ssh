@@ -219,13 +219,13 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives global request message" do
       let(:global_request_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_GLOBAL_REQUEST::VALUE,
           :'request name'   => 'dummy',
           :'want reply'     => true,
         }
       }
       let(:global_request_payload){
-        HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.new.encode global_request_message
+        HrrRbSsh::Messages::SSH_MSG_GLOBAL_REQUEST.new.encode global_request_message
       }
 
       it "calls global_request and sends resuest failure" do
@@ -240,7 +240,7 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel open message" do
       let(:channel_open_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN::VALUE,
           :'channel type'        => "session",
           :'sender channel'      => 0,
           :'initial window size' => 2097152,
@@ -248,7 +248,7 @@ RSpec.describe HrrRbSsh::Connection do
         }
       }
       let(:channel_open_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.new.encode channel_open_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN.new.encode channel_open_message
       }
 
       it "calls channel_open" do
@@ -263,7 +263,7 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel open confirmation message" do
       let(:channel_open_confirmation_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
           :'channel type'        => "forwarded-tcpip",
           :'sender channel'      => 0,
           :'recipient channel'   => 0,
@@ -272,7 +272,7 @@ RSpec.describe HrrRbSsh::Connection do
         }
       }
       let(:channel_open_confirmation_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.new.encode channel_open_confirmation_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.new.encode channel_open_confirmation_message
       }
 
       it "calls channel_open_confirmation" do
@@ -287,14 +287,14 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel request message" do
       let(:channel_request_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST::VALUE,
           :'recipient channel' => 0,
           :'request type'      => 'shell',
           :'want reply'        => true,
         }
       }
       let(:channel_request_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.new.encode channel_request_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST.new.encode channel_request_message
       }
 
       it "calls channel_request" do
@@ -309,13 +309,13 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel window adjust message" do
       let(:channel_window_adjust_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
           :'recipient channel' => 0,
           :'bytes to add'      => 12345,
         }
       }
       let(:channel_window_adjust_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.new.encode channel_window_adjust_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_WINDOW_ADJUST.new.encode channel_window_adjust_message
       }
 
       it "calls channel_window_adjust" do
@@ -330,13 +330,13 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel data message" do
       let(:channel_data_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_DATA::VALUE,
           :'recipient channel' => 0,
           :'data'              => "testing",
         }
       }
       let(:channel_data_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.new.encode channel_data_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_DATA.new.encode channel_data_message
       }
 
       it "calls channel_data" do
@@ -351,12 +351,12 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel eof message" do
       let(:channel_eof_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_EOF::VALUE,
           :'recipient channel' => 0,
         }
       }
       let(:channel_eof_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.new.encode channel_eof_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_EOF.new.encode channel_eof_message
       }
 
       let(:channel0){ double('channel0') }
@@ -378,12 +378,12 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives channel close message" do
       let(:channel_close_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_CLOSE::VALUE,
           :'recipient channel' => 0,
         }
       }
       let(:channel_close_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.new.encode channel_close_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_CLOSE.new.encode channel_close_message
       }
 
       it "calls channel_close" do
@@ -406,7 +406,7 @@ RSpec.describe HrrRbSsh::Connection do
         }
       }
       let(:unknown_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.new.encode unknown_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN.new.encode unknown_message
       }
 
       it "does nothing" do
@@ -429,7 +429,7 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives supported global request message" do
       let(:global_request_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_GLOBAL_REQUEST::VALUE,
           :'request name'        => 'tcpip-forward',
           :'want reply'          => true,
           :'address to bind'     => 'localhost',
@@ -437,15 +437,15 @@ RSpec.describe HrrRbSsh::Connection do
         }
       }
       let(:global_request_payload){
-        HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.new.encode global_request_message
+        HrrRbSsh::Messages::SSH_MSG_GLOBAL_REQUEST.new.encode global_request_message
       }
       let(:request_success_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_REQUEST_SUCCESS::VALUE,
         }
       }
       let(:request_success_payload){
-        HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS.new.encode request_success_message
+        HrrRbSsh::Messages::SSH_MSG_REQUEST_SUCCESS.new.encode request_success_message
       }
 
       it "calls global_request" do
@@ -458,21 +458,21 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives unsupported global request message" do
       let(:global_request_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_GLOBAL_REQUEST::VALUE,
           :'request name'        => 'unsupported',
           :'want reply'          => true,
         }
       }
       let(:global_request_payload){
-        HrrRbSsh::Message::SSH_MSG_GLOBAL_REQUEST.new.encode global_request_message
+        HrrRbSsh::Messages::SSH_MSG_GLOBAL_REQUEST.new.encode global_request_message
       }
       let(:request_failure_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_REQUEST_FAILURE::VALUE,
         }
       }
       let(:request_failure_payload){
-        HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE.new.encode request_failure_message
+        HrrRbSsh::Messages::SSH_MSG_REQUEST_FAILURE.new.encode request_failure_message
       }
 
       it "calls global_request" do
@@ -496,7 +496,7 @@ RSpec.describe HrrRbSsh::Connection do
 
     let(:channel_open_message){
       {
-        :'message number'             => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+        :'message number'             => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN::VALUE,
         :'channel type'               => "forwarded-tcpip",
         :'sender channel'             => 0,
         :'initial window size'        => HrrRbSsh::Connection::Channel::INITIAL_WINDOW_SIZE,
@@ -508,7 +508,7 @@ RSpec.describe HrrRbSsh::Connection do
       }
     }
     let(:channel_open_payload){
-      HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.new.encode channel_open_message
+      HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN.new.encode channel_open_message
     }
 
     it "calls send_channel_open" do
@@ -532,7 +532,7 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel open message" do
       let(:channel_open_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN::VALUE,
           :'channel type'        => "session",
           :'sender channel'      => 0,
           :'initial window size' => 2097152,
@@ -540,11 +540,11 @@ RSpec.describe HrrRbSsh::Connection do
         }
       }
       let(:channel_open_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.new.encode channel_open_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN.new.encode channel_open_message
       }
       let(:channel_open_confirmation_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
           :'channel type'        => "session",
           :'recipient channel'   => 0,
           :'sender channel'      => 0,
@@ -553,7 +553,7 @@ RSpec.describe HrrRbSsh::Connection do
         }
       }
       let(:channel_open_confirmation_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.new.encode channel_open_confirmation_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.new.encode channel_open_confirmation_message
       }
 
       it "calls channel_open" do
@@ -566,7 +566,7 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives invalid channel open message" do
       let(:channel_open_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN::VALUE,
           :'channel type'        => "unsupportd",
           :'sender channel'      => 0,
           :'initial window size' => 2097152,
@@ -574,19 +574,19 @@ RSpec.describe HrrRbSsh::Connection do
         }
       }
       let(:channel_open_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN.new.encode channel_open_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN.new.encode channel_open_message
       }
       let(:channel_open_failure_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_FAILURE::VALUE,
           :'recipient channel'   => 0,
-          :'reason code'         => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE::ReasonCode::SSH_OPEN_CONNECT_FAILED,
+          :'reason code'         => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_FAILURE::ReasonCode::SSH_OPEN_CONNECT_FAILED,
           :'description'         => "undefined method `new' for nil:NilClass",
           :'language tag'        => "",
         }
       }
       let(:channel_open_failure_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_FAILURE.new.encode channel_open_failure_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_FAILURE.new.encode channel_open_failure_message
       }
 
       it "calls channel_open" do
@@ -607,7 +607,7 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel open confirmation message" do
       let(:channel_open_confirmation_message){
         {
-          :'message number'      => HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
+          :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_CONFIRMATION::VALUE,
           :'recipient channel'   => 0,
           :'sender channel'      => 0,
           :'initial window size' => HrrRbSsh::Connection::Channel::INITIAL_WINDOW_SIZE,
@@ -615,7 +615,7 @@ RSpec.describe HrrRbSsh::Connection do
         }
       }
       let(:channel_open_confirmation_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.new.encode channel_open_confirmation_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_CONFIRMATION.new.encode channel_open_confirmation_message
       }
 
       let(:channel){ double('mock channel') }
@@ -643,14 +643,14 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel request message" do
       let(:channel_request_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST::VALUE,
           :'recipient channel' => 0,
           :'request type'      => 'shell',
           :'want reply'        => true,
         }
       }
       let(:channel_request_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_REQUEST.new.encode channel_request_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_REQUEST.new.encode channel_request_message
       }
 
       let(:channel){ double('channel') }
@@ -679,13 +679,13 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel window adjust message" do
       let(:channel_window_adjust_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_WINDOW_ADJUST::VALUE,
           :'recipient channel' => 0,
           :'bytes to add'      => 12345,
         }
       }
       let(:channel_window_adjust_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST.new.encode channel_window_adjust_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_WINDOW_ADJUST.new.encode channel_window_adjust_message
       }
 
       let(:channel){ double('channel') }
@@ -714,13 +714,13 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel data message" do
       let(:channel_data_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_DATA::VALUE,
           :'recipient channel' => 0,
           :'data'              => "testing",
         }
       }
       let(:channel_data_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_DATA.new.encode channel_data_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_DATA.new.encode channel_data_message
       }
 
       let(:channel){ double('channel') }
@@ -756,12 +756,12 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel eof message" do
       let(:channel_eof_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_EOF::VALUE,
           :'recipient channel' => 0,
         }
       }
       let(:channel_eof_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_EOF.new.encode channel_eof_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_EOF.new.encode channel_eof_message
       }
 
       it "eofs the channel and delete the channel from channels" do
@@ -795,12 +795,12 @@ RSpec.describe HrrRbSsh::Connection do
     context "when receives valid channel close message" do
       let(:channel_close_message){
         {
-          :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE::VALUE,
+          :'message number'    => HrrRbSsh::Messages::SSH_MSG_CHANNEL_CLOSE::VALUE,
           :'recipient channel' => 0,
         }
       }
       let(:channel_close_payload){
-        HrrRbSsh::Message::SSH_MSG_CHANNEL_CLOSE.new.encode channel_close_message
+        HrrRbSsh::Messages::SSH_MSG_CHANNEL_CLOSE.new.encode channel_close_message
       }
 
       it "closes the channel and delete the channel from channels" do
@@ -822,11 +822,11 @@ RSpec.describe HrrRbSsh::Connection do
 
     let(:request_success_message){
       {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS::VALUE,
+        :'message number' => HrrRbSsh::Messages::SSH_MSG_REQUEST_SUCCESS::VALUE,
       }
     }
     let(:request_success_payload){
-      HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS.new.encode request_success_message
+      HrrRbSsh::Messages::SSH_MSG_REQUEST_SUCCESS.new.encode request_success_message
     }
 
     it "calls global_request" do

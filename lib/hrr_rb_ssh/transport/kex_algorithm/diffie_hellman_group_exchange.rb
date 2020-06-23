@@ -101,60 +101,60 @@ module HrrRbSsh
         end
 
         def receive_kex_dh_gex_request payload
-          Message::SSH_MSG_KEX_DH_GEX_REQUEST.new(logger: logger).decode payload
+          Messages::SSH_MSG_KEX_DH_GEX_REQUEST.new(logger: logger).decode payload
         end
 
         def send_kex_dh_gex_group transport
           message = {
-            :'message number' => Message::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
+            :'message number' => Messages::SSH_MSG_KEX_DH_GEX_GROUP::VALUE,
             :'p'              => @p,
             :'g'              => @g,
           }
-          payload = Message::SSH_MSG_KEX_DH_GEX_GROUP.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_KEX_DH_GEX_GROUP.new(logger: logger).encode message
           transport.send payload
         end
 
         def receive_kex_dh_gex_init payload
-          Message::SSH_MSG_KEX_DH_GEX_INIT.new(logger: logger).decode payload
+          Messages::SSH_MSG_KEX_DH_GEX_INIT.new(logger: logger).decode payload
         end
 
         def send_kex_dh_gex_reply transport
           message = {
-            :'message number'                                => Message::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
+            :'message number'                                => Messages::SSH_MSG_KEX_DH_GEX_REPLY::VALUE,
             :'server public host key and certificates (K_S)' => @k_s,
             :'f'                                             => @f,
             :'signature of H'                                => sign(transport),
           }
-          payload = Message::SSH_MSG_KEX_DH_GEX_REPLY.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_KEX_DH_GEX_REPLY.new(logger: logger).encode message
           transport.send payload
         end
 
         def send_kex_dh_gex_request transport
           message = {
-            :'message number' => Message::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
+            :'message number' => Messages::SSH_MSG_KEX_DH_GEX_REQUEST::VALUE,
             :'min'            => @min,
             :'n'              => @n,
             :'max'            => @max,
           }
-          payload = Message::SSH_MSG_KEX_DH_GEX_REQUEST.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_KEX_DH_GEX_REQUEST.new(logger: logger).encode message
           transport.send payload
         end
 
         def receive_kex_dh_gex_group payload
-          Message::SSH_MSG_KEX_DH_GEX_GROUP.new(logger: logger).decode payload
+          Messages::SSH_MSG_KEX_DH_GEX_GROUP.new(logger: logger).decode payload
         end
 
         def send_kex_dh_gex_init transport
           message = {
-            :'message number' => Message::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
+            :'message number' => Messages::SSH_MSG_KEX_DH_GEX_INIT::VALUE,
             :'e'              => @e,
           }
-          payload = Message::SSH_MSG_KEX_DH_GEX_INIT.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_KEX_DH_GEX_INIT.new(logger: logger).encode message
           transport.send payload
         end
 
         def receive_kex_dh_gex_reply payload
-          Message::SSH_MSG_KEX_DH_GEX_REPLY.new(logger: logger).decode payload
+          Messages::SSH_MSG_KEX_DH_GEX_REPLY.new(logger: logger).decode payload
         end
       end
     end

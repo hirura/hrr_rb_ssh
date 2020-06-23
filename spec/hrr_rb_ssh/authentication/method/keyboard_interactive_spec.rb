@@ -60,7 +60,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
       let(:keyboard_interactive_method){ described_class.new transport, options, variables, authentication_methods }
       let(:userauth_info_request_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE,
           :'name'           => "keyboard interactive authentication",
           :'instruction'    => "instruction",
           :'language tag'   => "",
@@ -72,18 +72,18 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
         }
       }
       let(:userauth_info_request_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST.new.encode userauth_info_request_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_INFO_REQUEST.new.encode userauth_info_request_message
       }
       let(:userauth_info_response_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_INFO_RESPONSE::VALUE,
           :'num-responses'  => 2,
           :'response[1]'    => password1,
           :'response[2]'    => password2,
         }
       }
       let(:userauth_info_response_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE.new.encode userauth_info_response_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_INFO_RESPONSE.new.encode userauth_info_response_message
       }
 
       context "when authenticator returns true" do
@@ -164,7 +164,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
     let(:service_name){ "ssh-connection" }
     let(:userauth_request_with_keyboard_interactive_method_message){
       {
-        :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+        :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
         :'user name'      => username,
         :'service name'   => service_name,
         :'method name'    => "keyboard-interactive",
@@ -173,13 +173,13 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
       }
     }
     let(:userauth_request_with_keyboard_interactive_method_payload){
-      HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_keyboard_interactive_method_message
+      HrrRbSsh::Messages::SSH_MSG_USERAUTH_REQUEST.new.encode userauth_request_with_keyboard_interactive_method_message
     }
 
     context "when response message is info request" do
       let(:userauth_info_request_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE,
           :'name'           => "keyboard interactive authentication",
           :'instruction'    => "instruction",
           :'language tag'   => "",
@@ -191,18 +191,18 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
         }
       }
       let(:userauth_info_request_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST.new.encode userauth_info_request_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_INFO_REQUEST.new.encode userauth_info_request_message
       }
       let(:userauth_info_response_message){
         {
-          :'message number' => HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE::VALUE,
+          :'message number' => HrrRbSsh::Messages::SSH_MSG_USERAUTH_INFO_RESPONSE::VALUE,
           :'num-responses'  => 2,
           :'response[1]'    => "password1",
           :'response[2]'    => "password2",
         }
       }
       let(:userauth_info_response_payload){
-        HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE.new.encode userauth_info_response_message
+        HrrRbSsh::Messages::SSH_MSG_USERAUTH_INFO_RESPONSE.new.encode userauth_info_response_message
       }
 
       it "sends userauth request for keyboard_interactive method" do

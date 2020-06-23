@@ -31,30 +31,30 @@ module HrrRbSsh
 
         def request_authentication username, service_name
           message = {
-            :'message number' => Message::SSH_MSG_USERAUTH_REQUEST::VALUE,
+            :'message number' => Messages::SSH_MSG_USERAUTH_REQUEST::VALUE,
             :"user name"      => username,
             :"service name"   => service_name,
             :"method name"    => NAME,
             :"language tag"   => "",
             :'submethods'     => "",
           }
-          payload = Message::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
+          payload = Messages::SSH_MSG_USERAUTH_REQUEST.new(logger: logger).encode message
           @transport.send payload
 
           payload = @transport.receive
           case payload[0,1].unpack("C")[0]
-          when Message::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE
-            message = Message::SSH_MSG_USERAUTH_INFO_REQUEST.new(logger: logger).decode payload
+          when Messages::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE
+            message = Messages::SSH_MSG_USERAUTH_INFO_REQUEST.new(logger: logger).decode payload
             num_responses = @options['client_authentication_keyboard_interactive'].size
             message = {
-              :'message number' => Message::SSH_MSG_USERAUTH_INFO_RESPONSE::VALUE,
+              :'message number' => Messages::SSH_MSG_USERAUTH_INFO_RESPONSE::VALUE,
               :'num-responses'  => num_responses,
             }
             message_responses = @options['client_authentication_keyboard_interactive'].map.with_index{ |response, i|
               {:"response[#{i+1}]" => response}
             }.inject(Hash.new){ |a, b| a.merge(b) }
             message.update(message_responses)
-            payload = Message::SSH_MSG_USERAUTH_INFO_RESPONSE.new(logger: logger).encode message
+            payload = Messages::SSH_MSG_USERAUTH_INFO_RESPONSE.new(logger: logger).encode message
             @transport.send payload
             @transport.receive
           else

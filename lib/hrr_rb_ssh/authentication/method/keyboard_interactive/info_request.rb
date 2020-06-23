@@ -2,7 +2,6 @@
 # vim: et ts=2 sw=2
 
 require 'hrr_rb_ssh/loggable'
-require 'hrr_rb_ssh/message'
 
 module HrrRbSsh
   class Authentication
@@ -21,7 +20,7 @@ module HrrRbSsh
 
           def to_message
             message = {
-              :'message number' => Message::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE,
+              :'message number' => Messages::SSH_MSG_USERAUTH_INFO_REQUEST::VALUE,
               :'name'           => @name,
               :'instruction'    => @instruction,
               :'language tag'   => @language_tag,
@@ -37,7 +36,7 @@ module HrrRbSsh
           end
 
           def to_payload
-            Message::SSH_MSG_USERAUTH_INFO_REQUEST.new(logger: logger).encode self.to_message
+            Messages::SSH_MSG_USERAUTH_INFO_REQUEST.new(logger: logger).encode self.to_message
           end
         end
       end
