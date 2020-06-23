@@ -25,8 +25,8 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_UNIMPLEMENTED do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'packet sequence number of rejected message']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'packet sequence number of rejected message']),
     ].join
   }
 

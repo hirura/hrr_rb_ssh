@@ -2,9 +2,9 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
-  class DataType
+  class DataTypes
     # Boolean provides methods to convert boolean value and 8-bit unsigned binary string each other.
-    class Boolean < DataType
+    class Boolean < DataTypes
       # Convert boolean value into 8-bit unsigned binary string.
       #
       # @param [::Boolean] arg boolean value to be converted

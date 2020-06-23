@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -13,10 +12,10 @@ module HrrRbSsh
       VALUE = 60
 
       DEFINITION = [
-        #[DataType, Field Name]
-        [DataType::Byte,      :'message number'],
-        [DataType::String,    :'public key algorithm name from the request'],
-        [DataType::String,    :'public key blob from the request'],
+        #[DataTypes, Field Name]
+        [DataTypes::Byte,      :'message number'],
+        [DataTypes::String,    :'public key algorithm name from the request'],
+        [DataTypes::String,    :'public key blob from the request'],
       ]
     end
   end

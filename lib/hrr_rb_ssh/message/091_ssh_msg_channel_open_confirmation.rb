@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -13,32 +12,32 @@ module HrrRbSsh
       VALUE = 91
 
       DEFINITION = [
-        #[DataType, Field Name]
-        [DataType::Byte,      :'message number'],
-        [DataType::Uint32,    :'recipient channel'],
-        [DataType::Uint32,    :'sender channel'],
-        [DataType::Uint32,    :'initial window size'],
-        [DataType::Uint32,    :'maximum packet size'],
+        #[DataTypes, Field Name]
+        [DataTypes::Byte,      :'message number'],
+        [DataTypes::Uint32,    :'recipient channel'],
+        [DataTypes::Uint32,    :'sender channel'],
+        [DataTypes::Uint32,    :'initial window size'],
+        [DataTypes::Uint32,    :'maximum packet size'],
       ]
 
       SESSION_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'channel type' : "session"],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'channel type' : "session"],
       ]
 
       X11_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'channel type' : "x11"],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'channel type' : "x11"],
       ]
 
       FORWARDED_TCPIP_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'channel type' : "forwarded-tcpip"],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'channel type' : "forwarded-tcpip"],
       ]
 
       DIRECT_TCPIP_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'channel type' : "direct-tcpip"],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'channel type' : "direct-tcpip"],
       ]
 
       CONDITIONAL_DEFINITION = {

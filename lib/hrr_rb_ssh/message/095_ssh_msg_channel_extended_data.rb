@@ -1,13 +1,12 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
   module Message
     class SSH_MSG_CHANNEL_EXTENDED_DATA
-      module DataTypeCode
+      module DataTypesCode
         SSH_EXTENDED_DATA_STDERR = 1
       end
 
@@ -17,11 +16,11 @@ module HrrRbSsh
       VALUE = 95
 
       DEFINITION = [
-        #[DataType, Field Name]
-        [DataType::Byte,      :'message number'],
-        [DataType::Uint32,    :'recipient channel'],
-        [DataType::Uint32,    :'data type code'],
-        [DataType::String,    :'data'],
+        #[DataTypes, Field Name]
+        [DataTypes::Byte,      :'message number'],
+        [DataTypes::Uint32,    :'recipient channel'],
+        [DataTypes::Uint32,    :'data type code'],
+        [DataTypes::String,    :'data'],
       ]
     end
   end

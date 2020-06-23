@@ -29,11 +29,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'name']),
-        HrrRbSsh::DataType::String.encode(message[:'instruction']),
-        HrrRbSsh::DataType::String.encode(message[:'language tag']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'num-prompts']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'instruction']),
+        HrrRbSsh::DataTypes::String.encode(message[:'language tag']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'num-prompts']),
       ].join
     }
 
@@ -64,13 +64,13 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'name']),
-        HrrRbSsh::DataType::String.encode(message[:'instruction']),
-        HrrRbSsh::DataType::String.encode(message[:'language tag']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'num-prompts']),
-        HrrRbSsh::DataType::String.encode(message[:'prompt[1]']),
-        HrrRbSsh::DataType::Boolean.encode(message[:'echo[1]']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'instruction']),
+        HrrRbSsh::DataTypes::String.encode(message[:'language tag']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'num-prompts']),
+        HrrRbSsh::DataTypes::String.encode(message[:'prompt[1]']),
+        HrrRbSsh::DataTypes::Boolean.encode(message[:'echo[1]']),
       ].join
     }
 
@@ -103,15 +103,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'name']),
-        HrrRbSsh::DataType::String.encode(message[:'instruction']),
-        HrrRbSsh::DataType::String.encode(message[:'language tag']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'num-prompts']),
-        HrrRbSsh::DataType::String.encode(message[:'prompt[1]']),
-        HrrRbSsh::DataType::Boolean.encode(message[:'echo[1]']),
-        HrrRbSsh::DataType::String.encode(message[:'prompt[2]']),
-        HrrRbSsh::DataType::Boolean.encode(message[:'echo[2]']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'instruction']),
+        HrrRbSsh::DataTypes::String.encode(message[:'language tag']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'num-prompts']),
+        HrrRbSsh::DataTypes::String.encode(message[:'prompt[1]']),
+        HrrRbSsh::DataTypes::Boolean.encode(message[:'echo[1]']),
+        HrrRbSsh::DataTypes::String.encode(message[:'prompt[2]']),
+        HrrRbSsh::DataTypes::Boolean.encode(message[:'echo[2]']),
       ].join
     }
 
@@ -146,17 +146,17 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'name']),
-        HrrRbSsh::DataType::String.encode(message[:'instruction']),
-        HrrRbSsh::DataType::String.encode(message[:'language tag']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'num-prompts']),
-        HrrRbSsh::DataType::String.encode(message[:'prompt[1]']),
-        HrrRbSsh::DataType::Boolean.encode(message[:'echo[1]']),
-        HrrRbSsh::DataType::String.encode(message[:'prompt[2]']),
-        HrrRbSsh::DataType::Boolean.encode(message[:'echo[2]']),
-        HrrRbSsh::DataType::String.encode(message[:'prompt[3]']),
-        HrrRbSsh::DataType::Boolean.encode(message[:'echo[3]']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'instruction']),
+        HrrRbSsh::DataTypes::String.encode(message[:'language tag']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'num-prompts']),
+        HrrRbSsh::DataTypes::String.encode(message[:'prompt[1]']),
+        HrrRbSsh::DataTypes::Boolean.encode(message[:'echo[1]']),
+        HrrRbSsh::DataTypes::String.encode(message[:'prompt[2]']),
+        HrrRbSsh::DataTypes::Boolean.encode(message[:'echo[2]']),
+        HrrRbSsh::DataTypes::String.encode(message[:'prompt[3]']),
+        HrrRbSsh::DataTypes::Boolean.encode(message[:'echo[3]']),
       ].join
     }
 

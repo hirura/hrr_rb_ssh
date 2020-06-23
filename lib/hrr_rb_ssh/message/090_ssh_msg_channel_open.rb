@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -13,42 +12,42 @@ module HrrRbSsh
       VALUE = 90
 
       DEFINITION = [
-        #[DataType, Field Name]
-        [DataType::Byte,      :'message number'],
-        [DataType::String,    :'channel type'],
-        [DataType::Uint32,    :'sender channel'],
-        [DataType::Uint32,    :'initial window size'],
-        [DataType::Uint32,    :'maximum packet size'],
+        #[DataTypes, Field Name]
+        [DataTypes::Byte,      :'message number'],
+        [DataTypes::String,    :'channel type'],
+        [DataTypes::Uint32,    :'sender channel'],
+        [DataTypes::Uint32,    :'initial window size'],
+        [DataTypes::Uint32,    :'maximum packet size'],
       ]
 
       SESSION_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'channel type' : "session"],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'channel type' : "session"],
       ]
 
       X11_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'channel type' : "x11"],
-        [DataType::String,    :'originator address'],
-        [DataType::Uint32,    :'originator port'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'channel type' : "x11"],
+        [DataTypes::String,    :'originator address'],
+        [DataTypes::Uint32,    :'originator port'],
       ]
 
       FORWARDED_TCPIP_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'channel type' : "forwarded-tcpip"],
-        [DataType::String,    :'address that was connected'],
-        [DataType::Uint32,    :'port that was connected'],
-        [DataType::String,    :'originator IP address'],
-        [DataType::Uint32,    :'originator port'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'channel type' : "forwarded-tcpip"],
+        [DataTypes::String,    :'address that was connected'],
+        [DataTypes::Uint32,    :'port that was connected'],
+        [DataTypes::String,    :'originator IP address'],
+        [DataTypes::Uint32,    :'originator port'],
       ]
 
       DIRECT_TCPIP_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'channel type' : "direct-tcpip"],
-        [DataType::String,    :'host to connect'],
-        [DataType::Uint32,    :'port to connect'],
-        [DataType::String,    :'originator IP address'],
-        [DataType::Uint32,    :'originator port'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'channel type' : "direct-tcpip"],
+        [DataTypes::String,    :'host to connect'],
+        [DataTypes::Uint32,    :'port to connect'],
+        [DataTypes::String,    :'originator IP address'],
+        [DataTypes::Uint32,    :'originator port'],
       ]
 
       CONDITIONAL_DEFINITION = {

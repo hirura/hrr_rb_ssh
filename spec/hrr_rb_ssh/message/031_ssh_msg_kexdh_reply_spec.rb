@@ -27,10 +27,10 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEXDH_REPLY do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::String.encode(message[:'server public host key and certificates (K_S)']),
-      HrrRbSsh::DataType::Mpint.encode(message[:'f']),
-      HrrRbSsh::DataType::String.encode(message[:'signature of H']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::String.encode(message[:'server public host key and certificates (K_S)']),
+      HrrRbSsh::DataTypes::Mpint.encode(message[:'f']),
+      HrrRbSsh::DataTypes::String.encode(message[:'signature of H']),
     ].join
   }
 

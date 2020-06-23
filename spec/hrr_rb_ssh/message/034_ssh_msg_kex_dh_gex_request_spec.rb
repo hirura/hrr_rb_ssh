@@ -27,10 +27,10 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'min']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'n']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'max']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'min']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'n']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'max']),
     ].join
   }
 

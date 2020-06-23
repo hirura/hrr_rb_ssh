@@ -571,18 +571,18 @@ RSpec.describe HrrRbSsh::Transport do
         16.times do
           expect(i_s.read(1).unpack("C")[0]).to be_between(0x00, 0xff).inclusive
         end
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::KexAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq []
-        expect(HrrRbSsh::DataType::NameList.decode i_s).to eq []
-        expect(HrrRbSsh::DataType::Boolean.decode i_s).to eq false
-        expect(HrrRbSsh::DataType::Uint32.decode i_s).to eq 0
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::KexAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq []
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq []
+        expect(HrrRbSsh::DataTypes::Boolean.decode i_s).to eq false
+        expect(HrrRbSsh::DataTypes::Uint32.decode i_s).to eq 0
         expect(i_s.read).to eq ""
       end
 
@@ -946,18 +946,18 @@ RSpec.describe HrrRbSsh::Transport do
         16.times do
           expect(i_c.read(1).unpack("C")[0]).to be_between(0x00, 0xff).inclusive
         end
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::KexAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq []
-        expect(HrrRbSsh::DataType::NameList.decode i_c).to eq []
-        expect(HrrRbSsh::DataType::Boolean.decode i_c).to eq false
-        expect(HrrRbSsh::DataType::Uint32.decode i_c).to eq 0
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::KexAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::MacAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::CompressionAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq []
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq []
+        expect(HrrRbSsh::DataTypes::Boolean.decode i_c).to eq false
+        expect(HrrRbSsh::DataTypes::Uint32.decode i_c).to eq 0
         expect(i_c.read).to eq ""
       end
 

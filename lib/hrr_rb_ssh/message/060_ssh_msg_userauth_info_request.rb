@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -13,21 +12,21 @@ module HrrRbSsh
       VALUE = 60
 
       DEFINITION = [
-        #[DataType, Field Name]
-        [DataType::Byte,      :'message number'],
-        [DataType::String,    :'name'],
-        [DataType::String,    :'instruction'],
-        [DataType::String,    :'language tag'],
-        [DataType::Uint32,    :'num-prompts'],
+        #[DataTypes, Field Name]
+        [DataTypes::Byte,      :'message number'],
+        [DataTypes::String,    :'name'],
+        [DataTypes::String,    :'instruction'],
+        [DataTypes::String,    :'language tag'],
+        [DataTypes::Uint32,    :'num-prompts'],
       ]
 
       PER_NUM_PROMPTS_DEFINITION = Hash.new{ |hash, key|
         Array.new(key){ |i|
           [
-            #[DataType, Field Name]
-            #[DataType::String,   :'num-prompts' : "> 0"],
-            [DataType::String,    :"prompt[#{i+1}]"],
-            [DataType::Boolean,   :"echo[#{i+1}]"],
+            #[DataTypes, Field Name]
+            #[DataTypes::String,   :'num-prompts' : "> 0"],
+            [DataTypes::String,    :"prompt[#{i+1}]"],
+            [DataTypes::Boolean,   :"echo[#{i+1}]"],
           ]
         }.inject(:+)
       }

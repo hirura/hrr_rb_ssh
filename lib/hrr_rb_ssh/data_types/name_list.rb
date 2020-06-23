@@ -2,9 +2,9 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
-  class DataType
+  class DataTypes
     # NameList provides methods to convert a comma-separated list of names and binary string each other.
-    class NameList < DataType
+    class NameList < DataTypes
       # Convert a comma-separated list of names into binary string.
       #
       # @param [::Array] arg an array that containes names to be converted

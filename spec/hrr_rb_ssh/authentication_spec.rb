@@ -497,7 +497,7 @@ RSpec.describe HrrRbSsh::Authentication do
       }
       let(:not_userauth_request_payload){
         [
-          HrrRbSsh::DataType::Byte.encode(not_userauth_request_message.values[0]),
+          HrrRbSsh::DataTypes::Byte.encode(not_userauth_request_message.values[0]),
         ].join
       }
 

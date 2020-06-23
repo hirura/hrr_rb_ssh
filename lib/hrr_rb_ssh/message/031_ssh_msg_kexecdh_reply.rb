@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -13,11 +12,11 @@ module HrrRbSsh
       VALUE = 31
 
       DEFINITION = [
-        #[DataType, Field Name]
-        [DataType::Byte,      :'message number'],
-        [DataType::String,    :'K_S'],
-        [DataType::Mpint,     :'Q_S'],
-        [DataType::String,    :'signature of H'],
+        #[DataTypes, Field Name]
+        [DataTypes::Byte,      :'message number'],
+        [DataTypes::String,    :'K_S'],
+        [DataTypes::Mpint,     :'Q_S'],
+        [DataTypes::String,    :'signature of H'],
       ]
     end
   end

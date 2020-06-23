@@ -134,7 +134,7 @@ RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
 
       context "when authenticator gets invalid message" do
         let(:invalid_message_number){ 193 }
-        let(:userauth_info_response_payload){ HrrRbSsh::DataType::Byte.encode invalid_message_number }
+        let(:userauth_info_response_payload){ HrrRbSsh::DataTypes::Byte.encode invalid_message_number }
         let(:password1){ 'password1' }
         let(:password2){ 'password2' }
         let(:options){

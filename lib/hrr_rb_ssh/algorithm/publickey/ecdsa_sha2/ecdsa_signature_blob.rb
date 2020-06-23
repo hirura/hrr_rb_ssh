@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -11,8 +10,8 @@ module HrrRbSsh
         class EcdsaSignatureBlob
           include Codable
           DEFINITION = [
-            [DataType::Mpint, :'r'],
-            [DataType::Mpint, :'s'],
+            [DataTypes::Mpint, :'r'],
+            [DataTypes::Mpint, :'s'],
           ]
         end
       end

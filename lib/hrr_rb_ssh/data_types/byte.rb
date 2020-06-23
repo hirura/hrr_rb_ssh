@@ -2,9 +2,9 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
-  class DataType
+  class DataTypes
     # Byte provides methods to convert integer value and 8-bit unsigned binary string each other.
-    class Byte < DataType
+    class Byte < DataTypes
       # Convert integer value into 8-bit unsigned binary string.
       #
       # @param [::Integer] arg integer value to be converted

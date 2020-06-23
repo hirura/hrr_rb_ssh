@@ -2,9 +2,9 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
-  class DataType
+  class DataTypes
     # String provides methods to convert Ruby's string value and binary string each other.
-    class String < DataType
+    class String < DataTypes
       # Convert Ruby's string value into binary string.
       #
       # @param [::String] arg Ruby's string value to be converted

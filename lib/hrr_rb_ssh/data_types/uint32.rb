@@ -2,9 +2,9 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
-  class DataType
+  class DataTypes
     # Uint32 provides methods to convert integer value and 32-bit unsigned binary string each other.
-    class Uint32 < DataType
+    class Uint32 < DataTypes
       # Convert integer value into 32-bit unsigned binary string.
       #
       # @param [::Integer] arg integer value to be converted

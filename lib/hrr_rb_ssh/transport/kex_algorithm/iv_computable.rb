@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/transport/encryption_algorithm'
 require 'hrr_rb_ssh/transport/mac_algorithm'
 
@@ -10,8 +9,8 @@ module HrrRbSsh
     class KexAlgorithm
       module IvComputable
         def build_key(_k, h, _x, session_id, key_length)
-          k = DataType::Mpint.encode _k
-          x = DataType::Byte.encode _x
+          k = DataTypes::Mpint.encode _k
+          x = DataTypes::Byte.encode _x
 
           key = OpenSSL::Digest.digest(self.class::DIGEST, k + h + x + session_id)
 

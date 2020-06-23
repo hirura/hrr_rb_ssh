@@ -4,9 +4,9 @@
 require 'openssl'
 
 module HrrRbSsh
-  class DataType
+  class DataTypes
     # Mpint provides methods to convert integer value and multiple precision integer in two's complement as binary string each other.
-    class Mpint < DataType
+    class Mpint < DataTypes
       # Convert integer value into multiple precision integer in two's complement as binary string.
       #
       # @param [::Integer] arg integer value to be converted

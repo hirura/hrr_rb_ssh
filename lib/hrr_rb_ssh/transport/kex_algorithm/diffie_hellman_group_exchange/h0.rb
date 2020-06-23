@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -11,19 +10,19 @@ module HrrRbSsh
         class H0
           include Codable
           DEFINITION = [
-            [DataType::String, :'V_C'],
-            [DataType::String, :'V_S'],
-            [DataType::String, :'I_C'],
-            [DataType::String, :'I_S'],
-            [DataType::String, :'K_S'],
-            [DataType::Uint32, :'min'],
-            [DataType::Uint32, :'n'],
-            [DataType::Uint32, :'max'],
-            [DataType::Mpint,  :'p'],
-            [DataType::Mpint,  :'g'],
-            [DataType::Mpint,  :'e'],
-            [DataType::Mpint,  :'f'],
-            [DataType::Mpint,  :'k'],
+            [DataTypes::String, :'V_C'],
+            [DataTypes::String, :'V_S'],
+            [DataTypes::String, :'I_C'],
+            [DataTypes::String, :'I_S'],
+            [DataTypes::String, :'K_S'],
+            [DataTypes::Uint32, :'min'],
+            [DataTypes::Uint32, :'n'],
+            [DataTypes::Uint32, :'max'],
+            [DataTypes::Mpint,  :'p'],
+            [DataTypes::Mpint,  :'g'],
+            [DataTypes::Mpint,  :'e'],
+            [DataTypes::Mpint,  :'f'],
+            [DataTypes::Mpint,  :'k'],
           ]
         end
       end

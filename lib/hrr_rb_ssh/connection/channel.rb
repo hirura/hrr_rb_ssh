@@ -438,7 +438,7 @@ module HrrRbSsh
         @connection.send payload
       end
 
-      def send_channel_extended_data data, code=Message::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypeCode::SSH_EXTENDED_DATA_STDERR
+      def send_channel_extended_data data, code=Message::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypesCode::SSH_EXTENDED_DATA_STDERR
         message = {
           :'message number'    => Message::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE,
           :'recipient channel' => @remote_channel,

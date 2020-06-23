@@ -3,7 +3,7 @@
 
 require 'stringio'
 
-RSpec.describe HrrRbSsh::DataType::Boolean do
+RSpec.describe HrrRbSsh::DataTypes::Boolean do
   describe ".encode" do
     [
       [false, "00"],
@@ -13,7 +13,7 @@ RSpec.describe HrrRbSsh::DataType::Boolean do
 
       context "when arg is #{boolean} value" do
         it "encodes true to #{hex_str_pretty}" do
-          expect(HrrRbSsh::DataType::Boolean.encode boolean).to eq [hex_str].pack("H*")
+          expect(HrrRbSsh::DataTypes::Boolean.encode boolean).to eq [hex_str].pack("H*")
         end
       end
     end
@@ -30,7 +30,7 @@ RSpec.describe HrrRbSsh::DataType::Boolean do
         value_pretty = value.inspect.ljust(8, ' ')
 
         it "encodes #{value_pretty} with error" do
-          expect { HrrRbSsh::DataType::Boolean.encode value }.to raise_error ArgumentError
+          expect { HrrRbSsh::DataTypes::Boolean.encode value }.to raise_error ArgumentError
         end
       end
     end
@@ -45,7 +45,7 @@ RSpec.describe HrrRbSsh::DataType::Boolean do
 
         it "decodes #{hex_str_pretty} to #{boolean}" do
           io = StringIO.new [hex_str].pack("H*"), 'r'
-          expect(HrrRbSsh::DataType::Boolean.decode io).to be boolean
+          expect(HrrRbSsh::DataTypes::Boolean.decode io).to be boolean
         end
       end
     end
@@ -61,7 +61,7 @@ RSpec.describe HrrRbSsh::DataType::Boolean do
 
         it "decodes #{hex_str_pretty} to #{boolean}" do
           io = StringIO.new [hex_str].pack("H*"), 'r'
-          expect(HrrRbSsh::DataType::Boolean.decode io).to be boolean
+          expect(HrrRbSsh::DataTypes::Boolean.decode io).to be boolean
         end
       end
     end

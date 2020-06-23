@@ -25,8 +25,8 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_SERVICE_ACCEPT do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::String.encode(message[:'service name']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::String.encode(message[:'service name']),
     ].join
   }
 

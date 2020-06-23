@@ -28,10 +28,10 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'user name']),
-        HrrRbSsh::DataType::String.encode(message[:'service name']),
-        HrrRbSsh::DataType::String.encode(message[:'method name']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'user name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'service name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'method name']),
       ].join
     }
 
@@ -61,12 +61,12 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'user name']),
-        HrrRbSsh::DataType::String.encode(message[:'service name']),
-        HrrRbSsh::DataType::String.encode(message[:'method name']),
-        HrrRbSsh::DataType::Boolean.encode(message[:'FALSE']),
-        HrrRbSsh::DataType::String.encode(message[:'plaintext password']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'user name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'service name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'method name']),
+        HrrRbSsh::DataTypes::Boolean.encode(message[:'FALSE']),
+        HrrRbSsh::DataTypes::String.encode(message[:'plaintext password']),
       ].join
     }
 
@@ -98,13 +98,13 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
       }
       let(:payload){
         [
-          HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-          HrrRbSsh::DataType::String.encode(message[:'user name']),
-          HrrRbSsh::DataType::String.encode(message[:'service name']),
-          HrrRbSsh::DataType::String.encode(message[:'method name']),
-          HrrRbSsh::DataType::Boolean.encode(message[:'with signature']),
-          HrrRbSsh::DataType::String.encode(message[:'public key algorithm name']),
-          HrrRbSsh::DataType::String.encode(message[:'public key blob']),
+          HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+          HrrRbSsh::DataTypes::String.encode(message[:'user name']),
+          HrrRbSsh::DataTypes::String.encode(message[:'service name']),
+          HrrRbSsh::DataTypes::String.encode(message[:'method name']),
+          HrrRbSsh::DataTypes::Boolean.encode(message[:'with signature']),
+          HrrRbSsh::DataTypes::String.encode(message[:'public key algorithm name']),
+          HrrRbSsh::DataTypes::String.encode(message[:'public key blob']),
         ].join
       }
 
@@ -137,14 +137,14 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'user name']),
-        HrrRbSsh::DataType::String.encode(message[:'service name']),
-        HrrRbSsh::DataType::String.encode(message[:'method name']),
-        HrrRbSsh::DataType::Boolean.encode(message[:'with signature']),
-        HrrRbSsh::DataType::String.encode(message[:'public key algorithm name']),
-        HrrRbSsh::DataType::String.encode(message[:'public key blob']),
-        HrrRbSsh::DataType::String.encode(message[:'signature']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'user name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'service name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'method name']),
+        HrrRbSsh::DataTypes::Boolean.encode(message[:'with signature']),
+        HrrRbSsh::DataTypes::String.encode(message[:'public key algorithm name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'public key blob']),
+        HrrRbSsh::DataTypes::String.encode(message[:'signature']),
       ].join
     }
 
@@ -174,12 +174,12 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_REQUEST do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'user name']),
-        HrrRbSsh::DataType::String.encode(message[:'service name']),
-        HrrRbSsh::DataType::String.encode(message[:'method name']),
-        HrrRbSsh::DataType::String.encode(message[:'language tag']),
-        HrrRbSsh::DataType::String.encode(message[:'submethods']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'user name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'service name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'method name']),
+        HrrRbSsh::DataTypes::String.encode(message[:'language tag']),
+        HrrRbSsh::DataTypes::String.encode(message[:'submethods']),
       ].join
     }
 

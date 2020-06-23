@@ -2,9 +2,9 @@
 # vim: et ts=2 sw=2
 
 module HrrRbSsh
-  class DataType
+  class DataTypes
     # Uint64 provides methods to convert integer value and 64-bit unsigned binary string each other.
-    class Uint64 < DataType
+    class Uint64 < DataTypes
       # Convert integer value into 64-bit unsigned binary string.
       #
       # @param [::Integer] arg integer value to be converted

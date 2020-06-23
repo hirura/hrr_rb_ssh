@@ -1,5 +1,5 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-RSpec.describe HrrRbSsh::DataType do
+RSpec.describe HrrRbSsh::DataTypes do
 end

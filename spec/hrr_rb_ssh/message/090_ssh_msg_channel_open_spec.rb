@@ -29,11 +29,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'channel type']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'channel type']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
@@ -64,13 +64,13 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'channel type']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message[:'originator address']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'originator port']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'channel type']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataTypes::String.encode(message[:'originator address']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'originator port']),
       ].join
     }
 
@@ -103,15 +103,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'channel type']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message[:'address that was connected']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'port that was connected']),
-        HrrRbSsh::DataType::String.encode(message[:'originator IP address']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'originator port']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'channel type']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataTypes::String.encode(message[:'address that was connected']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'port that was connected']),
+        HrrRbSsh::DataTypes::String.encode(message[:'originator IP address']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'originator port']),
       ].join
     }
 
@@ -144,15 +144,15 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::String.encode(message[:'channel type']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
-        HrrRbSsh::DataType::String.encode(message[:'host to connect']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'port to connect']),
-        HrrRbSsh::DataType::String.encode(message[:'originator IP address']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'originator port']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::String.encode(message[:'channel type']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataTypes::String.encode(message[:'host to connect']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'port to connect']),
+        HrrRbSsh::DataTypes::String.encode(message[:'originator IP address']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'originator port']),
       ].join
     }
 

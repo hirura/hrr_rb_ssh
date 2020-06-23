@@ -25,8 +25,8 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_REQUEST_SUCCESS do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'port that was bound on the server']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'port that was bound on the server']),
     ].join
   }
 

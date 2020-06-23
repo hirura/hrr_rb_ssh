@@ -25,8 +25,8 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_REQUEST_OLD do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'n']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'n']),
     ].join
   }
 

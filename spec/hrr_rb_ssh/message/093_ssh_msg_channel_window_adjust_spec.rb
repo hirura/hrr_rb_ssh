@@ -26,9 +26,9 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_WINDOW_ADJUST do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'bytes to add']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'recipient channel']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'bytes to add']),
     ].join
   }
 

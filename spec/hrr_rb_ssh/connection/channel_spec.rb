@@ -502,7 +502,7 @@ RSpec.describe HrrRbSsh::Connection::Channel do
       {
         :'message number'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::VALUE,
         :'recipient channel' => 0,
-        :'data type code'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypeCode::SSH_EXTENDED_DATA_STDERR,
+        :'data type code'    => HrrRbSsh::Message::SSH_MSG_CHANNEL_EXTENDED_DATA::DataTypesCode::SSH_EXTENDED_DATA_STDERR,
         :'data'              => send_data,
       }
     }

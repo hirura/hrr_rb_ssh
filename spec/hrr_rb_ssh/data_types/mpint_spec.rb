@@ -3,7 +3,7 @@
 
 require 'stringio'
 
-RSpec.describe HrrRbSsh::DataType::Mpint do
+RSpec.describe HrrRbSsh::DataTypes::Mpint do
   describe ".encode" do
     context "when arg is within mpint value" do
       [
@@ -17,7 +17,7 @@ RSpec.describe HrrRbSsh::DataType::Mpint do
         hex_rpr_pretty = hex_rpr.each_char.each_slice(2).map(&:join).join(' ')
 
         it "encodes #{hex_str.ljust(15, ' ')} to #{hex_rpr_pretty}" do
-          expect(HrrRbSsh::DataType::Mpint.encode hex_str.hex).to eq [hex_rpr].pack("H*")
+          expect(HrrRbSsh::DataTypes::Mpint.encode hex_str.hex).to eq [hex_rpr].pack("H*")
         end
       end
     end
@@ -26,7 +26,7 @@ RSpec.describe HrrRbSsh::DataType::Mpint do
       let(:arg){ "string value" }
 
       it "raises ArgumentError" do
-        expect { HrrRbSsh::DataType::Mpint.encode arg }.to raise_error ArgumentError
+        expect { HrrRbSsh::DataTypes::Mpint.encode arg }.to raise_error ArgumentError
       end
     end
   end
@@ -44,7 +44,7 @@ RSpec.describe HrrRbSsh::DataType::Mpint do
 
       it "decodes #{hex_rpr_pretty.ljust(35, ' ')} to #{hex_str}" do
         io = StringIO.new [hex_rpr].pack("H*"), 'r'
-        expect(HrrRbSsh::DataType::Mpint.decode io).to eq hex_str.hex
+        expect(HrrRbSsh::DataTypes::Mpint.decode io).to eq hex_str.hex
       end
     end
   end

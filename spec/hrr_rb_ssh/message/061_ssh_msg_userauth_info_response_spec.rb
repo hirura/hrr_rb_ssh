@@ -26,8 +26,8 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'num-responses']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'num-responses']),
       ].join
     }
 
@@ -54,9 +54,9 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'num-responses']),
-        HrrRbSsh::DataType::String.encode(message[:'response[1]']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'num-responses']),
+        HrrRbSsh::DataTypes::String.encode(message[:'response[1]']),
       ].join
     }
 
@@ -84,10 +84,10 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'num-responses']),
-        HrrRbSsh::DataType::String.encode(message[:'response[1]']),
-        HrrRbSsh::DataType::String.encode(message[:'response[2]']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'num-responses']),
+        HrrRbSsh::DataTypes::String.encode(message[:'response[1]']),
+        HrrRbSsh::DataTypes::String.encode(message[:'response[2]']),
       ].join
     }
 
@@ -116,11 +116,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_USERAUTH_INFO_RESPONSE do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'num-responses']),
-        HrrRbSsh::DataType::String.encode(message[:'response[1]']),
-        HrrRbSsh::DataType::String.encode(message[:'response[2]']),
-        HrrRbSsh::DataType::String.encode(message[:'response[3]']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'num-responses']),
+        HrrRbSsh::DataTypes::String.encode(message[:'response[1]']),
+        HrrRbSsh::DataTypes::String.encode(message[:'response[2]']),
+        HrrRbSsh::DataTypes::String.encode(message[:'response[3]']),
       ].join
     }
 

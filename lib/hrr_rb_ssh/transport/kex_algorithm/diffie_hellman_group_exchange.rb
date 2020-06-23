@@ -3,7 +3,6 @@
 
 require 'openssl'
 require 'hrr_rb_ssh/loggable'
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/transport/kex_algorithm/iv_computable'
 
 module HrrRbSsh

@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -13,39 +12,39 @@ module HrrRbSsh
       VALUE = 50
 
       DEFINITION = [
-        #[DataType, Field Name]
-        [DataType::Byte,      :'message number'],
-        [DataType::String,    :'user name'],
-        [DataType::String,    :'service name'],
-        [DataType::String,    :'method name'],
+        #[DataTypes, Field Name]
+        [DataTypes::Byte,      :'message number'],
+        [DataTypes::String,    :'user name'],
+        [DataTypes::String,    :'service name'],
+        [DataTypes::String,    :'method name'],
       ]
 
       PUBLICKEY_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'method name' : "publickey"],
-        [DataType::Boolean,   :'with signature'],
-        [DataType::String,    :'public key algorithm name'],
-        [DataType::String,    :'public key blob'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'method name' : "publickey"],
+        [DataTypes::Boolean,   :'with signature'],
+        [DataTypes::String,    :'public key algorithm name'],
+        [DataTypes::String,    :'public key blob'],
       ]
 
       PUBLICKEY_SIGNATURE_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'with signature' : "TRUE"],
-        [DataType::String,    :'signature'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'with signature' : "TRUE"],
+        [DataTypes::String,    :'signature'],
       ]
 
       PASSWORD_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'method name' : "password"],
-        [DataType::Boolean,   :'FALSE'],
-        [DataType::String,    :'plaintext password'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'method name' : "password"],
+        [DataTypes::Boolean,   :'FALSE'],
+        [DataTypes::String,    :'plaintext password'],
       ]
 
       KEYBOARD_INTERACTIVE_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'method name' : "keyboard-interactive"],
-        [DataType::String,    :'language tag'],
-        [DataType::String,    :'submethods'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'method name' : "keyboard-interactive"],
+        [DataTypes::String,    :'language tag'],
+        [DataTypes::String,    :'submethods'],
       ]
 
       CONDITIONAL_DEFINITION = {

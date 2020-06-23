@@ -164,10 +164,10 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_DISCONNECT do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::Uint32.encode(message[:'reason code']),
-      HrrRbSsh::DataType::String.encode(message[:'description']),
-      HrrRbSsh::DataType::String.encode(message[:'language tag']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::Uint32.encode(message[:'reason code']),
+      HrrRbSsh::DataTypes::String.encode(message[:'description']),
+      HrrRbSsh::DataTypes::String.encode(message[:'language tag']),
     ].join
   }
 

@@ -24,7 +24,7 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_REQUEST_FAILURE do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
     ].join
   }
 

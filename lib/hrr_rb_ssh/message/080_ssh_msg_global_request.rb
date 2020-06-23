@@ -1,7 +1,6 @@
 # coding: utf-8
 # vim: et ts=2 sw=2
 
-require 'hrr_rb_ssh/data_type'
 require 'hrr_rb_ssh/codable'
 
 module HrrRbSsh
@@ -13,24 +12,24 @@ module HrrRbSsh
       VALUE = 80
 
       DEFINITION = [
-        #[DataType, Field Name]
-        [DataType::Byte,      :'message number'],
-        [DataType::String,    :'request name'],
-        [DataType::Boolean,   :'want reply'],
+        #[DataTypes, Field Name]
+        [DataTypes::Byte,      :'message number'],
+        [DataTypes::String,    :'request name'],
+        [DataTypes::Boolean,   :'want reply'],
       ]
 
       TCPIP_FORWARD_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'request name' : "tcpip-forward"],
-        [DataType::String,    :'address to bind'],
-        [DataType::Uint32,    :'port number to bind'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'request name' : "tcpip-forward"],
+        [DataTypes::String,    :'address to bind'],
+        [DataTypes::Uint32,    :'port number to bind'],
       ]
 
       CANCEL_TCPIP_FORWARD_DEFINITION = [
-        #[DataType, Field Name]
-        #[DataType::String,   :'request name' : "cancel-tcpip-forward"],
-        [DataType::String,    :'address to bind'],
-        [DataType::Uint32,    :'port number to bind'],
+        #[DataTypes, Field Name]
+        #[DataTypes::String,   :'request name' : "cancel-tcpip-forward"],
+        [DataTypes::String,    :'address to bind'],
+        [DataTypes::Uint32,    :'port number to bind'],
       ]
 
       CONDITIONAL_DEFINITION = {

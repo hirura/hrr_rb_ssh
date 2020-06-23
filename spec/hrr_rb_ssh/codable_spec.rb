@@ -8,8 +8,8 @@ RSpec.describe HrrRbSsh::Codable do
         include HrrRbSsh::Codable
 
         DEFINITION = [
-          [HrrRbSsh::DataType::Byte,   :'message number'],
-          [HrrRbSsh::DataType::String, :'data'        ],
+          [HrrRbSsh::DataTypes::Byte,   :'message number'],
+          [HrrRbSsh::DataTypes::String, :'data'        ],
         ]
       end
     end
@@ -51,12 +51,12 @@ RSpec.describe HrrRbSsh::Codable do
         include HrrRbSsh::Codable
 
         DEFINITION = [
-          [HrrRbSsh::DataType::Byte,   :'message number'],
-          [HrrRbSsh::DataType::String, :'data'        ],
+          [HrrRbSsh::DataTypes::Byte,   :'message number'],
+          [HrrRbSsh::DataTypes::String, :'data'        ],
         ]
 
         TESTING_DEFINITION = [
-          [HrrRbSsh::DataType::String, :'testing data'],
+          [HrrRbSsh::DataTypes::String, :'testing data'],
         ]
 
         CONDITIONAL_DEFINITION = {
@@ -104,16 +104,16 @@ RSpec.describe HrrRbSsh::Codable do
         include HrrRbSsh::Codable
 
         DEFINITION = [
-          [HrrRbSsh::DataType::Byte,   :'message number'],
-          [HrrRbSsh::DataType::String, :'data'        ],
+          [HrrRbSsh::DataTypes::Byte,   :'message number'],
+          [HrrRbSsh::DataTypes::String, :'data'        ],
         ]
 
         TESTING_DEFINITION = [
-          [HrrRbSsh::DataType::String, :'testing data'],
+          [HrrRbSsh::DataTypes::String, :'testing data'],
         ]
 
         CHAINED_DEFINITION = [
-          [HrrRbSsh::DataType::String, :'chained data'],
+          [HrrRbSsh::DataTypes::String, :'chained data'],
         ]
 
         CONDITIONAL_DEFINITION = {
@@ -164,12 +164,12 @@ RSpec.describe HrrRbSsh::Codable do
         include HrrRbSsh::Codable
 
         DEFINITION = [
-          [HrrRbSsh::DataType::Byte,   :'message number'],
-          [HrrRbSsh::DataType::String, :'data'        ],
+          [HrrRbSsh::DataTypes::Byte,   :'message number'],
+          [HrrRbSsh::DataTypes::String, :'data'        ],
         ]
 
         HIDDEN_DEFINITION = [
-          [HrrRbSsh::DataType::String, :'hidden data'],
+          [HrrRbSsh::DataTypes::String, :'hidden data'],
         ]
 
         CONDITIONAL_DEFINITION = {

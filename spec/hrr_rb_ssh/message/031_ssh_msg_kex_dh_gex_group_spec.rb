@@ -26,9 +26,9 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_KEX_DH_GEX_GROUP do
   }
   let(:payload){
     [
-      HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-      HrrRbSsh::DataType::Mpint.encode(message[:'p']),
-      HrrRbSsh::DataType::Mpint.encode(message[:'g']),
+      HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+      HrrRbSsh::DataTypes::Mpint.encode(message[:'p']),
+      HrrRbSsh::DataTypes::Mpint.encode(message[:'g']),
     ].join
   }
 

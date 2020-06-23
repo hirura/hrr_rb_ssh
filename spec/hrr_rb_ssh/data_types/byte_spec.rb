@@ -3,7 +3,7 @@
 
 require 'stringio'
 
-RSpec.describe HrrRbSsh::DataType::Byte do
+RSpec.describe HrrRbSsh::DataTypes::Byte do
   describe ".encode" do
     context "when arg is within byte value" do
       [
@@ -16,7 +16,7 @@ RSpec.describe HrrRbSsh::DataType::Byte do
         hex_str_pretty = "0x" + hex_str
 
         it "encodes #{"%3d" % hex_str.hex} to #{hex_str_pretty}" do
-          expect(HrrRbSsh::DataType::Byte.encode hex_str.hex).to eq [hex_str].pack("H*")
+          expect(HrrRbSsh::DataTypes::Byte.encode hex_str.hex).to eq [hex_str].pack("H*")
         end
       end
     end
@@ -27,7 +27,7 @@ RSpec.describe HrrRbSsh::DataType::Byte do
         256,
       ].each do |int|
         it "encodes #{"%3d" % int} with error" do
-          expect { HrrRbSsh::DataType::Byte.encode int }.to raise_error ArgumentError
+          expect { HrrRbSsh::DataTypes::Byte.encode int }.to raise_error ArgumentError
         end
       end
     end
@@ -45,7 +45,7 @@ RSpec.describe HrrRbSsh::DataType::Byte do
 
       it "decodes #{hex_str_pretty} to #{"%3d" % hex_str.hex}" do
         io = StringIO.new [hex_str].pack("H*"), 'r'
-        expect(HrrRbSsh::DataType::Byte.decode io).to eq hex_str.hex
+        expect(HrrRbSsh::DataTypes::Byte.decode io).to eq hex_str.hex
       end
     end
   end

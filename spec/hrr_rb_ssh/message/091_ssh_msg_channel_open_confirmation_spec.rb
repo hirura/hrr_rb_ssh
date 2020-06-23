@@ -29,11 +29,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
@@ -68,11 +68,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
@@ -107,11 +107,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
@@ -146,11 +146,11 @@ RSpec.describe HrrRbSsh::Message::SSH_MSG_CHANNEL_OPEN_CONFIRMATION do
     }
     let(:payload){
       [
-        HrrRbSsh::DataType::Byte.encode(message[:'message number']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'recipient channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'sender channel']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'initial window size']),
-        HrrRbSsh::DataType::Uint32.encode(message[:'maximum packet size']),
+        HrrRbSsh::DataTypes::Byte.encode(message[:'message number']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'recipient channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'sender channel']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'initial window size']),
+        HrrRbSsh::DataTypes::Uint32.encode(message[:'maximum packet size']),
       ].join
     }
 
