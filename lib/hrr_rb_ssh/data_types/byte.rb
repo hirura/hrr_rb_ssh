@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 module HrrRbSsh
   class DataTypes
     # Byte provides methods to convert integer value and 8-bit unsigned binary string each other.

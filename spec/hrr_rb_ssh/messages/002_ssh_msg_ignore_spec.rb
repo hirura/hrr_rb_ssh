@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Messages::SSH_MSG_IGNORE do
   let(:id){ 'SSH_MSG_IGNORE' }
   let(:value){ 2 }

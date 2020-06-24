@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::KexAlgorithm::EllipticCurveDiffieHellmanSha2Nistp256 do
   let(:name){ 'ecdh-sha2-nistp256' }
   let(:digest){ 'sha256' }

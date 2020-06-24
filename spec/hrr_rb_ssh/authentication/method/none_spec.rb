@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Authentication::Method::None do
   let(:name){ 'none' }
   let(:transport){ double('transport') }

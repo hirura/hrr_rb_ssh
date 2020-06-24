@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Authentication::Method::Publickey::Context do
   let(:username){ 'username' }
   let(:algorithm){ double('algorithm') }

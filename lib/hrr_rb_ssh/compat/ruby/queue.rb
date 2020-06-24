@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 if RUBY_VERSION < "2.3"
   require 'timeout'
 

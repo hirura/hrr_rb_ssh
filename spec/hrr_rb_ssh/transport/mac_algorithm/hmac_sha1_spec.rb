@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::MacAlgorithm::HmacSha1 do
   let(:name){ 'hmac-sha1' }
   let(:digest){ 'sha1' }

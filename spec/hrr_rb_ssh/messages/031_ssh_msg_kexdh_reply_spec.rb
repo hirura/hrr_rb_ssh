@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Messages::SSH_MSG_KEXDH_REPLY do
   let(:id){ 'SSH_MSG_KEXDH_REPLY' }
   let(:value){ 31 }

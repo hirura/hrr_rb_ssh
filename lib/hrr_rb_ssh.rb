@@ -1,8 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
-
-
 # HrrRbSsh is a pure Ruby SSH 2.0 implementation.
 module HrrRbSsh
 end

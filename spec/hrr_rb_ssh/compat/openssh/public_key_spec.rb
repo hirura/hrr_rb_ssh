@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Compat::OpenSSH::PublicKey do
   let(:public_key){ described_class.new public_key_line }
 

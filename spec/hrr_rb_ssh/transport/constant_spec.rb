@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::Constant do
   let(:cr){ 0x0d.chr }
   let(:lf){ 0x0a.chr }

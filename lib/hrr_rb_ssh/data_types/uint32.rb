@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 module HrrRbSsh
   class DataTypes
     # Uint32 provides methods to convert integer value and 32-bit unsigned binary string each other.

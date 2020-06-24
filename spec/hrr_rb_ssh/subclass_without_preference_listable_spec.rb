@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::SubclassWithoutPreferenceListable do
   let(:superclass){
     Class.new do

@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Arcfour do
   let(:name){ 'arcfour' }
   let(:cipher_name){ "RC4" }

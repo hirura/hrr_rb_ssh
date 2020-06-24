@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive do
   let(:name){ 'keyboard-interactive' }
   let(:transport){ double('transport') }

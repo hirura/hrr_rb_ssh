@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_FAILURE do
   let(:id){ 'SSH_MSG_CHANNEL_OPEN_FAILURE' }
   let(:value){ 92 }

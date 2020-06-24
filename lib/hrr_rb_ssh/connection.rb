@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/error/closed_connection'
 require 'hrr_rb_ssh/connection/global_request_handler'

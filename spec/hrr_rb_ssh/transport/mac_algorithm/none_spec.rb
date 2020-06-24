@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::MacAlgorithm::None do
   let(:name){ 'none' }
   let(:mac_algorithm){ described_class.new }

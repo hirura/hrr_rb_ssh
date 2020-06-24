@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes192Ctr do
   let(:name){ 'aes192-ctr' }
   let(:cipher_name){ "AES-192-CTR" }

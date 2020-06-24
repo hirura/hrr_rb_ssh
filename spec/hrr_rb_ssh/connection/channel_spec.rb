@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Connection::Channel do
   let(:io){ 'dummy' }
   let(:mode){ HrrRbSsh::Mode::SERVER }

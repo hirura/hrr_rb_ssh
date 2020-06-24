@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Aes128Cbc do
   let(:name){ 'aes128-cbc' }
   let(:cipher_name){ "AES-128-CBC" }

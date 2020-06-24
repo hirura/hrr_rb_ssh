@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Connection::Channel::ChannelType::Session::RequestType::Exec do
   let(:name){ 'exec' }
 

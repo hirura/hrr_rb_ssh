@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 require 'openssl'
 require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/transport/kex_algorithm/iv_computable'

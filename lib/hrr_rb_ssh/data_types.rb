@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 module HrrRbSsh
   # DataTypes is a parent class of classes that provide methods to convert value and binary string each other.
   class DataTypes

@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Authentication::Method::KeyboardInteractive::Context do
   let(:context_transport){ double('transport') }
   let(:context_username){ "username" }

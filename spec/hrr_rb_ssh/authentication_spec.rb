@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Authentication do
   describe '::SERVICE_NAME' do
     let(:service_name){ 'ssh-userauth' }

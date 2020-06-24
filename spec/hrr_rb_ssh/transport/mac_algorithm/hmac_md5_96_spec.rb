@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::MacAlgorithm::HmacMd5_96 do
   let(:name){ 'hmac-md5-96' }
   let(:digest){ 'md5' }

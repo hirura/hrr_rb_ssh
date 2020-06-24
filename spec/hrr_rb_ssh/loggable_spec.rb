@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Loggable do
   context "when initialize method does not initialize internal logger" do
     let(:loggable_instance){

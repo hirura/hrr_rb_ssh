@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 module HrrRbSsh
   class DataTypes
     # NameList provides methods to convert a comma-separated list of names and binary string each other.

@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Codable do
   context "when module does not have CONDITIONAL_DEFINITION" do
     before :context do

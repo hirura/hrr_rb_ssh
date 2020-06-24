@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 require 'hrr_rb_ssh/algorithm/publickey/ecdsa_sha2'
 
 module HrrRbSsh

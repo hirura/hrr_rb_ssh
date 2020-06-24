@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::BlowfishCbc do
   let(:name){ 'blowfish-cbc' }
   let(:cipher_name){ "BF-CBC" }

@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::SequenceNumber do
   let(:sequence_number){ HrrRbSsh::Transport::SequenceNumber.new }
 

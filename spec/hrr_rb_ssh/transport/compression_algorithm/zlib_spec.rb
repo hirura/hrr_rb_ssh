@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::Zlib do
   let(:name){ 'zlib' }
   let(:compression_algorithm){ described_class.new direction }

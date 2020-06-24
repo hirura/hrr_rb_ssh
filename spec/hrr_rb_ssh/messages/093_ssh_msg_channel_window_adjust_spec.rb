@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Messages::SSH_MSG_CHANNEL_WINDOW_ADJUST do
   let(:id){ 'SSH_MSG_CHANNEL_WINDOW_ADJUST' }
   let(:value){ 93 }

@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Compat::OpenSSH::AuthorizedKeys do
   let(:authorized_keys){ described_class.new authorized_keys_str }
   let(:authorized_keys_str){

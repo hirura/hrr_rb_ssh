@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 require 'hrr_rb_ssh/messages/001_ssh_msg_disconnect'
 require 'hrr_rb_ssh/messages/002_ssh_msg_ignore'
 require 'hrr_rb_ssh/messages/003_ssh_msg_unimplemented'

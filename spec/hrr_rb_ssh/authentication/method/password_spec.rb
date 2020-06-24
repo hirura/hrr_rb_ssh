@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Authentication::Method::Password do
   let(:name){ 'password' }
   let(:transport){ double('transport') }

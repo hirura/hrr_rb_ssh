@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup18Sha512 do
   let(:name){ 'diffie-hellman-group18-sha512' }
   let(:kex_algorithm){ described_class.new }

@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 require 'socket'
 require 'stringio'
 require 'hrr_rb_ssh/loggable'

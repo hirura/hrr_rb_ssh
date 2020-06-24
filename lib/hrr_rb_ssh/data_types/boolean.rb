@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 module HrrRbSsh
   class DataTypes
     # Boolean provides methods to convert boolean value and 8-bit unsigned binary string each other.

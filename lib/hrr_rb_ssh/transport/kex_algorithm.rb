@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 require 'hrr_rb_ssh/subclass_with_preference_listable'
 
 module HrrRbSsh

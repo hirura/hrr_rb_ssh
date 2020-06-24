@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 require 'etc'
 require 'timeout'
 require 'hrr_rb_ssh/connection/request_handler'

@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 module HrrRbSsh
   class DataTypes
     # String provides methods to convert Ruby's string value and binary string each other.

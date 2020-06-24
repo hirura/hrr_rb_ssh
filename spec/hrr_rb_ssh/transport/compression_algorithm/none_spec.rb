@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::CompressionAlgorithm::None do
   let(:name){ 'none' }
   let(:compression_algorithm){ described_class.new }

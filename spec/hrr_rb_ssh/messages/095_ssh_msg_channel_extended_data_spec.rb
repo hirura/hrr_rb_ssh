@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Messages::SSH_MSG_CHANNEL_EXTENDED_DATA do
   let(:id){ 'SSH_MSG_CHANNEL_EXTENDED_DATA' }
   let(:value){ 95 }

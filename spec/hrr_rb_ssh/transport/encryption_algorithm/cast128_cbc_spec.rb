@@ -1,6 +1,3 @@
-# coding: utf-8
-# vim: et ts=2 sw=2
-
 RSpec.describe HrrRbSsh::Transport::EncryptionAlgorithm::Cast128Cbc do
   let(:name){ 'cast128-cbc' }
   let(:cipher_name){ "CAST5-CBC" }
