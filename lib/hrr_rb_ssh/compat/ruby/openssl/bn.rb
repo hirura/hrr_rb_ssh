@@ -1,6 +1,4 @@
 if RUBY_VERSION < "2.1"
-  require 'openssl'
-
   class OpenSSL::BN
     alias_method :__initialize__, :initialize
 

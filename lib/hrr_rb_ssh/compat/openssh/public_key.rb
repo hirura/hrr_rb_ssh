@@ -1,5 +1,4 @@
 require 'base64'
-require 'openssl'
 
 module HrrRbSsh
   module Compat

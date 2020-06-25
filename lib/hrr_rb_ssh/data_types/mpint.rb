@@ -1,5 +1,3 @@
-require 'openssl'
-
 module HrrRbSsh
   class DataTypes
     # Mpint provides methods to convert integer value and multiple precision integer in two's complement as binary string each other.
