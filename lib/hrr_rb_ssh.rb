@@ -2,10 +2,13 @@
 module HrrRbSsh
 end
 
+require 'openssl'
+require 'securerandom'
 require "stringio"
 
 require "hrr_rb_ssh/version"
 require "hrr_rb_ssh/compat"
+require "hrr_rb_ssh/openssl_secure_random"
 require "hrr_rb_ssh/data_types"
 require "hrr_rb_ssh/messages"
 require "hrr_rb_ssh/mode"

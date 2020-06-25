@@ -1,6 +1,3 @@
-require 'securerandom'
-require 'openssl'
-
 module HrrRbSsh
   module OpenSslSecureRandom
     N_BYTES = 1024

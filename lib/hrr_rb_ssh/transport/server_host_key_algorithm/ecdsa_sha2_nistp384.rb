@@ -1,4 +1,3 @@
-require 'hrr_rb_ssh/openssl_secure_random'
 require 'hrr_rb_ssh/transport/server_host_key_algorithm/functionable'
 
 module HrrRbSsh
