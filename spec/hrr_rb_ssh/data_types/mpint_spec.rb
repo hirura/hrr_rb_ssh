@@ -1,5 +1,3 @@
-require 'stringio'
-
 RSpec.describe HrrRbSsh::DataTypes::Mpint do
   describe ".encode" do
     context "when arg is within mpint value" do

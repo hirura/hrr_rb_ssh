@@ -1,5 +1,3 @@
-require 'stringio'
-
 RSpec.describe HrrRbSsh::DataTypes::String do
   describe ".encode" do
     context "when arg is string value" do

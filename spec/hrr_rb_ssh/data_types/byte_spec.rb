@@ -1,5 +1,3 @@
-require 'stringio'
-
 RSpec.describe HrrRbSsh::DataTypes::Byte do
   describe ".encode" do
     context "when arg is within byte value" do

@@ -1,5 +1,4 @@
 require 'socket'
-require 'stringio'
 require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/mode'
 require 'hrr_rb_ssh/transport'

@@ -1,5 +1,3 @@
-require 'stringio'
-
 RSpec.describe HrrRbSsh::DataTypes::Uint64 do
   describe ".encode" do
     context "when arg is within uint64 value" do

@@ -2,6 +2,8 @@
 module HrrRbSsh
 end
 
+require "stringio"
+
 require "hrr_rb_ssh/version"
 require "hrr_rb_ssh/compat"
 require "hrr_rb_ssh/data_types"

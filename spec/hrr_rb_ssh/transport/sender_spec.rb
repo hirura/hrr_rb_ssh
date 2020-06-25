@@ -1,5 +1,3 @@
-require 'stringio'
-
 RSpec.describe HrrRbSsh::Transport::Sender do
   let(:sender){ described_class.new }
 

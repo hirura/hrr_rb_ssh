@@ -1,5 +1,3 @@
-require 'stringio'
-
 RSpec.describe HrrRbSsh::DataTypes::NameList do
   describe ".encode" do
     context "when arg is array of string value" do
