@@ -1,7 +1,6 @@
 require 'socket'
 require 'thread'
 require 'monitor'
-require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/connection/channel/channel_type'
 
 module HrrRbSsh

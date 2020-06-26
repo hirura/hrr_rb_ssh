@@ -1,4 +1,3 @@
-require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/error/closed_authentication'
 require 'hrr_rb_ssh/authentication/constant'
 require 'hrr_rb_ssh/authentication/authenticator'

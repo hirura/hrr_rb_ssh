@@ -1,5 +1,3 @@
-require 'hrr_rb_ssh/loggable'
-
 module HrrRbSsh
   module Algorithm
     class Publickey

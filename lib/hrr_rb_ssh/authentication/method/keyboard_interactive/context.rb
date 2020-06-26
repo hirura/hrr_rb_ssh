@@ -1,4 +1,3 @@
-require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/authentication/method/keyboard_interactive/info_request'
 require 'hrr_rb_ssh/authentication/method/keyboard_interactive/info_response'
 

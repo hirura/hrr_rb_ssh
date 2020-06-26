@@ -1,5 +1,4 @@
 require 'zlib'
-require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Transport

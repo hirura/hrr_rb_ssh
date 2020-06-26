@@ -1,5 +1,3 @@
-require 'hrr_rb_ssh/loggable'
-
 module HrrRbSsh
   class Connection
     class Channel

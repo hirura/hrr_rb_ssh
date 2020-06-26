@@ -1,4 +1,3 @@
-require 'hrr_rb_ssh/loggable'
 require 'hrr_rb_ssh/error/closed_connection'
 require 'hrr_rb_ssh/connection/global_request_handler'
 require 'hrr_rb_ssh/connection/channel'

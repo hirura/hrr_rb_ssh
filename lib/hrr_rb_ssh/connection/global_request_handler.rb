@@ -1,5 +1,4 @@
 require 'socket'
-require 'hrr_rb_ssh/loggable'
 
 module HrrRbSsh
   class Connection
