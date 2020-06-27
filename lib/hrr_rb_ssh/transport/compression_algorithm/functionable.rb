@@ -1,5 +1,3 @@
-require 'zlib'
-
 module HrrRbSsh
   class Transport
     class CompressionAlgorithm

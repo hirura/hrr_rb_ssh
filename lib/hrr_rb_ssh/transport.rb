@@ -1,4 +1,3 @@
-require 'monitor'
 require 'hrr_rb_ssh/version'
 require 'hrr_rb_ssh/error/closed_transport'
 require 'hrr_rb_ssh/transport/constant'

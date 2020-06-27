@@ -1,5 +1,3 @@
-require 'base64'
-
 module HrrRbSsh
   module Compat
     module OpenSSH

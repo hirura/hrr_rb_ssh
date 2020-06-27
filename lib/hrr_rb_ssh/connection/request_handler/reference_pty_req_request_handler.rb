@@ -1,7 +1,3 @@
-require 'etc'
-require 'fileutils'
-require 'pty'
-require 'io/console'
 require 'hrr_rb_ssh/connection/request_handler'
 
 module HrrRbSsh

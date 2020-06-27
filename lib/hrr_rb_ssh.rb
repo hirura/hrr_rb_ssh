@@ -2,9 +2,19 @@
 module HrrRbSsh
 end
 
+require 'base64'
+require 'etc'
+require 'fileutils'
+require 'io/console'
+require 'monitor'
 require 'openssl'
+require 'pty'
 require 'securerandom'
+require 'socket'
 require "stringio"
+require 'thread'
+require 'timeout'
+require 'zlib'
 
 require "hrr_rb_ssh/version"
 require "hrr_rb_ssh/compat"

@@ -1,6 +1,4 @@
 if RUBY_VERSION < "2.3"
-  require 'timeout'
-
   class ClosedQueueError < StandardError
   end
 

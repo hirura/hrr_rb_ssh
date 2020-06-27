@@ -1,4 +1,3 @@
-require 'etc'
 require 'hrr_rb_ssh/connection/request_handler'
 
 module HrrRbSsh
