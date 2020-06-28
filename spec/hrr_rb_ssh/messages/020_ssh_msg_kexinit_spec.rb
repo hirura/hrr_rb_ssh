@@ -14,7 +14,7 @@ RSpec.describe HrrRbSsh::Messages::SSH_MSG_KEXINIT do
     end
   end
 
-  let(:kex_algorithms){ HrrRbSsh::Transport::KexAlgorithm.list_preferred }
+  let(:kex_algorithms){ HrrRbSsh::Transport::KexAlgorithms.new.list_preferred }
   let(:server_host_key_algorithms){ HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred }
   let(:encryption_algorithms){ HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred }
   let(:encryption_algorithms){ HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred }

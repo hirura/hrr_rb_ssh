@@ -5,7 +5,7 @@ require 'hrr_rb_ssh/transport/direction'
 require 'hrr_rb_ssh/transport/sequence_number'
 require 'hrr_rb_ssh/transport/sender'
 require 'hrr_rb_ssh/transport/receiver'
-require 'hrr_rb_ssh/transport/kex_algorithm'
+require 'hrr_rb_ssh/transport/kex_algorithms'
 require 'hrr_rb_ssh/transport/server_host_key_algorithm'
 require 'hrr_rb_ssh/transport/encryption_algorithm'
 require 'hrr_rb_ssh/transport/mac_algorithm'
@@ -63,6 +63,8 @@ module HrrRbSsh
 
       @local_version  = (@options.delete('local_version') || "SSH-2.0-HrrRbSsh-#{VERSION}").encode(Encoding::ASCII_8BIT)
       @remote_version = nil
+
+      @kex_algorithms = KexAlgorithms.new logger: logger
 
       @incoming_sequence_number = SequenceNumber.new
       @outgoing_sequence_number = SequenceNumber.new
@@ -239,7 +241,7 @@ module HrrRbSsh
     end
 
     def update_supported_algorithms
-      @supported_kex_algorithms             = KexAlgorithm.list_supported
+      @supported_kex_algorithms             = @kex_algorithms.list_supported
       @supported_server_host_key_algorithms = ServerHostKeyAlgorithm.list_supported
       @supported_encryption_algorithms      = EncryptionAlgorithm.list_supported
       @supported_mac_algorithms             = MacAlgorithm.list_supported
@@ -247,7 +249,7 @@ module HrrRbSsh
     end
 
     def update_preferred_algorithms
-      @preferred_kex_algorithms             = @options['transport_preferred_kex_algorithms']             || KexAlgorithm.list_preferred
+      @preferred_kex_algorithms             = @options['transport_preferred_kex_algorithms']             || @kex_algorithms.list_preferred
       @preferred_server_host_key_algorithms = @options['transport_preferred_server_host_key_algorithms'] || ServerHostKeyAlgorithm.list_preferred
       @preferred_encryption_algorithms      = @options['transport_preferred_encryption_algorithms']      || EncryptionAlgorithm.list_preferred
       @preferred_mac_algorithms             = @options['transport_preferred_mac_algorithms']             || MacAlgorithm.list_preferred
@@ -445,7 +447,7 @@ module HrrRbSsh
         server_secret_host_key         = nil
       end
       @server_host_key_algorithm = ServerHostKeyAlgorithm[server_host_key_algorithm_name].new server_secret_host_key
-      @kex_algorithm             = KexAlgorithm[kex_algorithm_name].new
+      @kex_algorithm             = @kex_algorithms.instantiate(kex_algorithm_name)
     end
 
     def update_encryption_mac_compression_algorithms

@@ -403,9 +403,9 @@ p HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_supported
 p HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
 # => ["ecdsa-sha2-nistp521", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp256", "ssh-rsa", "ssh-dss"]
 
-p HrrRbSsh::Transport::KexAlgorithm.list_supported
+p HrrRbSsh::Transport::KexAlgorithms.new.list_supported
 # => ["diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group-exchange-sha256", "diffie-hellman-group14-sha256", "diffie-hellman-group15-sha512", "diffie-hellman-group16-sha512", "diffie-hellman-group17-sha512", "diffie-hellman-group18-sha512", "ecdh-sha2-nistp256", "ecdh-sha2-nistp384", "ecdh-sha2-nistp521"]
-p HrrRbSsh::Transport::KexAlgorithm.list_preferred
+p HrrRbSsh::Transport::KexAlgorithms.new.list_preferred
 # => ["ecdh-sha2-nistp521", "ecdh-sha2-nistp384", "ecdh-sha2-nistp256", "diffie-hellman-group18-sha512", "diffie-hellman-group17-sha512", "diffie-hellman-group16-sha512", "diffie-hellman-group15-sha512", "diffie-hellman-group14-sha256", "diffie-hellman-group-exchange-sha256", "diffie-hellman-group-exchange-sha1", "diffie-hellman-group14-sha1", "diffie-hellman-group1-sha1"]
 
 p HrrRbSsh::Transport::MacAlgorithm.list_supported

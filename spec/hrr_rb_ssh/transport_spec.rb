@@ -117,8 +117,8 @@ RSpec.describe HrrRbSsh::Transport do
     let(:mode){ 'dummy' }
     let(:transport){ described_class.new io, mode }
 
-    it "returns HrrRbSsh::Transport::KexAlgorithm.list_supported" do
-      expect(transport.supported_kex_algorithms).to eq HrrRbSsh::Transport::KexAlgorithm.list_supported
+    it "returns HrrRbSsh::Transport::KexAlgorithms#list_supported" do
+      expect(transport.supported_kex_algorithms).to eq HrrRbSsh::Transport::KexAlgorithms.new.list_supported
     end
   end
 
@@ -167,8 +167,8 @@ RSpec.describe HrrRbSsh::Transport do
     let(:mode){ 'dummy' }
     let(:transport){ described_class.new io, mode }
 
-    it "returns HrrRbSsh::Transport::KexAlgorithm.list_preferred" do
-      expect(transport.preferred_kex_algorithms).to eq HrrRbSsh::Transport::KexAlgorithm.list_preferred
+    it "returns HrrRbSsh::Transport::KexAlgorithms#list_preferred" do
+      expect(transport.preferred_kex_algorithms).to eq HrrRbSsh::Transport::KexAlgorithms.new.list_preferred
     end
   end
 
@@ -568,7 +568,7 @@ RSpec.describe HrrRbSsh::Transport do
         16.times do
           expect(i_s.read(1).unpack("C")[0]).to be_between(0x00, 0xff).inclusive
         end
-        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::KexAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::KexAlgorithms.new.list_preferred
         expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
         expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
         expect(HrrRbSsh::DataTypes::NameList.decode i_s).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
@@ -592,7 +592,7 @@ RSpec.describe HrrRbSsh::Transport do
         transport.exchange_key
 
         expect(transport.server_host_key_algorithm).to be_an_instance_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa
-        expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1
+        expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithms::DiffieHellmanGroup14Sha1
       end
     end
 
@@ -943,7 +943,7 @@ RSpec.describe HrrRbSsh::Transport do
         16.times do
           expect(i_c.read(1).unpack("C")[0]).to be_between(0x00, 0xff).inclusive
         end
-        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::KexAlgorithm.list_preferred
+        expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::KexAlgorithms.new.list_preferred
         expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::ServerHostKeyAlgorithm.list_preferred
         expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
         expect(HrrRbSsh::DataTypes::NameList.decode i_c).to eq HrrRbSsh::Transport::EncryptionAlgorithm.list_preferred
@@ -967,7 +967,7 @@ RSpec.describe HrrRbSsh::Transport do
         transport.exchange_key
 
         expect(transport.server_host_key_algorithm).to be_an_instance_of HrrRbSsh::Transport::ServerHostKeyAlgorithm::SshRsa
-        expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithm::DiffieHellmanGroup14Sha1
+        expect(transport.instance_variable_get('@kex_algorithm')).to be_an_instance_of HrrRbSsh::Transport::KexAlgorithms::DiffieHellmanGroup14Sha1
       end
     end
 
