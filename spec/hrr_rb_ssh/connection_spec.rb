@@ -586,6 +586,15 @@ RSpec.describe HrrRbSsh::Connection do
         HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_FAILURE.new.encode channel_open_failure_message
       }
 
+      before(:each) do
+        # Disable the enhanced error messages introduced in newer Ruby versions which adds additional
+        # data to the expected 'undefined method `new' for nil:NilClass' exception
+        # https://github.com/ruby/error_highlight/tree/f3626b9032bd1024d058984329accb757687cee4#custom-formatter
+        if defined?(ErrorHighlight)
+          allow(ErrorHighlight::DefaultFormatter).to receive(:message_for).and_return('')
+        end
+      end
+
       it "calls channel_open" do
         expect(authentication).to receive(:send).with(channel_open_failure_payload).once
         connection.channel_open channel_open_payload
