@@ -53,14 +53,11 @@ module HrrRbSsh
           else
             p, g = pg
           end
-          @dh = OpenSSL::PKey::DH.new
-          if @dh.respond_to?(:set_pqg)
-            @dh.set_pqg OpenSSL::BN.new(p, 16), nil, OpenSSL::BN.new(g)
-          else
-            @dh.p = OpenSSL::BN.new(p, 16)
-            @dh.g = OpenSSL::BN.new(g)
-          end
-          @dh.generate_key!
+
+          @dh = Compat::OpenSSL.new_dh_pkey(
+            p: OpenSSL::BN.new(p, 16),
+            g: OpenSSL::BN.new(g)
+          )
           @public_key = @dh.pub_key.to_i
         end
 

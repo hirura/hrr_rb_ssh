@@ -29,14 +29,10 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithms::DiffieHellmanGroup16Sha512 do
     2
   }
   let(:remote_dh){
-    dh = OpenSSL::PKey::DH.new
-    if dh.respond_to?(:set_pqg)
-      dh.set_pqg OpenSSL::BN.new(dh_group16_p, 16), nil, OpenSSL::BN.new(dh_group16_g)
-    else
-      dh.p = OpenSSL::BN.new(dh_group16_p, 16)
-      dh.g = OpenSSL::BN.new(dh_group16_g)
-    end
-    dh.generate_key!
+    dh = HrrRbSsh::Compat::OpenSSL.new_dh_pkey(
+      p: OpenSSL::BN.new(dh_group16_p, 16),
+      g: OpenSSL::BN.new(dh_group16_g)
+    )
     dh
   }
   let(:remote_dh_pub_key){

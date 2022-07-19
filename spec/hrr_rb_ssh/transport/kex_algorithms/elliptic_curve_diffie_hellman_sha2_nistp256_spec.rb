@@ -6,8 +6,12 @@ RSpec.describe HrrRbSsh::Transport::KexAlgorithms::EllipticCurveDiffieHellmanSha
   let(:kex_algorithm){ described_class.new }
   let(:remote_dh){
     dh = OpenSSL::PKey::EC.new(curve_name)
-    dh.generate_key
-    dh
+    if HrrRbSsh::Compat::OpenSSL.openssl_v3?
+      OpenSSL::PKey.generate_key(dh)
+    else
+      dh.generate_key
+      dh
+    end
   }
   let(:remote_dh_public_key){
     remote_dh.public_key.to_bn.to_i

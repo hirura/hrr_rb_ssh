@@ -22,12 +22,23 @@ module HrrRbSsh
 
         def new_by_public_key_blob public_key_blob
           public_key_blob_h = PublicKeyBlob.new(logger: logger).decode public_key_blob
-          @publickey = OpenSSL::PKey::RSA.new
-          if @publickey.respond_to?(:set_key)
-            @publickey.set_key public_key_blob_h[:'n'], public_key_blob_h[:'e'], nil
+          if Compat::OpenSSL.openssl_v3?
+            asn1 = OpenSSL::ASN1::Sequence(
+              [
+                OpenSSL::ASN1::Integer(public_key_blob_h[:'n']),
+                OpenSSL::ASN1::Integer(public_key_blob_h[:'e'])
+              ]
+            )
+
+            @publickey = OpenSSL::PKey::RSA.new(asn1.to_der)
           else
-            @publickey.n = public_key_blob_h[:'n']
-            @publickey.e = public_key_blob_h[:'e']
+            @publickey = OpenSSL::PKey::RSA.new
+            if @publickey.respond_to?(:set_key)
+              @publickey.set_key public_key_blob_h[:'n'], public_key_blob_h[:'e'], nil
+            else
+              @publickey.n = public_key_blob_h[:'n']
+              @publickey.e = public_key_blob_h[:'e']
+            end
           end
         end
 

@@ -7,8 +7,7 @@ module HrrRbSsh
 
         def initialize logger: nil
           self.logger = logger
-          @dh = OpenSSL::PKey::EC.new(self.class::CURVE_NAME)
-          @dh.generate_key
+          @dh = OpenSSL::PKey::EC.generate(self.class::CURVE_NAME)
           @public_key = @dh.public_key.to_bn.to_i
         end
 

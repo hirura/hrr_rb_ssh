@@ -19,8 +19,25 @@ module HrrRbSsh
 
         def new_by_public_key_blob public_key_blob
           public_key_blob_h = PublicKeyBlob.new(logger: logger).decode public_key_blob
-          @publickey = OpenSSL::PKey::EC.new(self.class::CURVE_NAME)
-          @publickey.public_key = OpenSSL::PKey::EC::Point.new(@publickey.group, OpenSSL::BN.new(public_key_blob_h[:'Q'], 2))
+
+          if Compat::OpenSSL.openssl_v3?
+            point = OpenSSL::PKey::EC::Point.new(
+              OpenSSL::PKey::EC::Group.new(self.class::CURVE_NAME),
+              OpenSSL::BN.new(public_key_blob_h[:'Q'], 2)
+            )
+            # Public key
+            asn1 = OpenSSL::ASN1::Sequence([
+              OpenSSL::ASN1::Sequence([
+                OpenSSL::ASN1::ObjectId("id-ecPublicKey"),
+                OpenSSL::ASN1::ObjectId(self.class::CURVE_NAME)
+              ]),
+              OpenSSL::ASN1::BitString(point.to_octet_string(:uncompressed))
+            ])
+            @publickey = OpenSSL::PKey::EC.new(asn1.to_der)
+          else
+            @publickey = OpenSSL::PKey::EC.new(self.class::CURVE_NAME)
+            @publickey.public_key = OpenSSL::PKey::EC::Point.new(@publickey.group, OpenSSL::BN.new(public_key_blob_h[:'Q'], 2))
+          end
         end
 
         def to_pem
