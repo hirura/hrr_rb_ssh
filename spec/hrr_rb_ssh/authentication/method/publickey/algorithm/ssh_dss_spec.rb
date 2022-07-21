@@ -146,8 +146,8 @@ yFHINL3X2CjZDKKLJ2Fl
       let(:hash){ OpenSSL::Digest.digest(digest, data) }
       let(:sign_der){ pkey.syssign(hash) }
       let(:sign_asn1){ OpenSSL::ASN1.decode(sign_der) }
-      let(:sign_r){ sign_asn1.value[0].value.to_s(2).rjust(20, ["00"].pack("H")) }
-      let(:sign_s){ sign_asn1.value[1].value.to_s(2).rjust(20, ["00"].pack("H")) }
+      let(:sign_r){ sign_asn1.value[0].value.to_s(2).rjust(28, ["00"].pack("H")) }
+      let(:sign_s){ sign_asn1.value[1].value.to_s(2).rjust(28, ["00"].pack("H")) }
       let(:signature_blob){ sign_r + sign_s }
       let(:signature){
         [
@@ -165,8 +165,8 @@ yFHINL3X2CjZDKKLJ2Fl
       let(:hash){ OpenSSL::Digest.digest(digest, data) }
       let(:sign_der){ pkey.syssign(hash) }
       let(:sign_asn1){ OpenSSL::ASN1.decode(sign_der) }
-      let(:sign_r){ sign_asn1.value[0].value.to_s(2).rjust(20, ["00"].pack("H")) }
-      let(:sign_s){ sign_asn1.value[1].value.to_s(2).rjust(20, ["00"].pack("H")) }
+      let(:sign_r){ sign_asn1.value[0].value.to_s(2).rjust(28, ["00"].pack("H")) }
+      let(:sign_s){ sign_asn1.value[1].value.to_s(2).rjust(28, ["00"].pack("H")) }
       let(:signature_blob){ sign_r + sign_s }
       let(:signature){
         [
@@ -184,8 +184,8 @@ yFHINL3X2CjZDKKLJ2Fl
       let(:hash){ OpenSSL::Digest.digest(digest, data) }
       let(:sign_der){ pkey.syssign(hash) }
       let(:sign_asn1){ OpenSSL::ASN1.decode(sign_der) }
-      let(:sign_r){ sign_asn1.value[0].value.to_s(2).rjust(20, ["00"].pack("H")) }
-      let(:sign_s){ sign_asn1.value[1].value.to_s(2).rjust(20, ["00"].pack("H")) }
+      let(:sign_r){ sign_asn1.value[0].value.to_s(2).rjust(28, ["00"].pack("H")) }
+      let(:sign_s){ sign_asn1.value[1].value.to_s(2).rjust(28, ["00"].pack("H")) }
       let(:signature_blob){ sign_r + sign_s }
       let(:incorrect_signature_blob){ "incorrect" + signature_blob }
       let(:signature){

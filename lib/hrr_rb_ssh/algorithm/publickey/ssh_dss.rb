@@ -56,8 +56,8 @@ module HrrRbSsh
           hash = OpenSSL::Digest.digest(self.class::DIGEST, signature_blob)
           sign_der = @publickey.syssign(hash)
           sign_asn1 = OpenSSL::ASN1.decode sign_der
-          sign_r = sign_asn1.value[0].value.to_s(2).rjust(20, ["00"].pack("H"))
-          sign_s = sign_asn1.value[1].value.to_s(2).rjust(20, ["00"].pack("H"))
+          sign_r = sign_asn1.value[0].value.to_s(2).rjust(28, ["00"].pack("H"))
+          sign_s = sign_asn1.value[1].value.to_s(2).rjust(28, ["00"].pack("H"))
           signature_h = {
             :'public key algorithm name' => self.class::NAME,
             :'signature blob'            => (sign_r + sign_s),
@@ -67,8 +67,8 @@ module HrrRbSsh
 
         def verify signature, signature_blob
           signature_h = Signature.new(logger: logger).decode signature
-          sign_r = signature_h[:'signature blob'][ 0, 20]
-          sign_s = signature_h[:'signature blob'][20, 20]
+          sign_r = signature_h[:'signature blob'][ 0, 28]
+          sign_s = signature_h[:'signature blob'][28, 28]
           sign_asn1 = OpenSSL::ASN1::Sequence.new(
             [
               OpenSSL::ASN1::Integer.new(OpenSSL::BN.new(sign_r, 2)),
