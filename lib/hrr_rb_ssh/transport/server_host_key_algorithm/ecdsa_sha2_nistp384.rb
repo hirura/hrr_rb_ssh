@@ -7,7 +7,7 @@ module HrrRbSsh
         NAME = 'ecdsa-sha2-nistp384'
         PREFERENCE = 40
         IDENTIFIER = 'nistp384'
-        SECRET_KEY = OpenSSL::PKey::EC.new('secp384r1').generate_key.to_pem
+        SECRET_KEY = OpenSSL::PKey::EC.generate('secp384r1').to_pem
 
         include Functionable
       end

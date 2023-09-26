@@ -7,6 +7,10 @@ if ENV['CI']
   end
 end
 
+# Enable legacy providers such as blowfish-cbc, cast128-cbc, arcfour
+ENV['OPENSSL_CONF'] = File.expand_path(
+  File.join(File.dirname(__FILE__), 'support', 'openssl.conf')
+)
 require "hrr_rb_ssh"
 
 RSpec.configure do |config|

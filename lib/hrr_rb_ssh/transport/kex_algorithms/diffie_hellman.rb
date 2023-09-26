@@ -7,14 +7,10 @@ module HrrRbSsh
 
         def initialize logger: nil
           self.logger = logger
-          @dh = OpenSSL::PKey::DH.new
-          if @dh.respond_to?(:set_pqg)
-            @dh.set_pqg OpenSSL::BN.new(self.class::P, 16), nil, OpenSSL::BN.new(self.class::G)
-          else
-            @dh.p = OpenSSL::BN.new(self.class::P, 16)
-            @dh.g = OpenSSL::BN.new(self.class::G)
-          end
-          @dh.generate_key!
+          @dh = Compat::OpenSSL.new_dh_pkey(
+            p: OpenSSL::BN.new(self.class::P, 16),
+            g: OpenSSL::BN.new(self.class::G)
+          )
           @public_key = @dh.pub_key.to_i
         end
 

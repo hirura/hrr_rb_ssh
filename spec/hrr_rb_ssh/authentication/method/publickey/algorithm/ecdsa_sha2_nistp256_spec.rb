@@ -80,11 +80,15 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE9DPmu6CIA5VCBaN9wpUP2UUZQ+dw
   end
 
   describe '#verify_signature' do
-    let(:private_key_str){
+    let(:private_key_str_parameters) do
       <<-'EOB'
 -----BEGIN EC PARAMETERS-----
 BggqhkjOPQMBBw==
 -----END EC PARAMETERS-----
+      EOB
+    end
+    let(:private_key_str_value){
+      <<-'EOB'
 -----BEGIN EC PRIVATE KEY-----
 MHcCAQEEIMNO6iWvjR+WGE9Yb51+olsKidn3sTNhhbgwlBqft78GoAoGCCqGSM49
 AwEHoUQDQgAE9DPmu6CIA5VCBaN9wpUP2UUZQ+dw77mTZ7lD+z5cjzF7OL/cPL1/
@@ -92,7 +96,21 @@ zklAsYaH7z7OcPYRbe24QCG5YfJQZjevJQ==
 -----END EC PRIVATE KEY-----
       EOB
     }
-    let(:pkey){ OpenSSL::PKey::EC.new private_key_str }
+
+    let(:private_key_str){
+      <<-EOB
+#{private_key_str_parameters}
+#{private_key_str_value}
+      EOB
+    }
+
+    let(:pkey) do
+      if HrrRbSsh::Compat::OpenSSL.openssl_v3?
+        OpenSSL::PKey::EC.new(private_key_str_value)
+      else
+        OpenSSL::PKey::EC.new(private_key_str)
+      end
+    end
     let(:public_key_blob){
       [
         HrrRbSsh::DataTypes::String.encode(name),

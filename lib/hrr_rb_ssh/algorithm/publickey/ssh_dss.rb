@@ -22,18 +22,40 @@ module HrrRbSsh
 
         def new_by_public_key_blob public_key_blob
           public_key_blob_h = PublicKeyBlob.new(logger: logger).decode public_key_blob
-          @publickey = OpenSSL::PKey::DSA.new
-          if @publickey.respond_to?(:set_pqg)
-            @publickey.set_pqg public_key_blob_h[:'p'], public_key_blob_h[:'q'], public_key_blob_h[:'g']
+          if Compat::OpenSSL.openssl_v3?
+            asn1 = OpenSSL::ASN1::Sequence.new(
+              [
+                OpenSSL::ASN1::Sequence.new(
+                  [
+                    OpenSSL::ASN1::ObjectId.new('DSA'),
+                    OpenSSL::ASN1::Sequence.new(
+                      [
+                        OpenSSL::ASN1::Integer.new(public_key_blob_h[:'p']),
+                        OpenSSL::ASN1::Integer.new(public_key_blob_h[:'q']),
+                        OpenSSL::ASN1::Integer.new(public_key_blob_h[:'g'])
+                      ]
+                    )
+                  ]
+                ),
+                OpenSSL::ASN1::BitString.new(OpenSSL::ASN1::Integer.new(public_key_blob_h[:'y']).to_der)
+              ]
+            )
+
+            @publickey = OpenSSL::PKey::DSA.new(asn1.to_der)
           else
-            @publickey.p = public_key_blob_h[:'p']
-            @publickey.q = public_key_blob_h[:'q']
-            @publickey.g = public_key_blob_h[:'g']
-          end
-          if @publickey.respond_to?(:set_key)
-            @publickey.set_key public_key_blob_h[:'y'], nil
-          else
-            @publickey.pub_key = public_key_blob_h[:'y']
+            @publickey = OpenSSL::PKey::DSA.new
+            if @publickey.respond_to?(:set_pqg)
+              @publickey.set_pqg public_key_blob_h[:'p'], public_key_blob_h[:'q'], public_key_blob_h[:'g']
+            else
+              @publickey.p = public_key_blob_h[:'p']
+              @publickey.q = public_key_blob_h[:'q']
+              @publickey.g = public_key_blob_h[:'g']
+            end
+            if @publickey.respond_to?(:set_key)
+              @publickey.set_key public_key_blob_h[:'y'], nil
+            else
+              @publickey.pub_key = public_key_blob_h[:'y']
+            end
           end
         end
 

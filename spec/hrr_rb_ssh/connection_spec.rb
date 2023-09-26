@@ -578,7 +578,7 @@ RSpec.describe HrrRbSsh::Connection do
           :'message number'      => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_FAILURE::VALUE,
           :'recipient channel'   => 0,
           :'reason code'         => HrrRbSsh::Messages::SSH_MSG_CHANNEL_OPEN_FAILURE::ReasonCode::SSH_OPEN_CONNECT_FAILED,
-          :'description'         => "undefined method `new' for nil:NilClass",
+          :'description'         => Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.3.0') ? "undefined method `new' for nil" : "undefined method `new' for nil:NilClass",
           :'language tag'        => "",
         }
       }
